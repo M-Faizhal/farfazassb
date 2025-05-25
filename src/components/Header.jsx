@@ -1,8 +1,12 @@
 import { Link } from 'react-router-dom'
+import { useState } from 'react'
+import { Menu, X } from 'lucide-react' // pastikan sudah install lucide-react
 
 function Header() {
+  const [menuOpen, setMenuOpen] = useState(false)
+
   return (
-    <header className="flex items-center justify-between px-6 py-4 max-w-7xl mx-auto">
+    <header className="px-6 py-4 max-w-7xl mx-auto flex items-center justify-between relative">
       <div className="flex items-center space-x-2">
         <img
           src="https://storage.googleapis.com/a1aa/image/d4a3db35-e74d-46a8-743b-28f01d0479b9.jpg"
@@ -11,19 +15,38 @@ function Header() {
         />
         <span className="font-semibold text-sm select-none">FARFAZA FC</span>
       </div>
+
+      {/* Desktop Nav */}
       <nav className="hidden md:flex space-x-8 text-sm font-medium">
-        <a className="hover:text-gray-700" href="#">Home</a>
-        <a className="hover:text-gray-700" href="#">About Us</a>
-        <a className="hover:text-gray-700" href="#">Staff Pelatih</a>
-        <a className="hover:text-gray-700" href="#">Team</a>
-        <a className="hover:text-gray-700" href="#">Contact</a>
+        <Link className="hover:text-gray-700" to="/">Home</Link>
+        <Link className="hover:text-gray-700" to="#">About Us</Link>
+        <Link className="hover:text-gray-700" to="/staff">Staff Pelatih</Link>
+        <Link className="hover:text-gray-700" to="#">Team</Link>
+        <Link className="hover:text-gray-700" to="#">Contact</Link>
       </nav>
-      <Link
-        to="/login"
-        className="hidden md:inline-block bg-green-500 hover:bg-green-600 text-white text-sm font-semibold px-4 py-2 rounded-full"
-      >
-        Get Started
-      </Link>
+
+      {/* Mobile Button */}
+      <button className="md:hidden" onClick={() => setMenuOpen(!menuOpen)}>
+        {menuOpen ? <X size={24} /> : <Menu size={24} />}
+      </button>
+
+      {/* Mobile Menu */}
+      {menuOpen && (
+        <div className="absolute top-full left-0 w-full bg-white shadow-md p-4 flex flex-col space-y-3 text-sm font-medium md:hidden z-10">
+          <Link onClick={() => setMenuOpen(false)} to="/">Home</Link>
+          <Link onClick={() => setMenuOpen(false)} to="#">About Us</Link>
+          <Link onClick={() => setMenuOpen(false)} to="/staff">Staff Pelatih</Link>
+          <Link onClick={() => setMenuOpen(false)} to="#">Team</Link>
+          <Link onClick={() => setMenuOpen(false)} to="#">Contact</Link>
+          <Link
+            onClick={() => setMenuOpen(false)}
+            to="/login"
+            className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-full text-center"
+          >
+            Get Started
+          </Link>
+        </div>
+      )}
     </header>
   )
 }
