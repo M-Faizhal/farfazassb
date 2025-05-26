@@ -23,6 +23,12 @@ function Header() {
         <Link className="hover:text-gray-700" to="/staff">Staff Pelatih</Link>
         <Link className="hover:text-gray-700" to="#">Team</Link>
         <Link className="hover:text-gray-700" to="#">Contact</Link>
+        <Link
+    to="/login"
+    className="ml-4 bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-full"
+  >
+    Get Started
+  </Link>
       </nav>
 
       {/* Mobile Button */}
