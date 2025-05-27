@@ -1,4 +1,3 @@
-import './App.css'
 import { Routes, Route, useLocation } from 'react-router-dom'
 import Login from './pages/Login'
 import Home from './pages/Home'
@@ -11,7 +10,7 @@ function App() {
   const hideHeaderRoutes = ['/login']
 
   return (
-    <>
+    <div className='font-poppins'>
       <Routes>
         <Route path="/login" element={<Login />} />
         <Route path="/" element={<Home />} />
@@ -19,7 +18,7 @@ function App() {
         <Route path="/about" element={<About />} />
         <Route path="/contact" element={<Contact />} />
       </Routes>
-    </>
+    </div>
   )
 }
 
