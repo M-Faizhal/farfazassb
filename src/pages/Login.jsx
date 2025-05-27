@@ -1,14 +1,32 @@
+import axios from "axios";
 import { useState } from "react";
+import { useCookies } from "react-cookie";
+import toast from "react-hot-toast";
 
 function Login() {
 
+  const env = import.meta.env;
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [, setCookie,] = useCookies([env.VITE_COOKIES_NAME]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
-  };
 
+    if (!email || !password) {
+      toast.error("Email dan Password tidak boleh kosong!");
+      return;
+    }else{
+      axios.post(env.VITE_API_URL + "/auth/login", {
+        email: email,
+        password: password
+      }).then((res) => {
+        setCookie(env.VITE_COOKIES_NAME, res.data.token)
+      }).catch(err=>{
+        toast.error(err.response.data.message)
+      })
+    }
+  };
 
   return (
     <div className="flex flex-row items-center w-screen justify-between h-screen overflow-hidden">
@@ -21,7 +39,7 @@ function Login() {
             <input type="email" onChange={e=>setEmail(e.target.value)} placeholder="Email" className="text-md outline-none border-1 rounded-md py-3 w-full px-5"  />
             <input type="password" onChange={e=>setPassword(e.target.value)} placeholder="Password" className="text-md outline-none border-1 rounded-md py-3 w-full px-5"  />
           </div>
-          <button className="font-bold w-full h-13 bg-black text-white rounded-md">
+          <button onClick={handleSubmit} className="cursor-pointer font-bold w-full h-13 bg-black text-white rounded-md">
             Masuk
           </button>
         </div>
