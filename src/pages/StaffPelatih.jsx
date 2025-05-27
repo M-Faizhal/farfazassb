@@ -75,4 +75,4 @@ function StaffPelatih(){
       )}
 
 
-export default StaffPelatih
+export default StaffPelatih;

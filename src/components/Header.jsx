@@ -22,7 +22,7 @@ function Header() {
         <Link className="hover:text-gray-700 py-2" to="/about">About Us</Link>
         <Link className="hover:text-gray-700 py-2" to="/staff">Staff Pelatih</Link>
         <Link className="hover:text-gray-700 py-2" to="#">Team</Link>
-        <Link className="hover:text-gray-700 py-2" to="#">Contact</Link>
+        <Link className="hover:text-gray-700 py-2" to="/contact">Contact</Link>
         <Link
     to="/login"
     className="ml-4 bg-[#27548A] hover:bg-[#27548aaf] text-white px-4 py-2 rounded-full"
@@ -40,14 +40,14 @@ function Header() {
       {menuOpen && (
         <div className="absolute top-full left-0 w-full bg-white shadow-md p-4 flex flex-col space-y-3 text-sm font-medium md:hidden z-10">
           <Link onClick={() => setMenuOpen(false)} to="/">Home</Link>
-          <Link onClick={() => setMenuOpen(false)} to="#">About Us</Link>
+          <Link onClick={() => setMenuOpen(false)} to="/about">About Us</Link>
           <Link onClick={() => setMenuOpen(false)} to="/staff">Staff Pelatih</Link>
           <Link onClick={() => setMenuOpen(false)} to="#">Team</Link>
-          <Link onClick={() => setMenuOpen(false)} to="#">Contact</Link>
+          <Link onClick={() => setMenuOpen(false)} to="/contact">Contact</Link>
           <Link
             onClick={() => setMenuOpen(false)}
             to="/login"
-            className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-full text-center"
+            className="bg-[#27548A] hover:bg-[#27548aaf] text-white px-4 py-2 rounded-full text-center"
           >
             Get Started
           </Link>
