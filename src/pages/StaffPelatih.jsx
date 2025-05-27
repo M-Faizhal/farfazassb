@@ -3,7 +3,7 @@ function StaffPelatih(){
     return (
         <>
           <Header />
-          <main className="max-w-7xl mx-auto px-6">
+          <main className="max-w-7xl mx-auto px-6 pt-20">
             {/* Hero Section */}
             <section class="max-w-6xl mx-auto px-4 py-12">
   <h2 class="text-center font-extrabold text-2xl md:text-3xl mb-2">

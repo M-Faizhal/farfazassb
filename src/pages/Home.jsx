@@ -4,7 +4,7 @@ function Home() {
   return (
     <>
       <Header />
-      <main className="max-w-7xl mx-auto px-6">
+      <main className="max-w-7xl mx-auto px-6 pt-20">
         {/* Hero Section */}
         <section className="relative mt-6 rounded-lg overflow-hidden max-w-4xl mx-auto">
           <img

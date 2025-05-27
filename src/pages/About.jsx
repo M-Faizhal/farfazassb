@@ -4,7 +4,7 @@ function About() {
   return (
     <>
       <Header />
-      
+      <main className ='pt-20'>
       {/* About Us Section */}
       <section className="bg-[#27548A] pt-12 pb-20 px-4 sm:px-6 lg:px-8">
         <div className="max-w-4xl mx-auto text-center relative text-white">
@@ -111,6 +111,7 @@ function About() {
             </div>
           </div>
         </section>
+      </main>
       </main>
     </>
   );
