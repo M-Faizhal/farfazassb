@@ -35,11 +35,23 @@ function Login() {
             <h1 className="font-bold text-3xl text-start">Masuk</h1>
             <p className="text-md text-start text-md">Isi identitas dengan benar!</p>
           </div>
-          <div className="flex flex-col gap-2 mt-5 mb-5">
-            <input type="email" onChange={e=>setEmail(e.target.value)} placeholder="Email" className="text-md outline-none border-1 rounded-md py-3 w-full px-5"  />
-            <input type="password" onChange={e=>setPassword(e.target.value)} placeholder="Password" className="text-md outline-none border-1 rounded-md py-3 w-full px-5"  />
-          </div>
-          <button onClick={handleSubmit} className="cursor-pointer font-bold w-full h-13 bg-black text-white rounded-md">
+         <div className="flex flex-col gap-2 mt-5 mb-5">
+          
+  <input
+    type="email"
+    onChange={(e) => setEmail(e.target.value)}
+    placeholder="Email"
+    className="text-md outline-none border border-gray-300 rounded-full py-3 w-full px-5"
+  />
+  <input
+    type="password"
+    onChange={(e) => setPassword(e.target.value)}
+    placeholder="Password"
+    className="text-md outline-none border border-gray-300 rounded-full py-3 w-full px-5"
+  />
+
+</div>
+          <button onClick={handleSubmit} className="cursor-pointer font-bold w-full h-13 bg-black text-white rounded-full">
             Masuk
           </button>
         </div>
