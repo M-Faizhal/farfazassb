@@ -5,7 +5,7 @@ function Contact() {
   return (
     <>
       <Header />
-      <main className="max-w-7xl mx-auto px-6">
+      <main className="max-w-7xl mx-auto px-6 pt-20">
         <section className="relative min-h-screen bg-[#27548A] text-white">
           <div className="relative max-w-7xl mx-auto px-6 py-20 flex flex-wrap md:flex-nowrap gap-12 md:gap-24">
 
