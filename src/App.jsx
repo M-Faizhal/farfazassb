@@ -1,9 +1,9 @@
 import { Routes, Route, useLocation } from 'react-router-dom'
-import Login from './pages/Login'
-import Home from './pages/Home'
-import StaffPelatih from './pages/StaffPelatih'
-import About from './pages/About'
-import Contact from './pages/Contact'
+import Login from './pages/Public/Login'
+import Home from './pages/Public/Home'
+import StaffPelatih from './pages/Public/StaffPelatih'
+import About from './pages/Public/About'
+import Contact from './pages/Public/Contact'
 
 function App() {
   const location = useLocation()
@@ -12,8 +12,8 @@ function App() {
   return (
     <div className='font-poppins'>
       <Routes>
-        <Route path="/login" element={<Login />} />
         <Route path="/" element={<Home />} />
+        <Route path="/login" element={<Login />} />
         <Route path="/staff" element={<StaffPelatih />} />
         <Route path="/about" element={<About />} />
         <Route path="/contact" element={<Contact />} />
