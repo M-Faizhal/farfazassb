@@ -3,4 +3,6 @@
 
 @theme {
   --font-poppins: 'Poppins', sans-serif;
+  --color-primary: #27548A ;
+  --color-primary-200: #27548aaf ;
 }

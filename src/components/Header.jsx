@@ -26,7 +26,7 @@ function Header() {
           <Link className="hover:text-gray-700 py-2" to="/contact">Contact</Link>
           <Link
             to="/login"
-            className="ml-4 bg-[#27548A] hover:bg-[#27548aaf] text-white px-4 py-2 rounded-full"
+            className="ml-4 bg-primary hover:bg-primary-200 text-white px-4 py-2 rounded-full"
           >
             Get Started
           </Link>

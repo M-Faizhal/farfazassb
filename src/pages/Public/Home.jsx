@@ -17,15 +17,18 @@ function Home() {
             <h1 className="text-white font-extrabold text-2xl sm:text-3xl md:text-4xl leading-tight max-w-2xl drop-shadow-lg">
               Membangun Bakat, Membentuk Masa Depan
             </h1>
-            <form className="mt-6 w-full max-w-md flex items-center bg-white rounded-full shadow-md overflow-hidden">
-              <input
+            <form className="mt-6 w-full max-w-md flex h-15 justify-between items-center bg-white rounded-2xl shadow-md overflow-hidden">
+              <div className='flex items-center w-full'>
+                <img className='ml-5 mr-2' src="/assets/search.svg" alt="search" />
+                <input
                 type="search"
                 placeholder="Cari program pelatihan..."
-                className="flex-grow px-4 py-2 text-sm text-gray-700 placeholder-gray-400 focus:outline-none"
+                className="flex-grow text-sm text-gray-700 placeholder-gray-400 focus:outline-none"
               />
+              </div>
               <button
                 type="submit"
-                className="bg-green-500 hover:bg-green-600 text-white px-5 py-2 text-sm font-semibold"
+                className="bg-primary rounded-2xl hover:bg-primary-200 cursor-pointer text-white px-8 h-full text-sm font-semibold"
               >
                 Cari
               </button>
