@@ -5,16 +5,15 @@ function Home() {
     <>
       <Header />
       <main className="max-w-7xl mx-auto px-4 sm:px-6 pt-20">
-        {/* Hero Section */}
-        <section className="relative mt-6 rounded-lg overflow-hidden max-w-5xl mx-auto shadow-lg">
-          <div className="aspect-video w-full">
+        <section className="relative mt-6 rounded-lg overflow-hidden max-w-5xl mx-auto">
+          <div className="aspect-video w-full relative">
             <img
-              src="https://storage.googleapis.com/a1aa/image/31f9c3b9-d15c-49d7-eff0-0297b0307981.jpg"
+              src="/assets/login-image.svg"
               alt="Kids playing soccer"
               className="w-full h-full object-cover"
             />
           </div>
-          <div className="absolute inset-0 bg-black bg-opacity-40 flex flex-col justify-center items-center px-6 text-center">
+          <div className="absolute inset-0 flex flex-col justify-center items-center px-6 text-center">
             <h1 className="text-white font-extrabold text-2xl sm:text-3xl md:text-4xl leading-tight max-w-2xl drop-shadow-lg">
               Membangun Bakat, Membentuk Masa Depan
             </h1>
@@ -34,20 +33,22 @@ function Home() {
           </div>
         </section>
 
-        {/* Pelatih Section */}
         <section className="mt-16 max-w-5xl mx-auto">
-          <h2 className="text-xl font-semibold mb-6 text-center">Pelatih</h2>
+          <h2 className="text-xl font-bold mb-6 text-center">Pelatih</h2>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-6">
             {[...Array(4)].map((_, i) => (
               <div key={i} className="relative rounded-lg overflow-hidden shadow-sm">
+                <div className='w-full h-full'>
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/30 to-transparent"></div>
                 <img
                   src="https://storage.googleapis.com/a1aa/image/30b557af-a7a2-4a7e-06c5-f8aee2ff07fe.jpg"
                   alt="Coach"
-                  className="w-full h-48 object-cover"
+                  className="w-full h-60 object-cover"
                 />
-                <div className="absolute bottom-2 left-2 text-white text-sm font-medium bg-black bg-opacity-60 rounded px-2 py-1">
-                  <div>Coach</div>
-                  <div className="font-bold">Alibaba</div>
+                <div className="absolute bottom-2 left-2 text-white text-sm font-medium rounded px-2 py-1">
+                  <p className='font-semibold'>Coach</p>
+                  <p className="font-bold text-2xl">Alibaba</p>
+                </div>
                 </div>
               </div>
             ))}
