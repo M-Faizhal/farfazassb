@@ -7,22 +7,23 @@ const AdminSidebar = () => {
   const [menuOpen, setMenuOpen] = useState(false);
 
   const menuItems = [
-    { name: 'Siswa', path: '/admin/dashboard/siswa' },
-    { name: 'Pelatih', path: '/admin/dashboard/pelatih' },
-    { name: 'Kehadiran', path: '/admin/dashboard/kehadiran' },
-    { name: 'Nilai', path: '/admin/dashboard/nilai' },
-    { name: 'Prestasi', path: '/admin/dashboard/prestasi' },
-    { name: 'Akun Orang Tua', path: '/admin/dashboard/orangtua' },
+    { name: 'Dashboard', path: '/admin/dashboard' },
+    { name: 'Siswa', path: '/admin/siswa' },
+    { name: 'Pelatih', path: '/admin/pelatih' },
+    { name: 'Kehadiran', path: '/admin/kehadiran' },
+    { name: 'Nilai', path: '/admin/nilai' },
+    { name: 'Prestasi', path: '/admin/prestasi' },
+    { name: 'Akun Orang Tua', path: '/admin/orangtua' },
   ];
 
   const SidebarContent = (
     <div className="flex flex-col px-6 py-8 space-y-6 bg-white h-full w-64 border-r border-gray-200">
       <div className="flex items-center justify-between md:justify-start space-x-2">
-        <div className="flex items-center space-x-2">
+        <div className="flex items-center ">
           <img
-            src="https://storage.googleapis.com/a1aa/image/bb90e843-86ae-4b5d-8625-65cd7b3ae954.jpg"
+            src="../../../public/assets/logo.png"
             alt="FARFAZA FC"
-            className="w-6 h-6"
+            className="w-18 h-16"
           />
           <span className="font-bold text-blue-900 text-sm">FARFAZA FC</span>
         </div>
@@ -44,7 +45,7 @@ const AdminSidebar = () => {
               onClick={() => setMenuOpen(false)} // close drawer after click
               className={`px-3 py-2 rounded-md text-left font-medium transition-colors ${
                 isActive
-                  ? 'bg-blue-100 text-black font-semibold'
+                  ? 'bg-[#d8d6f4] text-black font-semibold'
                   : 'hover:bg-gray-100 text-gray-700'
               }`}
             >

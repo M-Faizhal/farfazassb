@@ -34,17 +34,18 @@ function AdminLogin() {
 
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4 font-[Poppins]">
-      <div className="max-w-md w-full bg-white shadow-2xl rounded-2xl p-8">
-        <div className="flex items-center justify-center mb-6">
-          <img
-            src="https://storage.googleapis.com/a1aa/image/355b2e78-c762-4f2e-00d1-4e3fcfc447b3.jpg"
-            alt="FARFAZA FC logo"
-            className="w-14 h-14 object-contain rounded-full shadow"
-          />
-          <span className="ml-3 font-extrabold text-lg text-blue-600">FARFAZA FC</span>
-        </div>
+      <div className="max-w-md w-full bg-white shadow-xl rounded-2xl p-8">
+      <div className="flex items-center justify-center mb-6">
+      <img
+        src="/assets/logo.png"
+        alt="FARFAZA FC logo"
+        className="w-16 h-16 object-cover"
+      />
+      <span className="font-extrabold text-lg text-gray-900">FARFAZA FC</span>
+    </div>
 
-        <h2 className="text-center text-2xl font-bold text-gray-800 mb-8">
+
+        <h2 className="text-center text-2xl font-semibold text-gray-800 mb-8">
           Admin Login
         </h2>
 
@@ -89,7 +90,7 @@ function AdminLogin() {
 
           <button
             type="submit"
-            className="w-full py-2 bg-blue-600 hover:bg-blue-700 transition text-white font-semibold rounded-lg shadow-md text-sm"
+          className=" px-5 py-2 border border-[#29278C] rounded-md font-semibold transition duration-200 w-full bg-[#29278C] text-white hover:shadow-md"
           >
             Login
           </button>

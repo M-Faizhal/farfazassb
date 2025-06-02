@@ -10,9 +10,9 @@ function Header() {
       <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between relative">
         <div className="flex items-center space-x-2">
           <img
-            src="https://storage.googleapis.com/a1aa/image/d4a3db35-e74d-46a8-743b-28f01d0479b9.jpg"
+            src="../../public/assets/logo.png"
             alt="FARFAZA FC logo"
-            className="w-8 h-8"
+            className="w-18 h-16"
           />
           <span className="font-semibold text-sm select-none">FARFAZA FC</span>
         </div>

@@ -10,6 +10,7 @@ import Contact from './pages/Public/Contact'
 // Admin Pages
 import AdminLogin from './pages/Admin/Auth/Login'
 import AdminDashboard from './pages/Admin/Dashboard'
+import Siswa from './pages/Admin/Siswa'
 
 function App() {
   const location = useLocation()
@@ -27,7 +28,8 @@ function App() {
 
         {/* Admin Pages */}
         <Route path="/admin/login" element={<AdminLogin />} />
-        <Route path="/admin/dashboard/siswa" element={<AdminDashboard />} />
+        <Route path="/admin/dashboard" element={<AdminDashboard />} />
+        <Route path="/admin/siswa" element={<Siswa />} />
       </Routes>
     </div>
   )
