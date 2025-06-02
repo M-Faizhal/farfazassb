@@ -3,7 +3,7 @@ import { useState } from "react";
 import { useCookies } from "react-cookie";
 import toast from "react-hot-toast";
 
-function Login() {
+function UserLogin() {
 
   const env = import.meta.env;
   const [email, setEmail] = useState("");
@@ -60,4 +60,4 @@ function Login() {
   );
 }
 
-export default Login;
+export default UserLogin;
