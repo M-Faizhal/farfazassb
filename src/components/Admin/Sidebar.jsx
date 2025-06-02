@@ -37,7 +37,7 @@ const AdminSidebar = () => {
 
       <nav className="flex flex-col space-y-2">
         {menuItems.map((item) => {
-          const isActive = location.pathname === item.path;
+          const isActive = location.pathname.startsWith(item.path);
           return (
             <NavLink
               key={item.name}

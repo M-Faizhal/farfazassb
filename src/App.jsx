@@ -11,6 +11,8 @@ import Contact from './pages/Public/Contact'
 import AdminLogin from './pages/Admin/Auth/Login'
 import AdminDashboard from './pages/Admin/Dashboard'
 import Siswa from './pages/Admin/Siswa'
+import CreateSiswa from './pages/Admin/Siswa/CreateSiswa'
+import EditSiswa from './pages/Admin/Siswa/EditSiswa'
 
 function App() {
   const location = useLocation()
@@ -30,6 +32,8 @@ function App() {
         <Route path="/admin/login" element={<AdminLogin />} />
         <Route path="/admin/dashboard" element={<AdminDashboard />} />
         <Route path="/admin/siswa" element={<Siswa />} />
+        <Route path="/admin/siswa/create" element={<CreateSiswa />} />  
+        <Route path="/admin/siswa/edit" element={<EditSiswa />} />  
       </Routes>
     </div>
   )

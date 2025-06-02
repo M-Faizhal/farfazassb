@@ -85,7 +85,7 @@ const Siswa = () => {
           <div className="flex justify-between items-center mb-6 mt-6">
             <h1 className="text-xl font-bold text-black">Data Siswa</h1>
             <Link
-              to="/admin/dashboard/siswa/new"
+              to="/admin/siswa/create"
               className="bg-[#1F3C86] text-white font-medium px-4 py-2 rounded-md"
             >
               New Student
@@ -163,7 +163,7 @@ const Siswa = () => {
                         <td className="px-4 py-3">{siswa.kategoriBMI}</td>
                         <td className="px-4 py-3 text-right">
                           <div className="flex justify-end gap-3">
-                            <Link to={`/admin/dashboard/siswa/${siswa.id}`}>
+                            <Link to={`/admin/siswa/edit`}>
                               <FiEdit className="text-[#1F3C86] w-5 h-5 hover:scale-110" />
                             </Link>
                             <button onClick={() => handleOpenModal(siswa.id)}>
