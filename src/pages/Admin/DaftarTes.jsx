@@ -38,11 +38,13 @@ const DaftarTes = () => {
   const sortedTesList = tesList.sort((a, b) => new Date(a.tanggal) - new Date(b.tanggal));
 
   return (
-    <div className="bg-gradient-to-br from-gray-50 via-white to-gray-100 min-h-screen font-sans text-gray-800">
-      <div className="flex min-h-screen">
+    <div className="bg-[#f7f7f7] min-h-screen text-sm text-[#333]">
+      <div className="flex flex-col md:flex-row mx-auto min-h-screen">
         <AdminSidebar />
-        <main className="flex-1 p-8 max-w-7xl mx-auto">
+        
+        <main className="flex-1 px-6 py-8">
           <AdminHeader />
+          
           <div className="flex justify-between items-center mb-6 mt-6">
             <h1 className="text-xl font-bold text-black">Daftar Tes</h1>
             <Link
@@ -54,20 +56,22 @@ const DaftarTes = () => {
           </div>
 
           {sortedTesList.length === 0 ? (
-            <p className="text-gray-500 text-center mt-20 text-xl">
-              Tidak ada data tes tersedia.
-            </p>
+            <div className="bg-white rounded-md border border-gray-200 shadow-sm p-8">
+              <p className="text-gray-500 text-center text-lg">
+                Tidak ada data tes tersedia.
+              </p>
+            </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 md:gap-6">
               {sortedTesList.map((tes) => (
                 <div
                   key={tes.id}
-                  className="bg-white rounded-2xl p-6 shadow-md hover:shadow-xl border border-gray-200 hover:border-[#1F3C86] transition-all duration-300 cursor-pointer"
+                  className="bg-white rounded-md p-4 md:p-6 shadow-sm hover:shadow-md border border-gray-200 hover:border-primary transition-all duration-300 cursor-pointer"
                 >
-                  <h2 className="text-xl font-bold text-[#1F3C86] mb-2 tracking-wide select-none">
+                  <h2 className="text-lg md:text-xl font-bold text-primary mb-2 tracking-wide select-none">
                     {tes.id}
                   </h2>
-                  <p className="text-gray-600 mb-1">
+                  <p className="text-gray-600 mb-1 text-xs md:text-sm">
                     <span className="font-semibold">Tanggal:</span>{' '}
                     {new Date(tes.tanggal).toLocaleDateString('id-ID', {
                       day: 'numeric',
@@ -75,27 +79,27 @@ const DaftarTes = () => {
                       year: 'numeric',
                     })}
                   </p>
-                  <p className="text-gray-600 mb-1">
+                  <p className="text-gray-600 mb-1 text-xs md:text-sm">
                     <span className="font-semibold">Jumlah Siswa:</span>{' '}
                     {tes.jumlahSiswa}
                   </p>
-                  <p className="text-gray-600 mb-4">
+                  <p className="text-gray-600 mb-4 text-xs md:text-sm">
                     <span className="font-semibold">Nama Pelatih:</span>{' '}
                     {tes.namaPelatih ? tes.namaPelatih : 'Tidak tersedia'}
                   </p>
-                  <div className="flex justify-between">
+                  <div className="flex flex-col sm:flex-row justify-between gap-2">
                     <Link
                       to={`/admin/penilaian/`}
-                      className="inline-flex items-center text-[#1F3C86] hover:text-[#1f3c86ca] font-medium transition-colors duration-200"
+                      className="inline-flex items-center text-primary hover:text-primary/80 font-medium transition-colors duration-200 text-xs md:text-sm"
                     >
-                      <FiEye className="mr-1" size={18} />
+                      <FiEye className="mr-1" size={16} />
                       Lihat Siswa
                     </Link>
                     <Link
                       to={`/admin/daftartes/edit`}
-                      className="inline-flex items-center text-[#1F3C86] hover:text-[#1f3c86ca] font-medium transition-colors duration-200"
+                      className="inline-flex items-center text-primary hover:text-primary/80 font-medium transition-colors duration-200 text-xs md:text-sm"
                     >
-                      <FiEdit className="mr-1" size={18} />
+                      <FiEdit className="mr-1" size={16} />
                       Edit Tes
                     </Link>
                   </div>

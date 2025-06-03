@@ -74,11 +74,8 @@ const AdminSidebar = () => {
       {/* Mobile topbar */}
       <div className="md:hidden flex items-center justify-between px-4 py-3 bg-white border-b shadow-sm">
         <div className="flex items-center space-x-2">
-          <img
-            src="https://storage.googleapis.com/a1aa/image/bb90e843-86ae-4b5d-8625-65cd7b3ae954.jpg"
-            alt="FARFAZA FC"
-            className="w-6 h-6"
-          />
+        <img src="/assets/logo.png" alt="FARFAZA FC" className="w-18 h-16" />
+
           <span className="font-bold text-blue-900 text-sm">FARFAZA FC</span>
         </div>
         <button onClick={() => setMenuOpen(true)}>
