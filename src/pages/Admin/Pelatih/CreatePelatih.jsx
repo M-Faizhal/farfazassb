@@ -52,7 +52,7 @@ const CreatePelatih = () => {
       <div className="flex flex-col md:flex-row mx-auto min-h-screen">
         <AdminSidebar />
         
-        <main className="flex-1 px-6 py-8">
+        <main className="flex-1 px-6 py-8 pt-20 md:pt-0 md:ml-64">
           <AdminHeader />
 
           <h2 className="text-black text-xl font-bold mb-6 mt-6">Tambah Data Pelatih</h2>

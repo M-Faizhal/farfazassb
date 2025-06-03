@@ -71,11 +71,10 @@ const AdminSidebar = () => {
 
   return (
     <>
-      {/* Mobile topbar */}
-      <div className="md:hidden flex items-center justify-between px-4 py-3 bg-white border-b shadow-sm">
+      {/* Mobile topbar - Fixed at top */}
+      <div className="md:hidden fixed top-0 left-0 right-0 z-40 flex items-center justify-between px-4 py-4 bg-white shadow-sm mb-6">
         <div className="flex items-center space-x-2">
-        <img src="/assets/logo.png" alt="FARFAZA FC" className="w-18 h-16" />
-
+          <img src="/assets/logo.png" alt="FARFAZA FC" className="w-18 h-16" />
           <span className="font-bold text-blue-900 text-sm">FARFAZA FC</span>
         </div>
         <button onClick={() => setMenuOpen(true)}>
@@ -83,13 +82,15 @@ const AdminSidebar = () => {
         </button>
       </div>
 
-      {/* Desktop sidebar */}
-      <aside className="hidden md:flex w-80">{SidebarContent}</aside>
+      {/* Desktop sidebar - Fixed at left side */}
+      <aside className="hidden md:flex fixed left-0 top-0 bottom-0 w-80 z-30">
+        {SidebarContent}
+      </aside>
 
       {/* Mobile drawer */}
       {menuOpen && (
         <div className="fixed inset-0 z-50">
-          <div className="bg-black/30 w-full" onClick={() => setMenuOpen(false)} />
+          <div className="bg-black/30 w-full h-full" onClick={() => setMenuOpen(false)} />
           <div className="bg-white shadow-lg h-full w-64 animate-slide-in-left absolute left-0 top-0 z-50">
             {SidebarContent}
           </div>

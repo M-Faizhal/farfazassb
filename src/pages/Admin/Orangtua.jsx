@@ -97,7 +97,7 @@ const Orangtua = () => {
       <div className="flex flex-col md:flex-row mx-auto min-h-screen">
         <AdminSidebar />
 
-        <main className="flex-1 px-6 py-8">
+        <main className="flex-1 px-6 py-8 pt-20 md:pt-0 md:ml-64">
           <AdminHeader />
 
           <div className="flex justify-between items-center mb-6 mt-6">
@@ -115,7 +115,7 @@ const Orangtua = () => {
               <input
                 type="text"
                 placeholder="Cari nama orangtua, email, atau nama anak..."
-                className="bg-gray-100 text-sm px-3 py-2 rounded-md w-full max-w-md placeholder-gray-500 focus:outline-none"
+                className="bg-gray-100 text-sm px-3 py-2 rounded-md w-full max-w-xs placeholder-gray-500 focus:outline-none"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
               />
@@ -210,7 +210,7 @@ const Orangtua = () => {
 
       {showModal && (
         <div className="fixed inset-0 bg-black/20 backdrop-blur-none flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 shadow-lg max-w-md w-full">
+          <div className="bg-white rounded-lg p-6 shadow-lg max-w-md w-full mx-4">
             <h2 className="text-lg font-semibold mb-2">Konfirmasi Hapus</h2>
             <p className="text-sm text-gray-700 mb-4">
               Apakah Anda yakin ingin menghapus akun orangtua ini?
