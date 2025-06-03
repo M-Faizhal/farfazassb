@@ -1,10 +1,15 @@
 import { NavLink, useLocation } from 'react-router-dom';
 import { useState } from 'react';
 import { Menu, X } from 'lucide-react';
+import { FiLogOut } from 'react-icons/fi';
+import { useCookies } from 'react-cookie';
+import { useNavigate } from 'react-router';
 
 const AdminSidebar = () => {
   const location = useLocation();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [, removeCookie ] = useCookies([import.meta.env.VITE_COOKIES_NAME]);
+  const navigate = useNavigate();
 
   const menuItems = [
     { name: 'Dashboard', path: '/admin/dashboard' },
@@ -15,6 +20,11 @@ const AdminSidebar = () => {
     { name: 'Prestasi', path: '/admin/prestasi' },
     { name: 'Akun Orang Tua', path: '/admin/orangtua' },
   ];
+
+  const logout = () => {
+    removeCookie(import.meta.env.VITE_COOKIES_NAME);
+    navigate('/');
+  }
 
   const SidebarContent = (
     <div className="flex flex-col px-6 py-8 space-y-6 bg-white h-full w-64 border-r border-gray-200">
@@ -53,6 +63,10 @@ const AdminSidebar = () => {
             </NavLink>
           );
         })}
+        <div onClick={logout} className="flex flex-row gap-2 items-center px-3 py-2 rounded-md text-red-500 cursor-pointer bg-red-200 text-left font-medium transition-colors">
+          <FiLogOut width={20} />
+          <p>Logout</p>
+        </div>
       </nav>
     </div>
   );
@@ -79,7 +93,7 @@ const AdminSidebar = () => {
 
       {/* Mobile drawer */}
       {menuOpen && (
-        <div className="fixed inset-0 z-50 flex">
+        <div className="fixed inset-0 z-50">
           <div className="bg-black/30  w-full" onClick={() => setMenuOpen(false)} />
           <div className="bg-white shadow-lg h-full w-64 animate-slide-in-left absolute left-0 top-0 z-50">
             {SidebarContent}

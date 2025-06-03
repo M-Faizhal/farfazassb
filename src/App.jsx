@@ -15,10 +15,11 @@ import CreateSiswa from './pages/Admin/Siswa/CreateSiswa'
 import EditSiswa from './pages/Admin/Siswa/EditSiswa'
 import Presence from './pages/Admin/Siswa/Presence'
 import Orangtua from './pages/Admin/Orangtua'
+import ProtectAdmin from './utils/ProtectAdmin'
+import AlreadyLogin from './utils/AlreadyLogin'
+
 
 function App() {
-  const location = useLocation()
-  const hideHeaderRoutes = ['/login', '/admin/login']
 
   return (
     <div className="font-poppins">
@@ -31,13 +32,19 @@ function App() {
         <Route path="/contact" element={<Contact />} />
 
         {/* Admin Pages */}
-        <Route path="/admin/login" element={<AdminLogin />} />
-        <Route path="/admin/dashboard" element={<AdminDashboard />} />
-        <Route path="/admin/siswa" element={<Siswa />} />
-        <Route path="/admin/siswa/create" element={<CreateSiswa />} />  
-        <Route path="/admin/siswa/edit" element={<EditSiswa />} />  
-        <Route path="/admin/kehadiran" element={<Presence/>} />
-        <Route path="/admin/orangtua" element={<Orangtua />} />
+        
+        <Route path='/admin' element={<ProtectAdmin />} >
+          <Route path="dashboard" element={<AdminDashboard />} />
+          <Route path="siswa" element={<Siswa />} />
+          <Route path="siswa/create" element={<CreateSiswa />} />  
+          <Route path="siswa/edit" element={<EditSiswa />} />  
+          <Route path="kehadiran" element={<Presence/>} />
+          <Route path="orangtua" element={<Orangtua />} />
+        </Route>
+
+        <Route element={<AlreadyLogin />}>
+          <Route path="/admin/login" element={<AdminLogin />} />
+        </Route>
       </Routes>
     </div>
   )

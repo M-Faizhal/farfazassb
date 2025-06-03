@@ -2,12 +2,14 @@ import axios from "axios";
 import { useState } from "react";
 import { useCookies } from "react-cookie";
 import toast from "react-hot-toast";
+import { useNavigate } from "react-router";
 
 function AdminLogin() {
   const env = import.meta.env;
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [, setCookie] = useCookies([env.VITE_COOKIES_NAME]);
+  const navigate = useNavigate();
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -25,6 +27,7 @@ function AdminLogin() {
       .then((res) => {
         setCookie(env.VITE_COOKIES_NAME, res.data.token);
         toast.success("Login berhasil!");
+        navigate('/admin/dashboard');
       })
       .catch((err) => {
         toast.error(err.response?.data?.message || "Login gagal");
