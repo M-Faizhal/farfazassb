@@ -17,7 +17,7 @@ const AdminSidebar = () => {
     { name: 'Siswa', path: '/admin/siswa' },
     { name: 'Pelatih', path: '/admin/pelatih' },
     { name: 'Kehadiran', path: '/admin/kehadiran' },
-    { name: 'Nilai', path: '/admin/nilai' },
+    { name: 'Penilaian', path: '/admin/daftartes' },
     { name: 'Prestasi', path: '/admin/prestasi' },
     { name: 'Akun Orang Tua', path: '/admin/orangtua' },
   ];

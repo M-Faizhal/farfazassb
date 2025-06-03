@@ -16,6 +16,9 @@ import EditSiswa from './pages/Admin/Siswa/EditSiswa'
 import Pelatih from './pages/Admin/Pelatih'
 import CreatePelatih from './pages/Admin/Pelatih/CreatePelatih'
 import EditPelatih from './pages/Admin/Pelatih/EditPelatih'
+import DaftarTes from './pages/Admin/DaftarTes'
+import CreateTes from './pages/Admin/Tes/CreateTes'
+import EditTes from './pages/Admin/Tes/EditTes'
 import Presence from './pages/Admin/Kehadiran'
 import Orangtua from './pages/Admin/Orangtua'
 import ProtectAdmin from './utils/ProtectAdmin'
@@ -44,6 +47,9 @@ function App() {
           <Route path="pelatih" element={<Pelatih />} />  
           <Route path="pelatih/create" element={<CreatePelatih />} />  
           <Route path="pelatih/edit" element={<EditPelatih />} />  
+          <Route path="daftartes" element={<DaftarTes />} />  
+          <Route path="daftartes/create" element={<CreateTes />} />  
+          <Route path="daftartes/edit" element={<EditTes />} />  
           <Route path="kehadiran" element={<Presence/>} />
           <Route path="orangtua" element={<Orangtua />} />
         </Route>
