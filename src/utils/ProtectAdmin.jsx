@@ -4,7 +4,7 @@ import { Navigate,Outlet } from "react-router";
 
 const ProtectAdmin = () => {
     const [cookies] = useCookies([import.meta.env.VITE_COOKIES_NAME]);
-    const isAdmin = jwtDecode(cookies.session)?.role === 'SUPER_ADMIN';
+    const isAdmin = cookies.session? jwtDecode(cookies.session)?.role === 'SUPER_ADMIN' : false;
 
   return isAdmin? <Outlet/> : <Navigate to="/admin/login" replace={true} />
 };
