@@ -14,6 +14,7 @@ import Siswa from './pages/Admin/Siswa'
 import CreateSiswa from './pages/Admin/Siswa/CreateSiswa'
 import EditSiswa from './pages/Admin/Siswa/EditSiswa'
 import Presence from './pages/Admin/Siswa/Presence'
+import Orangtua from './pages/Admin/Orangtua'
 
 function App() {
   const location = useLocation()
@@ -36,6 +37,7 @@ function App() {
         <Route path="/admin/siswa/create" element={<CreateSiswa />} />  
         <Route path="/admin/siswa/edit" element={<EditSiswa />} />  
         <Route path="/admin/kehadiran" element={<Presence/>} />
+        <Route path="/admin/orangtua" element={<Orangtua />} />
       </Routes>
     </div>
   )
