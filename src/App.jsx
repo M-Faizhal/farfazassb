@@ -13,6 +13,7 @@ import AdminDashboard from './pages/Admin/Dashboard'
 import Siswa from './pages/Admin/Siswa'
 import CreateSiswa from './pages/Admin/Siswa/CreateSiswa'
 import EditSiswa from './pages/Admin/Siswa/EditSiswa'
+import Presence from './pages/Admin/Siswa/Presence'
 
 function App() {
   const location = useLocation()
@@ -34,6 +35,7 @@ function App() {
         <Route path="/admin/siswa" element={<Siswa />} />
         <Route path="/admin/siswa/create" element={<CreateSiswa />} />  
         <Route path="/admin/siswa/edit" element={<EditSiswa />} />  
+        <Route path="/admin/kehadiran" element={<Presence/>} />
       </Routes>
     </div>
   )

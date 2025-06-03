@@ -3,7 +3,7 @@ import AdminHeader from '../../components/Admin/Header';
 
 const AdminDashboard = () => {
   return (
-    <div className="bg-[#f7f7f7] min-h-screen text-sm text-[#333]">
+    <div className="bg-white min-h-screen text-sm text-[#333]">
       <div className="flex flex-col md:flex-row  mx-auto min-h-screen">
         <AdminSidebar />
 
@@ -18,7 +18,7 @@ const AdminDashboard = () => {
           {/* Summary cards */}
           <section className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
             {['Siswa', 'Pelatih', 'Orang Tua', 'Prestasi'].map((item, i) => (
-              <div key={i} className="bg-[#1F3C86] rounded-lg p-4 shadow-sm text-white">
+              <div key={i} className="bg-primary rounded-lg p-4 shadow-sm text-white">
                 <p className="text-sm font-medium mb-1">Total {item}</p>
                 <p className="text-2xl font-bold">{i === 0 ? 200 : '—'}</p>
               </div>
@@ -30,7 +30,7 @@ const AdminDashboard = () => {
             <h2 className="text-base font-semibold text-black mb-4">Kehadiran Terbaru</h2>
             <div className="overflow-x-auto bg-white rounded-md border border-gray-200 shadow-sm">
               <table className="w-full text-left table-auto">
-                <thead className="bg-[#1F3C86] text-white">
+                <thead className="bg-primary text-white">
                   <tr>
                     <th className="px-4 py-2 font-semibold ">Student Name</th>
                     <th className="px-4 py-2 font-semibold ">Date</th>
@@ -58,7 +58,7 @@ const AdminDashboard = () => {
             <h2 className="text-base font-semibold text-black mb-4">Nilai Terbaru</h2>
             <div className="overflow-x-auto bg-white rounded-md border border-gray-200 shadow-sm">
               <table className="w-full text-left table-auto">
-                <thead className="bg-[#1F3C86] text-white">
+                <thead className="bg-primary text-white">
                   <tr>
                     <th className="px-4 py-2 font-semibold ">Nama Siswa</th>
                     <th className="px-4 py-2 font-semibold ">Tanggal</th>

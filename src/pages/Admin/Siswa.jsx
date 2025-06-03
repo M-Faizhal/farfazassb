@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { FiEdit, FiTrash2 } from 'react-icons/fi';
 import AdminSidebar from '../../components/Admin/Sidebar';
 import AdminHeader from '../../components/Admin/Header';
+import { sortIcon } from '../../utils/sort';
 
 const siswaDummy = [
   {
@@ -69,11 +70,6 @@ const Siswa = () => {
       }
     });
 
-  const sortIcon = (field) => {
-    if (sortField !== field) return '⇅';
-    return sortOrder === 'asc' ? '↑' : '↓';
-  };
-
   return (
     <div className="bg-[#f7f7f7] min-h-screen text-sm text-[#333]">
       <div className="flex flex-col md:flex-row mx-auto min-h-screen">
@@ -86,7 +82,7 @@ const Siswa = () => {
             <h1 className="text-xl font-bold text-black">Data Siswa</h1>
             <Link
               to="/admin/siswa/create"
-              className="bg-[#1F3C86] text-white font-medium px-4 py-2 rounded-md"
+              className="bg-primary text-white font-medium px-4 py-2 rounded-md"
             >
               New Student
             </Link>
@@ -105,13 +101,13 @@ const Siswa = () => {
 
             <div className="overflow-x-auto">
               <table className="min-w-full text-sm text-left text-gray-700">
-                <thead className="bg-[#1F3C86] text-white font-semibold">
+                <thead className="bg-primary text-white font-semibold">
                   <tr>
                     <th
                       className="px-4 py-3 cursor-pointer"
                       onClick={() => handleSort('id')}
                     >
-                      ID Siswa {sortIcon('id')}
+                      ID Siswa {sortIcon(sortField,'id')}
                     </th>
                     <th
                       className="px-4 py-3 cursor-pointer"
@@ -164,7 +160,7 @@ const Siswa = () => {
                         <td className="px-4 py-3 text-right">
                           <div className="flex justify-end gap-3">
                             <Link to={`/admin/siswa/edit`}>
-                              <FiEdit className="text-[#1F3C86] w-5 h-5 hover:scale-110" />
+                              <FiEdit className="text-primary w-5 h-5 hover:scale-110" />
                             </Link>
                             <button onClick={() => handleOpenModal(siswa.id)}>
                               <FiTrash2 className="text-red-600 w-5 h-5 hover:scale-110" />

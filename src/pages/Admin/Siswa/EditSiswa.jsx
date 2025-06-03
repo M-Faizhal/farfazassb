@@ -124,7 +124,7 @@ const EditSiswa = () => {
           <button
             type="button"
             onClick={() => setShowSaveModal(true)}
-            className="bg-[#1F3C86] text-white font-semibold px-4 py-2 rounded-md"
+            className="bg-primary text-white font-semibold px-4 py-2 rounded-md"
           >
             Save
           </button>
@@ -154,7 +154,7 @@ const EditSiswa = () => {
                 </button>
                 <button
                   onClick={handleSave}
-                  className="px-4 py-2 bg-[#1F3C86] text-white rounded-md"
+                  className="px-4 py-2 bg-primary text-white rounded-md"
                 >
                   Ya, Simpan
                 </button>
@@ -185,7 +185,7 @@ const InputField = ({ label, id, required, type = 'text', value, onChange }) => 
       type={type}
       value={value}
       onChange={onChange}
-      className="rounded-md bg-[#E6EEFF] border border-gray-300 h-10 px-3 text-black placeholder-gray-600 focus:outline-[#1F3C86]"
+      className="rounded-md bg-[#E6EEFF] border border-gray-300 h-10 px-3 text-black placeholder-gray-600 focus:outline-primary"
       required={required}
     />
   </div>
@@ -201,7 +201,7 @@ const SelectField = ({ label, id, options = [], required, value, onChange }) => 
       id={id}
       value={value}
       onChange={onChange}
-      className="rounded-md bg-[#E6EEFF] border border-gray-300 h-10 px-3 text-black focus:outline-[#1F3C86]"
+      className="rounded-md bg-[#E6EEFF] border border-gray-300 h-10 px-3 text-black focus:outline-primary"
       required={required}
     >
       <option value="">-- Pilih --</option>
@@ -225,7 +225,7 @@ const FileUpload = ({ label, id, onChange, preview }) => (
           htmlFor={id}
           className="cursor-pointer rounded-md bg-white border border-gray-300 h-12 flex items-center justify-center text-sm text-gray-600"
         >
-          Drag & Drop atau <span className="text-[#1F3C86] font-semibold ml-1">Browse</span>
+          Drag & Drop atau <span className="text-primary font-semibold ml-1">Browse</span>
         </label>
         <input id={id} type="file" onChange={onChange} className="hidden" />
       </>

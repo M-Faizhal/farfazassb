@@ -25,7 +25,6 @@ function AdminLogin() {
       .then((res) => {
         setCookie(env.VITE_COOKIES_NAME, res.data.token);
         toast.success("Login berhasil!");
-        // Redirect if needed, e.g., window.location.href = "/dashboard";
       })
       .catch((err) => {
         toast.error(err.response?.data?.message || "Login gagal");
@@ -78,19 +77,9 @@ function AdminLogin() {
             />
           </div>
 
-          <div className="flex items-center justify-between text-sm text-gray-600">
-            <label className="flex items-center">
-              <input type="checkbox" className="mr-2" />
-              Remember me
-            </label>
-            <a href="#" className="text-blue-500 hover:underline">
-              Forgot password?
-            </a>
-          </div>
-
           <button
             type="submit"
-          className=" px-5 py-2 border border-[#29278C] rounded-md font-semibold transition duration-200 w-full bg-[#29278C] text-white hover:shadow-md"
+          className=" px-5 py-2 border border-[#29278C] rounded-md font-semibold transition duration-200 w-full bg-primary text-white hover:shadow-md"
           >
             Login
           </button>

@@ -21,7 +21,7 @@ const AdminSidebar = () => {
       <div className="flex items-center justify-between md:justify-start space-x-2">
         <div className="flex items-center ">
           <img
-            src="../../../public/assets/logo.png"
+            src="/assets/logo.png"
             alt="FARFAZA FC"
             className="w-18 h-16"
           />
@@ -45,7 +45,7 @@ const AdminSidebar = () => {
               onClick={() => setMenuOpen(false)} // close drawer after click
               className={`px-3 py-2 rounded-md text-left font-medium transition-colors ${
                 isActive
-                  ? 'bg-[#d8d6f4] text-black font-semibold'
+                  ? 'bg-primary-200/20 text-black font-semibold'
                   : 'hover:bg-gray-100 text-gray-700'
               }`}
             >
