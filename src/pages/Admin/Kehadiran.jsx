@@ -1,8 +1,8 @@
-import AdminHeader from "../../../components/Admin/Header";
-import AdminSidebar from "../../../components/Admin/Sidebar";
+import AdminHeader from "../../components/Admin/Header";
+import AdminSidebar from "../../components/Admin/Sidebar";
 import { Link } from "react-router";
 import { FiEdit, FiPlus, FiTrash2 } from "react-icons/fi";
-import { sortIcon } from "../../../utils/sort";
+import { sortIcon } from "../../utils/sort";
 import { useState } from "react";
 
 const siswaDummy = [

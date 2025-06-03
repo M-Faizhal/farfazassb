@@ -8,7 +8,8 @@ import { useNavigate } from 'react-router';
 const AdminSidebar = () => {
   const location = useLocation();
   const [menuOpen, setMenuOpen] = useState(false);
-  const [, removeCookie ] = useCookies([import.meta.env.VITE_COOKIES_NAME]);
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
+  const [, removeCookie] = useCookies([import.meta.env.VITE_COOKIES_NAME]);
   const navigate = useNavigate();
 
   const menuItems = [
@@ -24,23 +25,16 @@ const AdminSidebar = () => {
   const logout = () => {
     removeCookie(import.meta.env.VITE_COOKIES_NAME);
     navigate('/');
-  }
+  };
 
   const SidebarContent = (
     <div className="flex flex-col px-6 py-8 space-y-6 bg-white h-full w-64 border-r border-gray-200">
       <div className="flex items-center justify-between md:justify-start space-x-2">
-        <div className="flex items-center ">
-          <img
-            src="/assets/logo.png"
-            alt="FARFAZA FC"
-            className="w-18 h-16"
-          />
+        <div className="flex items-center">
+          <img src="/assets/logo.png" alt="FARFAZA FC" className="w-18 h-16" />
           <span className="font-bold text-blue-900 text-sm">FARFAZA FC</span>
         </div>
-        <button
-          className="md:hidden"
-          onClick={() => setMenuOpen(false)}
-        >
+        <button className="md:hidden" onClick={() => setMenuOpen(false)}>
           <X size={20} />
         </button>
       </div>
@@ -52,7 +46,7 @@ const AdminSidebar = () => {
             <NavLink
               key={item.name}
               to={item.path}
-              onClick={() => setMenuOpen(false)} // close drawer after click
+              onClick={() => setMenuOpen(false)}
               className={`px-3 py-2 rounded-md text-left font-medium transition-colors ${
                 isActive
                   ? 'bg-primary-200/20 text-black font-semibold'
@@ -63,7 +57,11 @@ const AdminSidebar = () => {
             </NavLink>
           );
         })}
-        <div onClick={logout} className="flex flex-row gap-2 items-center px-3 py-2 rounded-md text-red-500 cursor-pointer bg-red-200 text-left font-medium transition-colors">
+
+        <div
+          onClick={() => setShowLogoutModal(true)}
+          className="flex flex-row gap-2 items-center px-3 py-2 rounded-md text-red-500 cursor-pointer bg-red-200 text-left font-medium transition-colors"
+        >
           <FiLogOut width={20} />
           <p>Logout</p>
         </div>
@@ -73,7 +71,7 @@ const AdminSidebar = () => {
 
   return (
     <>
-      {/* Mobile topbar with menu button */}
+      {/* Mobile topbar */}
       <div className="md:hidden flex items-center justify-between px-4 py-3 bg-white border-b shadow-sm">
         <div className="flex items-center space-x-2">
           <img
@@ -94,9 +92,33 @@ const AdminSidebar = () => {
       {/* Mobile drawer */}
       {menuOpen && (
         <div className="fixed inset-0 z-50">
-          <div className="bg-black/30  w-full" onClick={() => setMenuOpen(false)} />
+          <div className="bg-black/30 w-full" onClick={() => setMenuOpen(false)} />
           <div className="bg-white shadow-lg h-full w-64 animate-slide-in-left absolute left-0 top-0 z-50">
             {SidebarContent}
+          </div>
+        </div>
+      )}
+
+      {/* Logout Confirmation Modal */}
+      {showLogoutModal && (
+        <div className="fixed inset-0 flex items-center justify-center z-50 bg-black/40">
+          <div className="bg-white p-6 rounded-lg shadow-md w-[90%] max-w-md">
+            <h2 className="text-lg font-semibold mb-4 text-gray-800">Konfirmasi Logout</h2>
+            <p className="text-sm text-gray-600 mb-6">Apakah Anda yakin ingin logout dari akun admin?</p>
+            <div className="flex justify-end space-x-3">
+              <button
+                onClick={() => setShowLogoutModal(false)}
+                className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300 text-gray-800 text-sm"
+              >
+                Batal
+              </button>
+              <button
+                onClick={logout}
+                className="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded text-sm"
+              >
+                Logout
+              </button>
+            </div>
           </div>
         </div>
       )}

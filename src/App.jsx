@@ -13,7 +13,10 @@ import AdminDashboard from './pages/Admin/Dashboard'
 import Siswa from './pages/Admin/Siswa'
 import CreateSiswa from './pages/Admin/Siswa/CreateSiswa'
 import EditSiswa from './pages/Admin/Siswa/EditSiswa'
-import Presence from './pages/Admin/Siswa/Presence'
+import Pelatih from './pages/Admin/Pelatih'
+import CreatePelatih from './pages/Admin/Pelatih/CreatePelatih'
+import EditPelatih from './pages/Admin/Pelatih/EditPelatih'
+import Presence from './pages/Admin/Kehadiran'
 import Orangtua from './pages/Admin/Orangtua'
 import ProtectAdmin from './utils/ProtectAdmin'
 import AlreadyLogin from './utils/AlreadyLogin'
@@ -38,6 +41,9 @@ function App() {
           <Route path="siswa" element={<Siswa />} />
           <Route path="siswa/create" element={<CreateSiswa />} />  
           <Route path="siswa/edit" element={<EditSiswa />} />  
+          <Route path="pelatih" element={<Pelatih />} />  
+          <Route path="pelatih/create" element={<CreatePelatih />} />  
+          <Route path="pelatih/edit" element={<EditPelatih />} />  
           <Route path="kehadiran" element={<Presence/>} />
           <Route path="orangtua" element={<Orangtua />} />
         </Route>
