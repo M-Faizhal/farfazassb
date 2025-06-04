@@ -21,6 +21,8 @@ import CreateTes from './pages/Admin/Tes/CreateTes'
 import EditTes from './pages/Admin/Tes/EditTes'
 import Presence from './pages/Admin/Kehadiran'
 import Orangtua from './pages/Admin/Orangtua'
+import CreateOrangtua from './pages/Admin/Orangtua/CreateOrangtua'
+import EditOrangtua from './pages/Admin/Orangtua/EditOrangtua'
 import ProtectAdmin from './utils/ProtectAdmin'
 import AlreadyLogin from './utils/AlreadyLogin'
 
@@ -52,6 +54,8 @@ function App() {
           <Route path="daftartes/edit" element={<EditTes />} />  
           <Route path="kehadiran" element={<Presence/>} />
           <Route path="orangtua" element={<Orangtua />} />
+          <Route path="orangtua/create" element={<CreateOrangtua />} />
+          <Route path="orangtua/edit" element={<EditOrangtua />} />
         </Route>
 
         <Route element={<AlreadyLogin />}>
