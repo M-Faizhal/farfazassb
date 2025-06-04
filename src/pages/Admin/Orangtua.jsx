@@ -184,7 +184,7 @@ const Orangtua = () => {
                         <td className="px-4 py-3">{orangtua.tanggalDaftar}</td>
                         <td className="px-4 py-3 text-right">
                           <div className="flex justify-end gap-3">
-                            <Link to={`/admin/orangtua/edit/${orangtua.id}`}>
+                            <Link to={`/admin/orangtua/edit/`}>
                               <Edit className="text-primary w-5 h-5 hover:scale-110 cursor-pointer" />
                             </Link>
                             <button onClick={() => handleOpenModal(orangtua.id)}>

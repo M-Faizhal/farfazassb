@@ -8,28 +8,25 @@ const tesList = [
     id: 'TES001',
     tanggal: '2025-05-28',
     jumlahSiswa: 5,
-    namaPelatih: "Bambang"
+    namaPelatih: "Coach Bambang"
   },
   {
     id: 'TES002',
     tanggal: '2025-06-01',
     jumlahSiswa: 3,
-    namaPelatih: "Joko"
-
+    namaPelatih: "Coach Joko"
   },
   {
     id: 'TES003',
     tanggal: '2025-06-01',
     jumlahSiswa: 3,
-    namaPelatih: "Lathif"
-
+    namaPelatih: "Coach Lathif"
   },
   {
     id: 'TES004',
     tanggal: '2025-06-01',
     jumlahSiswa: 3,
-    namaPelatih: "Bayu"
-
+    namaPelatih: "Coach Bayu"
   }
 ];
 
@@ -89,7 +86,7 @@ const DaftarTes = () => {
                   </p>
                   <div className="flex flex-col sm:flex-row justify-between gap-2">
                     <Link
-                      to={`/admin/penilaian/`}
+                      to={`/admin/daftartes/penilaian`}
                       className="inline-flex items-center text-primary hover:text-primary/80 font-medium transition-colors duration-200 text-xs md:text-sm"
                     >
                       <FiEye className="mr-1" size={16} />
