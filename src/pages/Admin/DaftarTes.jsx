@@ -1,9 +1,10 @@
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import AdminHeader from '../../components/Admin/Header';
 import AdminSidebar from '../../components/Admin/Sidebar';
-import { FiEdit, FiEye, FiPlus } from 'react-icons/fi';
+import { FiEdit, FiEye, FiPlus, FiTrash } from 'react-icons/fi';
 
-const tesList = [
+const initialTesList = [
   {
     id: 'TES001',
     tanggal: '2025-05-28',
@@ -31,23 +32,38 @@ const tesList = [
 ];
 
 const DaftarTes = () => {
-  // Sort the tesList by tanggal
-  const sortedTesList = tesList.sort((a, b) => new Date(a.tanggal) - new Date(b.tanggal));
+  const [tesData, setTesData] = useState(initialTesList);
+  const [showModal, setShowModal] = useState(false);
+  const [selectedId, setSelectedId] = useState(null);
+
+  const handleOpenModal = (id) => {
+    setSelectedId(id);
+    setShowModal(true);
+  };
+
+  const handleDelete = () => {
+    const updatedData = tesData.filter(tes => tes.id !== selectedId);
+    setTesData(updatedData);
+    setShowModal(false);
+  };
+
+  const sortedTesList = [...tesData].sort((a, b) => new Date(a.tanggal) - new Date(b.tanggal));
 
   return (
     <div className="bg-[#f7f7f7] min-h-screen text-sm text-[#333]">
       <div className="flex flex-col md:flex-row mx-auto min-h-screen">
         <AdminSidebar />
-        
+
         <main className="flex-1 px-6 py-8 pt-20 md:pt-0 md:ml-64">
           <AdminHeader />
-          
+
           <div className="flex justify-between items-center mb-6 mt-6">
             <h1 className="text-xl font-bold text-black">Daftar Tes</h1>
             <Link
               to="/admin/daftartes/create"
               className="bg-primary text-white font-medium px-4 py-2 rounded-md"
             >
+              <FiPlus className="inline-block mr-1" />
               New Test
             </Link>
           </div>
@@ -82,7 +98,7 @@ const DaftarTes = () => {
                   </p>
                   <p className="text-gray-600 mb-4 text-xs md:text-sm">
                     <span className="font-semibold">Nama Pelatih:</span>{' '}
-                    {tes.namaPelatih ? tes.namaPelatih : 'Tidak tersedia'}
+                    {tes.namaPelatih || 'Tidak tersedia'}
                   </p>
                   <div className="flex flex-col sm:flex-row justify-between gap-2">
                     <Link
@@ -99,6 +115,13 @@ const DaftarTes = () => {
                       <FiEdit className="mr-1" size={16} />
                       Edit Tes
                     </Link>
+                    <button
+                      onClick={() => handleOpenModal(tes.id)}
+                      className="inline-flex items-center text-red-600 hover:text-red-700 text-xs md:text-sm font-medium"
+                    >
+                      <FiTrash className="mr-1" size={16} />
+                      
+                    </button>
                   </div>
                 </div>
               ))}
@@ -106,6 +129,32 @@ const DaftarTes = () => {
           )}
         </main>
       </div>
+
+      {/* Modal Konfirmasi Hapus */}
+      {showModal && (
+        <div className="fixed inset-0 bg-black/20 backdrop-blur-none flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 shadow-lg max-w-md w-full mx-4">
+            <h2 className="text-lg font-semibold mb-2">Konfirmasi Hapus</h2>
+            <p className="text-sm text-gray-700 mb-4">
+              Apakah Anda yakin ingin menghapus data tes ini?
+            </p>
+            <div className="flex justify-end gap-3">
+              <button
+                onClick={() => setShowModal(false)}
+                className="px-4 py-2 bg-gray-200 text-gray-800 rounded-md"
+              >
+                Batal
+              </button>
+              <button
+                onClick={handleDelete}
+                className="px-4 py-2 bg-red-600 text-white rounded-md"
+              >
+                Hapus
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

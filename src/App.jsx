@@ -22,7 +22,9 @@ import EditTes from './pages/Admin/Tes/EditTes'
 import PenilaianSiswa from './pages/Admin/Penilaian/PenilaianSiswa'
 import CreatePenilaian from './pages/Admin/Penilaian/CreatePenilaian'
 import EditPenilaian from './pages/Admin/Penilaian/EditPenilaian'
-import Presence from './pages/Admin/Kehadiran'
+import Kehadiran from './pages/Admin/Kehadiran'
+import KalenderAbsensi from './pages/Admin/Kehadiran/KalenderAbsensi'
+import AbsensiTanggal from './pages/Admin/Kehadiran/AbsensiTanggal'
 import Orangtua from './pages/Admin/Orangtua'
 import CreateOrangtua from './pages/Admin/Orangtua/CreateOrangtua'
 import EditOrangtua from './pages/Admin/Orangtua/EditOrangtua'
@@ -58,7 +60,9 @@ function App() {
           <Route path="daftartes/penilaian" element={<PenilaianSiswa />} />  
           <Route path="daftartes/penilaian/create" element={<CreatePenilaian />} />  
           <Route path="daftartes/penilaian/edit" element={<EditPenilaian />} />  
-          <Route path="kehadiran" element={<Presence/>} />
+          <Route path="kehadiran" element={<Kehadiran/>} />
+          <Route path="kehadiran/kalender" element={<KalenderAbsensi/>} />
+          <Route path="kehadiran/kalender/absensi" element={<AbsensiTanggal/>} />
           <Route path="orangtua" element={<Orangtua />} />
           <Route path="orangtua/create" element={<CreateOrangtua />} />
           <Route path="orangtua/edit" element={<EditOrangtua />} />
