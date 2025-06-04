@@ -4,13 +4,11 @@ import AdminSidebar from '../../../components/Admin/Sidebar';
 import AdminHeader from '../../../components/Admin/Header';
 
 const daftarSiswa = ['Budi', 'Ani', 'Joko'];
-const daftarPelatih = ['Coach A', 'Coach B', 'Coach C'];
 const kategoriSkala = ['Kurang', 'Cukup', 'Baik', 'Sangat Baik'];
 
 const dummyPenilaian = {
   namaSiswa: 'Budi',
   tanggalTes: '2025-06-01',
-  namaPelatih: 'Coach A',
   tinggiBadan: '170',
   beratBadan: '65',
   bmi: '22.5',
@@ -73,7 +71,6 @@ const EditPenilaian = () => {
           <form onSubmit={(e) => e.preventDefault()} className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-white p-6 rounded-md border border-gray-200 shadow-sm max-w-6xl">
             <SelectField label="Nama Siswa" id="namaSiswa" options={daftarSiswa} required value={formData.namaSiswa} onChange={handleChange} />
             <InputField label="Tanggal Tes" id="tanggalTes" type="date" required value={formData.tanggalTes || ''} onChange={handleChange} />
-            <SelectField label="Nama Pelatih" id="namaPelatih" options={daftarPelatih} required value={formData.namaPelatih} onChange={handleChange} />
 
             <Section title="Antropometri">
               {[
