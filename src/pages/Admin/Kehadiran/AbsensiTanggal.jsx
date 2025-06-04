@@ -252,7 +252,7 @@ const AbsensiTanggal = () => {
             <p className="mb-4">Apakah Anda yakin ingin menghapus siswa ini dari daftar absensi?</p>
             <div className="flex justify-end gap-3">
               <button onClick={() => setShowHapusModal(false)} className="px-4 py-2 bg-gray-200 rounded-md">Batal</button>
-              <button onClick={handleHapusSiswa} className="px-4 py-2 bg-primary text-white rounded-md">Hapus</button>
+              <button onClick={handleHapusSiswa} className="px-4 py-2 bg-red-600 text-white rounded-md">Hapus</button>
             </div>
           </div>
         </div>

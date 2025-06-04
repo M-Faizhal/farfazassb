@@ -56,11 +56,10 @@ const KalenderAbsensi = () => {
   };
 
   return (
-    <div className="bg-[#f5f7fa] min-h-screen text-[#333]">
-      <div className="flex flex-col md:flex-row min-h-screen">
+    <div className="bg-[#f7f7f7] min-h-screen text-sm text-[#333]">
+      <div className="flex flex-col md:flex-row mx-auto min-h-screen">
         <AdminSidebar />
-
-        <main className="flex-1 px-6 py-8 pt-20 md:pt-0 md:ml-64">
+        <main className="flex-1 px-4 md:px-6 py-8 pt-20 md:pt-0 md:ml-64">
           <AdminHeader />
 
           <h1 className="text-xl font-bold text-black mb-6 pt-6">Absensi Siswa - U10</h1>
