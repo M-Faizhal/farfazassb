@@ -28,6 +28,7 @@ import AbsensiTanggal from './pages/Admin/Kehadiran/AbsensiTanggal'
 import Orangtua from './pages/Admin/Orangtua'
 import CreateOrangtua from './pages/Admin/Orangtua/CreateOrangtua'
 import EditOrangtua from './pages/Admin/Orangtua/EditOrangtua'
+import Prestasi from './pages/Admin/Prestasi'
 import ProtectAdmin from './utils/ProtectAdmin'
 import AlreadyLogin from './utils/AlreadyLogin'
 
@@ -66,6 +67,7 @@ function App() {
           <Route path="orangtua" element={<Orangtua />} />
           <Route path="orangtua/create" element={<CreateOrangtua />} />
           <Route path="orangtua/edit" element={<EditOrangtua />} />
+          <Route path="prestasi" element={<Prestasi />} />
         </Route>
 
         <Route element={<AlreadyLogin />}>
