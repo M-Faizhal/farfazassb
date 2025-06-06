@@ -22,7 +22,7 @@ function Header() {
           <Link className="hover:text-gray-700 py-2" to="/">Home</Link>
           <Link className="hover:text-gray-700 py-2" to="/about">About Us</Link>
           <Link className="hover:text-gray-700 py-2" to="/staff">Staff Pelatih</Link>
-          <Link className="hover:text-gray-700 py-2" to="#">Team</Link>
+          <Link className="hover:text-gray-700 py-2" to="/Team">Team</Link>
           <Link className="hover:text-gray-700 py-2" to="/contact">Contact</Link>
           <Link
             to="/login"
@@ -44,7 +44,7 @@ function Header() {
           <Link onClick={() => setMenuOpen(false)} to="/">Home</Link>
           <Link onClick={() => setMenuOpen(false)} to="/about">About Us</Link>
           <Link onClick={() => setMenuOpen(false)} to="/staff">Staff Pelatih</Link>
-          <Link onClick={() => setMenuOpen(false)} to="#">Team</Link>
+          <Link onClick={() => setMenuOpen(false)} to="/Team">Team</Link>
           <Link onClick={() => setMenuOpen(false)} to="/contact">Contact</Link>
           <Link
             onClick={() => setMenuOpen(false)}

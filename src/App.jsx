@@ -6,6 +6,7 @@ import Home from './pages/Public/Home'
 import StaffPelatih from './pages/Public/StaffPelatih'
 import About from './pages/Public/About'
 import Contact from './pages/Public/Contact'
+import Team from './pages/Public/Team' 
 
 // Admin Pages
 import AdminLogin from './pages/Admin/Auth/Login'
@@ -46,6 +47,7 @@ function App() {
         <Route path="/staff" element={<StaffPelatih />} />
         <Route path="/about" element={<About />} />
         <Route path="/contact" element={<Contact />} />
+        <Route path="/team" element={<Team />} />
 
         {/* Admin Pages */}
         
