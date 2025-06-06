@@ -29,6 +29,8 @@ import Orangtua from './pages/Admin/Orangtua'
 import CreateOrangtua from './pages/Admin/Orangtua/CreateOrangtua'
 import EditOrangtua from './pages/Admin/Orangtua/EditOrangtua'
 import Prestasi from './pages/Admin/Prestasi'
+import CreatePrestasi from './pages/Admin/Prestasi/CreatePrestasi'
+import EditPrestasi from './pages/Admin/Prestasi/EditPrestasi'
 import ProtectAdmin from './utils/ProtectAdmin'
 import AlreadyLogin from './utils/AlreadyLogin'
 
@@ -68,6 +70,8 @@ function App() {
           <Route path="orangtua/create" element={<CreateOrangtua />} />
           <Route path="orangtua/edit" element={<EditOrangtua />} />
           <Route path="prestasi" element={<Prestasi />} />
+          <Route path="prestasi/create" element={<CreatePrestasi />} />
+          <Route path="prestasi/edit/:id" element={<EditPrestasi />} />
         </Route>
 
         <Route element={<AlreadyLogin />}>

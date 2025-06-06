@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import AdminHeader from '../../components/Admin/Header';
 import AdminSidebar from '../../components/Admin/Sidebar';
-import { Edit, Eye, Plus, Trash2, Trophy, Users, User } from 'lucide-react';
+import { Edit, Eye, Plus, Trash2, Trophy, Users, User, X, Calendar, Award, MapPin } from 'lucide-react';
 
 const initialPrestasiList = [
   {
@@ -12,8 +12,8 @@ const initialPrestasiList = [
     tanggal: '2024-12-15',
     tingkat: 'Regional',
     peringkat: '1',
-    deskripsi: 'Tim U12 berhasil meraih juara 1 dalam Liga Junior Surabaya dengan skor akhir 3-1',
-    namaAtlet: null,
+    deskripsi: 'Tim U12 berhasil meraih juara 1 dalam Liga Junior Surabaya dengan skor akhir 3-1. Pertandingan berlangsung sangat sengit dan tim menunjukkan performa luar biasa sepanjang turnamen.',
+    namaSiswa: null,
     namaEvent: 'Liga Junior Surabaya 2024'
   },
   {
@@ -23,8 +23,8 @@ const initialPrestasiList = [
     tanggal: '2024-11-20',
     tingkat: 'Regional',
     peringkat: '1',
-    deskripsi: 'Afif Bima Said menjadi top scorer dengan 15 gol',
-    namaAtlet: 'Afif Bima Said',
+    deskripsi: 'Afif Bima Said menjadi top scorer dengan 15 gol sepanjang liga junior. Pencapaian yang luar biasa untuk pemain muda berbakat ini.',
+    namaSiswa: 'Afif Bima Said',
     namaEvent: 'Liga Junior Surabaya 2024'
   },
   {
@@ -34,8 +34,8 @@ const initialPrestasiList = [
     tanggal: '2024-10-10',
     tingkat: 'Nasional',
     peringkat: '3',
-    deskripsi: 'Tim U11 meraih juara 3 setelah mengalahkan tim dari Jakarta',
-    namaAtlet: null,
+    deskripsi: 'Tim U11 meraih juara 3 setelah mengalahkan tim dari Jakarta dengan skor 2-0 di pertandingan perebutan juara 3.',
+    namaSiswa: null,
     namaEvent: 'Turnamen Nasional U11 Indonesia Cup'
   },
   {
@@ -45,8 +45,8 @@ const initialPrestasiList = [
     tanggal: '2024-09-05',
     tingkat: 'Lokal',
     peringkat: '1',
-    deskripsi: 'Muhammad Farhan terpilih sebagai pemain terbaik turnamen',
-    namaAtlet: 'Muhammad Farhan',
+    deskripsi: 'Muhammad Farhan terpilih sebagai pemain terbaik turnamen berkat performa konsisten dan skill yang luar biasa di setiap pertandingan.',
+    namaSiswa: 'Muhammad Farhan',
     namaEvent: 'Turnamen Ramadan Cup'
   }
 ];
@@ -54,12 +54,19 @@ const initialPrestasiList = [
 const Prestasi = () => {
   const [prestasiData, setPrestasiData] = useState(initialPrestasiList);
   const [showModal, setShowModal] = useState(false);
+  const [showDetailModal, setShowDetailModal] = useState(false);
   const [selectedId, setSelectedId] = useState(null);
+  const [selectedPrestasi, setSelectedPrestasi] = useState(null);
   const [filterKategori, setFilterKategori] = useState('Semua');
 
   const handleOpenModal = (id) => {
     setSelectedId(id);
     setShowModal(true);
+  };
+
+  const handleOpenDetailModal = (prestasi) => {
+    setSelectedPrestasi(prestasi);
+    setShowDetailModal(true);
   };
 
   const handleDelete = () => {
@@ -174,9 +181,9 @@ const Prestasi = () => {
                         {prestasi.kategori}
                       </span>
                     </p>
-                    {prestasi.namaAtlet && (
+                    {prestasi.namaSiswa && (
                       <p className="text-gray-600 text-xs md:text-sm">
-                        <span className="font-semibold">Atlet:</span> {prestasi.namaAtlet}
+                        <span className="font-semibold">Siswa:</span> {prestasi.namaSiswa}
                       </p>
                     )}
                   </div>
@@ -186,13 +193,13 @@ const Prestasi = () => {
                   </p>
 
                   <div className="flex flex-col sm:flex-row justify-between gap-2 pt-2 border-t border-gray-100">
-                    <Link
-                      to={`/admin/prestasi/detail/${prestasi.id}`}
+                    <button
+                      onClick={() => handleOpenDetailModal(prestasi)}
                       className="inline-flex items-center text-primary hover:text-primary/80 font-medium transition-colors duration-200 text-xs md:text-sm"
                     >
                       <Eye className="mr-1" size={14} />
                       Detail
-                    </Link>
+                    </button>
                     <Link
                       to={`/admin/prestasi/edit/${prestasi.id}`}
                       className="inline-flex items-center text-primary hover:text-primary/80 font-medium transition-colors duration-200 text-xs md:text-sm"
@@ -215,7 +222,138 @@ const Prestasi = () => {
         </main>
       </div>
 
-      {/* Modal Konfirmasi Hapus */}
+      {showDetailModal && selectedPrestasi && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="sticky top-0 bg-white border-b border-gray-200 p-6 rounded-t-lg">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className={`p-2 rounded-full ${selectedPrestasi.kategori === 'Tim' ? 'bg-blue-100' : 'bg-purple-100'}`}>
+                    {selectedPrestasi.kategori === 'Tim' ? (
+                      <Users className="text-primary" size={24} />
+                    ) : (
+                      <User className="text-primary" size={24} />
+                    )}
+                  </div>
+                  <div>
+                    <h2 className="text-xl font-bold text-gray-800">Detail Prestasi</h2>
+                    <p className="text-sm text-gray-600">{selectedPrestasi.id}</p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setShowDetailModal(false)}
+                  className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                >
+                  <X size={20} className="text-gray-500" />
+                </button>
+              </div>
+            </div>
+
+            <div className="p-6">
+              <div className="mb-6">
+                <div className="flex items-center gap-2 mb-3">
+                  <div className={`px-3 py-1 rounded-full text-sm font-bold border ${getPeringkatBadge(selectedPrestasi.peringkat)} flex items-center gap-2`}>
+                    <Trophy size={16} />
+                    Juara {selectedPrestasi.peringkat}
+                  </div>
+                  <span className={`px-3 py-1 rounded-full text-sm font-medium ${getTingkatBadge(selectedPrestasi.tingkat)}`}>
+                    {selectedPrestasi.tingkat}
+                  </span>
+                </div>
+                <h1 className="text-2xl font-bold text-gray-800 mb-2">{selectedPrestasi.judul}</h1>
+                <p className="text-gray-600">{selectedPrestasi.namaEvent}</p>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                <div className="space-y-4">
+                  <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                    <Calendar className="text-primary" size={20} />
+                    <div>
+                      <p className="text-sm font-medium text-gray-700">Tanggal Event</p>
+                      <p className="text-gray-800">
+                        {new Date(selectedPrestasi.tanggal).toLocaleDateString('id-ID', {
+                          weekday: 'long',
+                          day: 'numeric',
+                          month: 'long',
+                          year: 'numeric',
+                        })}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                    <MapPin className="text-primary" size={20} />
+                    <div>
+                      <p className="text-sm font-medium text-gray-700">Tingkat Kompetisi</p>
+                      <p className="text-gray-800">{selectedPrestasi.tingkat}</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="space-y-4">
+                  <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                    {selectedPrestasi.kategori === 'Tim' ? (
+                      <Users className="text-primary" size={20} />
+                    ) : (
+                      <User className="text-primary" size={20} />
+                    )}
+                    <div>
+                      <p className="text-sm font-medium text-gray-700">Kategori</p>
+                      <p className="text-gray-800">{selectedPrestasi.kategori}</p>
+                    </div>
+                  </div>
+
+                  {selectedPrestasi.namaSiswa && (
+                    <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                      <User className="text-primary" size={20} />
+                      <div>
+                        <p className="text-sm font-medium text-gray-700">Nama Siswa</p>
+                        <p className="text-gray-800">{selectedPrestasi.namaSiswa}</p>
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                    <Award className="text-primary" size={20} />
+                    <div>
+                      <p className="text-sm font-medium text-gray-700">Peringkat</p>
+                      <p className="text-gray-800">Juara {selectedPrestasi.peringkat}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="mb-6">
+                <h3 className="text-lg font-semibold text-gray-800 mb-3">Deskripsi Prestasi</h3>
+                <div className="bg-gray-50 rounded-lg p-4">
+                  <p className="text-gray-700 leading-relaxed">{selectedPrestasi.deskripsi}</p>
+                </div>
+              </div>
+
+              <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t border-gray-200">
+                <Link
+                  to={`/admin/prestasi/edit/${selectedPrestasi.id}`}
+                  className="flex-1 bg-primary text-white font-medium px-4 py-2 rounded-md inline-flex items-center justify-center hover:bg-primary/90 transition-colors"
+                >
+                  <Edit className="mr-2" size={16} />
+                  Edit Prestasi
+                </Link>
+                <button
+                  onClick={() => {
+                    setShowDetailModal(false);
+                    handleOpenModal(selectedPrestasi.id);
+                  }}
+                  className="flex-1 bg-red-600 text-white font-medium px-4 py-2 rounded-md inline-flex items-center justify-center hover:bg-red-700 transition-colors"
+                >
+                  <Trash2 className="mr-2" size={16} />
+                  Hapus Prestasi
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {showModal && (
         <div className="fixed inset-0 bg-black/20 backdrop-blur-none flex items-center justify-center z-50">
           <div className="bg-white rounded-lg p-6 shadow-lg max-w-md w-full mx-4">
