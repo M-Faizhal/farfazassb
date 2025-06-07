@@ -51,7 +51,7 @@ export default function Team() {
               />
             </div>
             <div className="w-full md:w-1/2 text-center md:text-left">
-              <h2 className="text-4xl font-bold text-gray-800 mb-4">Team</h2>
+              <h2 className="text-4xl font-bold text-gray-800 mb-4">Kaido</h2>
               <p className="text-lg text-gray-600 leading-relaxed">
                 Get to know the team
                 <br />
