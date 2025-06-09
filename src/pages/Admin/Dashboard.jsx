@@ -3,6 +3,7 @@ import AdminHeader from "../../components/Admin/Header";
 import { useEffect, useState } from "react";
 import Api from "../../utils/Api";
 import { useToken } from "../../utils/Cookies";
+import { jwtDecode } from "jwt-decode";
 
 const AdminDashboard = () => {
   const [siswa, setSiswa] = useState([]);
@@ -19,6 +20,16 @@ const AdminDashboard = () => {
     })
   }
 
+     const getSiswaByCoach = async() =>{
+    await Api.get("/admin/students/coach/" + jwtDecode(getToken()).userId,{
+      headers : { 
+        Authorization : "Bearer " + getToken()
+      }
+    }).then((res)=>{
+      setSiswa(res.data)
+    })
+  }
+
   const getAllSiswa = async () => {
     await Api.get("/admin/students", {
       headers: {
@@ -30,7 +41,16 @@ const AdminDashboard = () => {
   };
 
   useEffect(() => {
-    getAllSiswa();
+    const role = jwtDecode(getToken()).role
+    switch (role) {
+      case "SUPER_ADMIN":
+        getAllSiswa();
+        break;
+    
+      case "COACH":
+        getSiswaByCoach()
+        break;
+    }
     getAllPelatih()
   }, []);
 

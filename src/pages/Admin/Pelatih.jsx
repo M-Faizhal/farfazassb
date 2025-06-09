@@ -7,6 +7,7 @@ import { sortIcon } from '../../utils/sort';
 import Api from '../../utils/Api';
 import { useToken } from '../../utils/Cookies';
 import toast from 'react-hot-toast';
+import { jwtDecode } from 'jwt-decode';
 
 const Pelatih = () => {
   const [search, setSearch] = useState('');
@@ -89,12 +90,12 @@ const Pelatih = () => {
 
           <div className="flex justify-between items-center mb-6 mt-6">
             <h1 className="text-xl font-bold text-black">Data Akun Pelatih</h1>
-            <Link
+            {jwtDecode(getToken()).role == "SUPER_ADMIN"? (<Link
               to="/admin/pelatih/create"
               className="bg-primary text-white font-medium px-4 py-2 rounded-md"
             >
               New Coach Account
-            </Link>
+            </Link>) : null }
           </div>
 
           <div className="bg-white rounded-md border border-gray-200 shadow-sm mb-8">
@@ -125,7 +126,7 @@ const Pelatih = () => {
                       Email {sortIcon(sortField, sortOrder, 'email')}
                     </th>
                     <th className="px-4 py-3">No. Telepon</th>
-                    <th className="px-4 py-3 text-right">Aksi</th>
+                    {jwtDecode(getToken()).role == "SUPER_ADMIN"? (<th className="px-4 py-3 text-right">Aksi</th>) : null }
                   </tr>
                 </thead>
                 <tbody>
@@ -138,7 +139,7 @@ const Pelatih = () => {
                         <td className="px-4 py-3 font-medium">{p.name}</td>
                         <td className="px-4 py-3">{p.email}</td>
                         <td className="px-4 py-3">{p.telp}</td>
-                        <td className="px-4 py-3 text-right">
+                        {jwtDecode(getToken()).role == "SUPER_ADMIN" ? (<td className="px-4 py-3 text-right">
                           <div className="flex justify-end gap-3">
                             <Link to={`/admin/pelatih/edit/${p.id}`}>
                               <Edit className="text-primary w-5 h-5 hover:scale-110 cursor-pointer" />
@@ -147,7 +148,7 @@ const Pelatih = () => {
                               <Trash2 className="text-red-600 w-5 h-5 hover:scale-110" />
                             </button>
                           </div>
-                        </td>
+                        </td>) : null}
                       </tr>
                     ))
                   ) : (

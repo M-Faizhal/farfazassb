@@ -1,12 +1,15 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import AdminSidebar from "../../../components/Admin/Sidebar";
 import AdminHeader from "../../../components/Admin/Header";
 import Api from "../../../utils/Api";
 import { useToken } from "../../../utils/Cookies";
+import { jwtDecode } from "jwt-decode";
+import toast from "react-hot-toast";
 
 const CreateSiswa = () => {
   const navigate = useNavigate();
+  const {getToken} = useToken()
   const [formData, setFormData] = useState({
     nama: "",
     gender: "",
@@ -15,7 +18,7 @@ const CreateSiswa = () => {
     age: "",
     level: "",
     kategoriBMI: "",
-    coachId: null,
+    coachId: jwtDecode(getToken()).userId,
   });
 
   const [files, setFiles] = useState({
@@ -27,10 +30,8 @@ const CreateSiswa = () => {
   });
 
   const [previews, setPreviews] = useState({});
-  const [showCancelModal, setShowCancelModal] = useState(false);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
-  const {getToken} = useToken()
 
   const handleChange = (e) => {
     const { id, value } = e.target;
@@ -49,13 +50,36 @@ const CreateSiswa = () => {
     }
   };
 
+  const addSiswa = async() =>{
+    const data = new FormData()
+    data.append("coachId",formData.coachId)
+    data.append("name",formData.nama)
+    data.append("age",formData.age)
+    data.append("gender",formData.gender)
+    data.append("level",formData.level)
+    data.append("tanggalLahir",formData.tanggalLahir)
+    data.append("tempatLahir",formData.tempatLahir)
+    data.append("kategoriBMI",formData.kategoriBMI)
+    data.append("photo",files.foto)
+    await Api.post("/admin/students",data,{
+      headers : {
+        Authorization : "Bearer " + getToken()
+      }
+    }).then(()=>{
+      toast.success("Berhasil menambah siswa")
+      navigate("/admin/siswa")
+    }).catch(err=>{
+      console.log(err)
+    })
+  }
+
+const handleGender = (e) => {
+  setFormData({ ...formData, gender: e.target.value === "Laki-Laki" ? "L" : "P" });
+};
+
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log("Form submitted:", formData, files);
-    setSuccessMessage("Data siswa berhasil ditambahkan!");
-    setTimeout(() => {
-      navigate("/admin/siswa");
-    }, 2000);
+    addSiswa()
   };
 
   return (
@@ -92,8 +116,8 @@ const CreateSiswa = () => {
               label="Jenis Kelamin"
               id="gender"
               required
-              onChange={handleChange}
-              value={formData.gender}
+              onChange={handleGender}
+              value={formData.gender == "L"? "Laki-Laki": "Perempuan"}
               options={["Laki-Laki", "Perempuan"]}
             />
 
@@ -137,6 +161,15 @@ const CreateSiswa = () => {
                 "U17",
                 "U18",
               ]}
+            />
+
+            <SelectField
+              label="Kategori BMI"
+              id="kategoriBMI"
+              required
+              onChange={handleChange}
+              value={formData.kategoriBMI}
+              options={["NORMAL", "UNDERWEIGHT", "OVERWEIGHT"]}
             />
 
             <FileUpload

@@ -5,7 +5,6 @@ import AdminSidebar from '../../components/Admin/Sidebar';
 import AdminHeader from '../../components/Admin/Header';
 import { sortIcon } from '../../utils/sort';
 import Api from '../../utils/Api';
-import { useCookies } from 'react-cookie';
 import { toLocal } from '../../utils/dates';
 import { useToken } from '../../utils/Cookies';
 import { jwtDecode } from 'jwt-decode';
@@ -98,12 +97,12 @@ const Siswa = () => {
 
           <div className="flex justify-between items-center mb-6 mt-6">
             <h1 className="text-xl font-bold text-black">Data Siswa</h1>
-            <Link
+            {jwtDecode(getToken()).role == "COACH" ? (<Link
               to="/admin/siswa/create"
               className="bg-primary text-white font-medium px-4 py-2 rounded-md"
             >
               New Student
-            </Link>
+            </Link>):null }
           </div>
 
           <div className="bg-white rounded-md border border-gray-200 shadow-sm mb-8">
@@ -177,9 +176,9 @@ const Siswa = () => {
                         <td className="px-4 py-3">{siswa.kategoriBMI}</td>
                         <td className="px-4 py-3 text-right">
                           <div className="flex justify-end gap-3">
-                            <Link to={`/admin/siswa/edit`}>
+                            {jwtDecode(getToken()).role == "COACH"? (<Link to={`/admin/siswa/edit`}>
                               <FiEdit className="text-primary w-5 h-5 hover:scale-110" />
-                            </Link>
+                            </Link>) : null}
                             <button onClick={() => handleOpenModal(siswa.id)}>
                               <FiTrash2 className="text-red-600 w-5 h-5 hover:scale-110" />
                             </button>
