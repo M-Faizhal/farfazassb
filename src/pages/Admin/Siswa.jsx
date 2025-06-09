@@ -149,7 +149,7 @@ const Siswa = () => {
                       >
                         <td className="px-4 py-3 font-medium">{siswa.id}</td>
                         <td className="px-4 py-3">{siswa.name}</td>
-                        <td className="px-4 py-3">{siswa.gender}</td>
+                        <td className="px-4 py-3">{siswa.gender == "L"? "Laki-Laki" : "Perempuan"}</td>
                         <td className="px-4 py-3">{siswa.tempatLahir + ", " + toLocal(siswa.tanggalLahir)}</td>
                         <td className="px-4 py-3">{siswa.age}</td>
                         <td className="px-4 py-3">{siswa.level}</td>

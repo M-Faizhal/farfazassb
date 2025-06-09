@@ -3,15 +3,18 @@ import { useNavigate } from 'react-router-dom';
 import { Eye, EyeOff } from 'lucide-react';
 import AdminSidebar from '../../../components/Admin/Sidebar';
 import AdminHeader from '../../../components/Admin/Header';
+import Api from '../../../utils/Api';
+import { useToken } from '../../../utils/Cookies';
+import toast from 'react-hot-toast';
 
 const CreatePelatih = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
-    id: '',
     nama: '',
-    jenisKelamin: '',
+    gender: '',
     password: '',
-    sertifikasi: '',
+    email: '',
+    telp: '',
   });
 
   const [foto, setFoto] = useState(null);
@@ -19,6 +22,29 @@ const CreatePelatih = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
+  const {getToken} = useToken()
+
+  const addPelatih = async() =>{
+
+    const form = new FormData();
+      form.append("name", formData.nama);
+      form.append("email", formData.email);
+      form.append("telp",formData.telp)
+      form.append("gender",formData.gender)
+      if (formData.password) form.append("password", formData.password);
+      if (foto) form.append("photo", foto);
+
+    await Api.post("/admin/coaches", form,{
+      headers : {
+        Authorization : "Bearer " + getToken()
+      }
+    }).then(()=>{
+      toast.success("Berhasil membuat pelatih!")
+      navigate("/admin/pelatih")
+    }).catch(err=>{
+      console.log(err)
+    })
+  }
 
   const handleChange = (e) => {
     const { id, value } = e.target;
@@ -40,11 +66,7 @@ const CreatePelatih = () => {
       return;
     }
 
-    console.log('Data Pelatih:', formData, foto);
-    setSuccessMessage('Data pelatih berhasil ditambahkan!');
-    setTimeout(() => {
-      navigate('/admin/pelatih');
-    }, 2000);
+    addPelatih()
   };
 
   return (
@@ -61,18 +83,13 @@ const CreatePelatih = () => {
             onSubmit={(e) => e.preventDefault()}
             className="grid grid-cols-1 md:grid-cols-2 gap-x-4 md:gap-x-8 gap-y-4 md:gap-y-6 max-w-6xl bg-white p-4 md:p-6 rounded-md border border-gray-200 shadow-sm"
           >
-            <InputField label="ID Pelatih" id="id" required value={formData.id} onChange={handleChange} />
             <FileUpload label="Foto Pelatih" id="foto" required onChange={handleFileChange} preview={preview} />
 
             <InputField label="Nama" id="nama" required value={formData.nama} onChange={handleChange} />
-            <SelectField
-              label="Jenis Kelamin"
-              id="jenisKelamin"
-              required
-              value={formData.jenisKelamin}
-              onChange={handleChange}
-              options={['Laki-laki', 'Perempuan']}
-            />
+
+            <InputField label="Email" id="email" required value={formData.email} onChange={handleChange} />
+
+            <InputField label="No. Telepon" id="telp" required value={formData.telp} onChange={handleChange} />
 
             <PasswordField
               label="Password"
@@ -83,6 +100,16 @@ const CreatePelatih = () => {
               show={showPassword}
               toggleShow={() => setShowPassword((prev) => !prev)}
             />
+
+            <SelectField
+              label="Jenis Kelamin"
+              id="gender"
+              required
+              value={formData.gender}
+              onChange={handleChange}
+              options={['Laki-Laki', 'Perempuan']}
+            />
+
             <SelectField
               label="Sertifikasi"
               id="sertifikasi"
@@ -116,9 +143,8 @@ const CreatePelatih = () => {
               <div className="bg-white rounded-lg p-6 shadow-lg max-w-md w-full">
                 <h2 className="text-lg font-semibold mb-2">Konfirmasi Tambah</h2>
                 <div className="text-sm text-gray-800 space-y-1 mb-4">
-                  <p><strong>ID:</strong> {formData.id}</p>
                   <p><strong>Nama:</strong> {formData.nama}</p>
-                  <p><strong>Jenis Kelamin:</strong> {formData.jenisKelamin}</p>
+                  <p><strong>Jenis Kelamin:</strong> {formData.gender}</p>
                   <p><strong>Sertifikasi:</strong> {formData.sertifikasi}</p>
                   <p><strong>Password:</strong> {formData.password.replace(/./g, '*')}</p>
                   {preview && (
