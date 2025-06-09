@@ -1,7 +1,39 @@
-import AdminSidebar from '../../components/Admin/Sidebar';
-import AdminHeader from '../../components/Admin/Header';
+import AdminSidebar from "../../components/Admin/Sidebar";
+import AdminHeader from "../../components/Admin/Header";
+import { useEffect, useState } from "react";
+import Api from "../../utils/Api";
+import { useToken } from "../../utils/Cookies";
 
 const AdminDashboard = () => {
+  const [siswa, setSiswa] = useState([]);
+  const [pelatih,setPelatih] = useState([])
+  const { getToken } = useToken();
+
+  const getAllPelatih = async() =>{
+    await Api.get("/admin/coaches",{
+      headers : {
+        Authorization : "Bearer " + getToken()
+      }
+    }).then((res)=>{
+      setPelatih(res.data)
+    })
+  }
+
+  const getAllSiswa = async () => {
+    await Api.get("/admin/students", {
+      headers: {
+        Authorization: "Bearer " + getToken(),
+      },
+    }).then((res) => {
+      setSiswa(res.data);
+    });
+  };
+
+  useEffect(() => {
+    getAllSiswa();
+    getAllPelatih()
+  }, []);
+
   return (
     <div className="bg-white min-h-screen text-sm text-[#333]">
       <div className="flex flex-col md:flex-row  mx-auto min-h-screen">
@@ -12,22 +44,31 @@ const AdminDashboard = () => {
 
           <div className="flex justify-between items-center mb-6 mt-6">
             <h1 className="text-xl font-bold text-black">Dashboard</h1>
-            
           </div>
 
           {/* Summary cards */}
           <section className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
-            {['Siswa', 'Pelatih', 'Orang Tua', 'Prestasi'].map((item, i) => (
-              <div key={i} className="bg-primary rounded-lg p-4 shadow-sm text-white">
-                <p className="text-sm font-medium mb-1">Total {item}</p>
-                <p className="text-2xl font-bold">{i === 0 ? 200 : '—'}</p>
+            {[
+              { label: "Siswa", value: siswa.length },
+              { label: "Pelatih", value: pelatih.length },
+              { label: "Orang tua", value: 0 },
+              { label: "Prestasi", value: 0 },
+            ].map((item, i) => (
+              <div
+                key={i}
+                className="bg-primary rounded-lg p-4 shadow-sm text-white"
+              >
+                <p className="text-sm font-medium mb-1">Total {item.label}</p>
+                <p className="text-2xl font-bold">{item.value}</p>
               </div>
             ))}
           </section>
 
           {/* Kehadiran */}
           <section className="mb-10">
-            <h2 className="text-base font-semibold text-black mb-4">Kehadiran Terbaru</h2>
+            <h2 className="text-base font-semibold text-black mb-4">
+              Kehadiran Terbaru
+            </h2>
             <div className="overflow-x-auto bg-white rounded-md border border-gray-200 shadow-sm">
               <table className="w-full text-left table-auto">
                 <thead className="bg-primary text-white">
@@ -41,12 +82,20 @@ const AdminDashboard = () => {
                   <tr className="border-t">
                     <td className="px-4 py-2">Alex</td>
                     <td className="px-4 py-2 text-gray-700">2023-12-12</td>
-                    <td className="px-4 py-2"><span className="bg-red-600 text-white px-3 py-1 rounded-full text-xs font-semibold">Absent</span></td>
+                    <td className="px-4 py-2">
+                      <span className="bg-red-600 text-white px-3 py-1 rounded-full text-xs font-semibold">
+                        Absent
+                      </span>
+                    </td>
                   </tr>
                   <tr className="border-t">
                     <td className="px-4 py-2">Liam</td>
                     <td className="px-4 py-2 text-gray-700">2023-12-12</td>
-                    <td className="px-4 py-2"><span className="bg-green-600 text-white px-3 py-1 rounded-full text-xs font-semibold">Present</span></td>
+                    <td className="px-4 py-2">
+                      <span className="bg-green-600 text-white px-3 py-1 rounded-full text-xs font-semibold">
+                        Present
+                      </span>
+                    </td>
                   </tr>
                 </tbody>
               </table>
@@ -55,7 +104,9 @@ const AdminDashboard = () => {
 
           {/* Nilai */}
           <section>
-            <h2 className="text-base font-semibold text-black mb-4">Nilai Terbaru</h2>
+            <h2 className="text-base font-semibold text-black mb-4">
+              Nilai Terbaru
+            </h2>
             <div className="overflow-x-auto bg-white rounded-md border border-gray-200 shadow-sm">
               <table className="w-full text-left table-auto">
                 <thead className="bg-primary text-white">

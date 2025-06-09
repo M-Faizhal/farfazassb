@@ -1,18 +1,21 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import AdminSidebar from '../../../components/Admin/Sidebar';
-import AdminHeader from '../../../components/Admin/Header';
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import AdminSidebar from "../../../components/Admin/Sidebar";
+import AdminHeader from "../../../components/Admin/Header";
+import Api from "../../../utils/Api";
+import { useToken } from "../../../utils/Cookies";
 
 const CreateSiswa = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
-    id: '',
-    nama: '',
-    jenisKelamin: '',
-    tempatLahir: '',
-    tanggalLahir: '',
-    usia: '',
-    level: '',
+    nama: "",
+    gender: "",
+    tempatLahir: "",
+    tanggalLahir: "",
+    age: "",
+    level: "",
+    kategoriBMI: "",
+    coachId: null,
   });
 
   const [files, setFiles] = useState({
@@ -26,7 +29,8 @@ const CreateSiswa = () => {
   const [previews, setPreviews] = useState({});
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [showCreateModal, setShowCreateModal] = useState(false);
-  const [successMessage, setSuccessMessage] = useState('');
+  const [successMessage, setSuccessMessage] = useState("");
+  const {getToken} = useToken()
 
   const handleChange = (e) => {
     const { id, value } = e.target;
@@ -47,10 +51,10 @@ const CreateSiswa = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log('Form submitted:', formData, files);
-    setSuccessMessage('Data siswa berhasil ditambahkan!');
+    console.log("Form submitted:", formData, files);
+    setSuccessMessage("Data siswa berhasil ditambahkan!");
     setTimeout(() => {
-      navigate('/admin/siswa');
+      navigate("/admin/siswa");
     }, 2000);
   };
 
@@ -58,32 +62,107 @@ const CreateSiswa = () => {
     <div className="bg-[#f7f7f7] min-h-screen text-sm text-[#333]">
       <div className="flex flex-col md:flex-row mx-auto min-h-screen">
         <AdminSidebar />
-        
+
         <main className="flex-1 px-6 py-8 pt-20 md:pt-0 md:ml-64">
           <AdminHeader />
 
-          <h2 className="text-black text-xl font-bold mb-6 mt-6">Tambah Data Siswa</h2>
+          <h2 className="text-black text-xl font-bold mb-6 mt-6">
+            Tambah Data Siswa
+          </h2>
 
           <form
             onSubmit={(e) => e.preventDefault()}
             className="grid grid-cols-1 md:grid-cols-2 gap-x-4 md:gap-x-8 gap-y-4 md:gap-y-6 max-w-6xl bg-white p-4 md:p-6 rounded-md border border-gray-200 shadow-sm"
           >
-            <InputField label="ID Siswa" id="id" required onChange={handleChange} value={formData.id} />
-            <FileUpload label="Foto Siswa" id="foto" onChange={handleFileChange} preview={previews.foto} />
+            <FileUpload
+              label="Foto Siswa"
+              id="foto"
+              onChange={handleFileChange}
+              preview={previews.foto}
+            />
 
-            <InputField label="Nama" id="nama" required onChange={handleChange} value={formData.nama} />
-            <SelectField label="Jenis Kelamin" id="jenisKelamin" required onChange={handleChange} value={formData.jenisKelamin} options={['Laki-laki', 'Perempuan']} />
+            <InputField
+              label="Nama"
+              id="nama"
+              required
+              onChange={handleChange}
+              value={formData.nama}
+            />
+            <SelectField
+              label="Jenis Kelamin"
+              id="gender"
+              required
+              onChange={handleChange}
+              value={formData.gender}
+              options={["Laki-Laki", "Perempuan"]}
+            />
 
-            <InputField label="Tempat Lahir" id="tempatLahir" required onChange={handleChange} value={formData.tempatLahir} />
-            <InputField label="Tanggal Lahir" id="tanggalLahir" type="date" required onChange={handleChange} value={formData.tanggalLahir} />
+            <InputField
+              label="Tempat Lahir"
+              id="tempatLahir"
+              required
+              onChange={handleChange}
+              value={formData.tempatLahir}
+            />
+            <InputField
+              label="Tanggal Lahir"
+              id="tanggalLahir"
+              type="date"
+              required
+              onChange={handleChange}
+              value={formData.tanggalLahir}
+            />
 
-            <InputField label="Usia" id="usia" onChange={handleChange} value={formData.usia} />
-            <SelectField label="Level" id="level" onChange={handleChange} value={formData.level} options={['U9', 'U10', 'U11', 'U12']} />
+            <InputField
+              label="Usia"
+              id="age"
+              onChange={handleChange}
+              value={formData.age}
+            />
+            <SelectField
+              label="Level"
+              id="level"
+              onChange={handleChange}
+              value={formData.level}
+              options={[
+                "U8",
+                "U9",
+                "U10",
+                "U11",
+                "U12",
+                "U13",
+                "U14",
+                "U15",
+                "U16",
+                "U17",
+                "U18",
+              ]}
+            />
 
-            <FileUpload label="Kartu Keluarga" id="kk" onChange={handleFileChange} preview={previews.kk} />
-            <FileUpload label="Kartu Koperasi" id="koperasi" onChange={handleFileChange} preview={previews.koperasi} />
-            <FileUpload label="Akta Kelahiran" id="akta" onChange={handleFileChange} preview={previews.akta} />
-            <FileUpload label="Kartu BPJS" id="bpjs" onChange={handleFileChange} preview={previews.bpjs} />
+            <FileUpload
+              label="Kartu Keluarga"
+              id="kk"
+              onChange={handleFileChange}
+              preview={previews.kk}
+            />
+            <FileUpload
+              label="Kartu Koperasi"
+              id="koperasi"
+              onChange={handleFileChange}
+              preview={previews.koperasi}
+            />
+            <FileUpload
+              label="Akta Kelahiran"
+              id="akta"
+              onChange={handleFileChange}
+              preview={previews.akta}
+            />
+            <FileUpload
+              label="Kartu BPJS"
+              id="bpjs"
+              onChange={handleFileChange}
+              preview={previews.bpjs}
+            />
           </form>
 
           <div className="mt-6 flex flex-col sm:flex-row gap-3 ">
@@ -96,7 +175,7 @@ const CreateSiswa = () => {
             </button>
             <button
               type="button"
-              onClick={() => navigate('/admin/siswa')}
+              onClick={() => navigate("/admin/siswa")}
               className="bg-gray-200 cursor-pointer text-gray-800 font-semibold px-4 py-2 rounded-md w-full sm:w-auto "
             >
               Cancel
@@ -107,7 +186,9 @@ const CreateSiswa = () => {
           {showCreateModal && (
             <div className="fixed inset-0 bg-black/20 backdrop-blur-none flex items-center justify-center z-50 px-4">
               <div className="bg-white rounded-lg p-6 shadow-lg max-w-md w-full">
-                <h2 className="text-lg font-semibold mb-2">Konfirmasi Tambah</h2>
+                <h2 className="text-lg font-semibold mb-2">
+                  Konfirmasi Tambah
+                </h2>
                 <p className="text-sm text-gray-700 mb-4">
                   Apakah data yang Anda masukkan sudah benar?
                 </p>
@@ -141,7 +222,14 @@ const CreateSiswa = () => {
   );
 };
 
-const InputField = ({ label, id, required, type = 'text', value, onChange }) => (
+const InputField = ({
+  label,
+  id,
+  required,
+  type = "text",
+  value,
+  onChange,
+}) => (
   <div className="flex flex-col">
     <label htmlFor={id} className="text-sm text-black mb-1">
       {label}
@@ -158,7 +246,14 @@ const InputField = ({ label, id, required, type = 'text', value, onChange }) => 
   </div>
 );
 
-const SelectField = ({ label, id, options = [], required, value, onChange }) => (
+const SelectField = ({
+  label,
+  id,
+  options = [],
+  required,
+  value,
+  onChange,
+}) => (
   <div className="flex flex-col">
     <label htmlFor={id} className="text-sm text-black mb-1">
       {label}
@@ -192,13 +287,18 @@ const FileUpload = ({ label, id, onChange, preview }) => (
           htmlFor={id}
           className="cursor-pointer rounded-md bg-white border border-gray-300 h-12 flex items-center justify-center text-sm text-gray-600"
         >
-          Drag & Drop atau <span className="text-primary font-semibold ml-1">Browse</span>
+          Drag & Drop atau{" "}
+          <span className="text-primary font-semibold ml-1">Browse</span>
         </label>
         <input id={id} type="file" onChange={onChange} className="hidden" />
       </>
     ) : (
       <div className="mt-3 border rounded overflow-hidden">
-        <img src={preview} alt={`Preview ${id}`} className="w-full max-h-32 md:max-h-64 object-contain" />
+        <img
+          src={preview}
+          alt={`Preview ${id}`}
+          className="w-full max-h-32 md:max-h-64 object-contain"
+        />
       </div>
     )}
   </div>

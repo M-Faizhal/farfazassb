@@ -7,6 +7,8 @@ import { sortIcon } from '../../utils/sort';
 import Api from '../../utils/Api';
 import { useCookies } from 'react-cookie';
 import { toLocal } from '../../utils/dates';
+import { useToken } from '../../utils/Cookies';
+import { jwtDecode } from 'jwt-decode';
 
 const Siswa = () => {
   const [search, setSearch] = useState('');
@@ -15,12 +17,22 @@ const Siswa = () => {
   const [showModal, setShowModal] = useState(false);
   const [selectedId, setSelectedId] = useState(null);
   const [siswa,setSiswa] = useState([])
-  const [cookies] = useCookies([import.meta.env.VITE_COOKIES_NAME]);
+  const {getToken} = useToken()
 
   const getAllSiswa = async() =>{
     await Api.get("/admin/students",{
       headers : { 
-        Authorization : "Bearer " + cookies.session 
+        Authorization : "Bearer " + getToken()
+      }
+    }).then((res)=>{
+      setSiswa(res.data)
+    })
+  }
+
+   const getSiswaByCoach = async() =>{
+    await Api.get("/admin/students/coach/" + jwtDecode(getToken()).userId,{
+      headers : { 
+        Authorization : "Bearer " + getToken()
       }
     }).then((res)=>{
       setSiswa(res.data)
@@ -64,7 +76,16 @@ const Siswa = () => {
     });
 
     useEffect(()=>{
-      getAllSiswa()
+      const role = jwtDecode(getToken()).role
+      switch (role) {
+        case "SUPER_ADMIN":
+          getAllSiswa()
+          break;
+      
+        case "COACH":
+          getSiswaByCoach()
+          break;
+      }
     },[])
 
   return (
@@ -108,22 +129,22 @@ const Siswa = () => {
                     </th>
                     <th
                       className="px-4 py-3 cursor-pointer"
-                      onClick={() => handleSort('nama')}
+                      onClick={() => handleSort('name')}
                     >
-                      Nama {sortIcon('nama')}
+                      Nama {sortIcon('name')}
                     </th>
                     <th
                       className="px-4 py-3 cursor-pointer"
-                      onClick={() => handleSort('jenisKelamin')}
+                      onClick={() => handleSort('gender')}
                     >
-                      Jenis Kelamin {sortIcon('jenisKelamin')}
+                      Jenis Kelamin {sortIcon('gender')}
                     </th>
                     <th className="px-4 py-3">Tempat, Tanggal Lahir</th>
                     <th
                       className="px-4 py-3 cursor-pointer"
-                      onClick={() => handleSort('usia')}
+                      onClick={() => handleSort('age')}
                     >
-                      Usia {sortIcon('usia')}
+                      Usia {sortIcon('age')}
                     </th>
                     <th
                       className="px-4 py-3 cursor-pointer"
