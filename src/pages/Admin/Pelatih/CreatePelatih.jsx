@@ -21,7 +21,6 @@ const CreatePelatih = () => {
   const [preview, setPreview] = useState(null);
   const [showPassword, setShowPassword] = useState(false);
   const [showCreateModal, setShowCreateModal] = useState(false);
-  const [successMessage, setSuccessMessage] = useState('');
   const {getToken} = useToken()
 
   const addPelatih = async() =>{
@@ -166,13 +165,6 @@ const CreatePelatih = () => {
                   </button>
                 </div>
               </div>
-            </div>
-          )}
-
-          {/* Notifikasi Sukses */}
-          {successMessage && (
-            <div className="fixed bottom-6 right-6 bg-green-500 text-white px-4 py-3 rounded-md shadow-lg z-50 mx-4">
-              {successMessage}
             </div>
           )}
         </main>
