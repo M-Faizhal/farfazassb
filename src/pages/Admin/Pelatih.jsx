@@ -5,7 +5,8 @@ import AdminSidebar from '../../components/Admin/Sidebar';
 import AdminHeader from '../../components/Admin/Header';
 import { sortIcon } from '../../utils/sort';
 import Api from '../../utils/Api';
-import { useCookies } from 'react-cookie';
+import { useToken } from '../../utils/Cookies';
+import toast from 'react-hot-toast';
 
 const Pelatih = () => {
   const [search, setSearch] = useState('');
@@ -14,16 +15,26 @@ const Pelatih = () => {
   const [showModal, setShowModal] = useState(false);
   const [selectedId, setSelectedId] = useState(null);
   const [pelatih,setPelatih] = useState([])
-  const [cookies] = useCookies([import.meta.env.VITE_COOKIES_NAME]);
+  const {getToken} = useToken()
+
+  const hapusPelatih = async(id) =>{
+    await Api.delete("/admin/coaches/" + id,{
+      headers : {
+        Authorization : "Bearer " + getToken()
+      }
+    }).then(()=>{
+      toast.success("Sukses Menghapus Pelatih")
+      getAllPelatih()
+    })
+  }
 
     const getAllPelatih = async() =>{
     await Api.get("/admin/coaches",{
       headers : {
-        Authorization : "Bearer " + cookies.session 
+        Authorization : "Bearer " + getToken()
       }
     }).then((res)=>{
       setPelatih(res.data)
-      console.log(res.data)
     })
   }
 
@@ -41,8 +52,8 @@ const Pelatih = () => {
     setShowModal(true);
   };
 
-  const handleDelete = () => {
-    console.log(`Menghapus akun pelatih dengan ID: ${selectedId}`);
+  const handleDelete = async() => {
+    await hapusPelatih(selectedId)
     setShowModal(false);
   };
 
@@ -103,9 +114,9 @@ const Pelatih = () => {
                   <tr>
                     <th
                       className="px-4 py-3 cursor-pointer"
-                      onClick={() => handleSort('nama')}
+                      onClick={() => handleSort('name')}
                     >
-                      Nama {sortIcon(sortField, sortOrder, 'nama')}
+                      Nama {sortIcon(sortField, sortOrder, 'name')}
                     </th>
                     <th
                       className="px-4 py-3 cursor-pointer"
