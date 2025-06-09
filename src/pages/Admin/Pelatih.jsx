@@ -1,30 +1,11 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Edit, Trash2 } from 'lucide-react';
 import AdminSidebar from '../../components/Admin/Sidebar';
 import AdminHeader from '../../components/Admin/Header';
 import { sortIcon } from '../../utils/sort';
-
-const pelatihDummy = [
-  {
-    id: 1,
-    nama: 'Rudi Hartono',
-    email: 'rudi.hartono@email.com',
-    noTelepon: '081234567890',
-  },
-  {
-    id: 2,
-    nama: 'Dewi Lestari',
-    email: 'dewi.lestari@email.com',
-    noTelepon: '081234567891',
-  },
-  {
-    id: 3,
-    nama: 'Andi Prasetya',
-    email: 'andi.prasetya@email.com',
-    noTelepon: '081234567892',
-  },
-];
+import Api from '../../utils/Api';
+import { useCookies } from 'react-cookie';
 
 const Pelatih = () => {
   const [search, setSearch] = useState('');
@@ -32,6 +13,19 @@ const Pelatih = () => {
   const [sortOrder, setSortOrder] = useState('asc');
   const [showModal, setShowModal] = useState(false);
   const [selectedId, setSelectedId] = useState(null);
+  const [pelatih,setPelatih] = useState([])
+  const [cookies] = useCookies([import.meta.env.VITE_COOKIES_NAME]);
+
+    const getAllPelatih = async() =>{
+    await Api.get("/admin/coaches",{
+      headers : {
+        Authorization : "Bearer " + cookies.session 
+      }
+    }).then((res)=>{
+      setPelatih(res.data)
+      console.log(res.data)
+    })
+  }
 
   const handleSort = (field) => {
     if (field === sortField) {
@@ -52,9 +46,9 @@ const Pelatih = () => {
     setShowModal(false);
   };
 
-  const filteredPelatih = pelatihDummy
+  const filteredPelatih = pelatih
     .filter((p) =>
-      p.nama.toLowerCase().includes(search.toLowerCase()) ||
+      p.name.toLowerCase().includes(search.toLowerCase()) || 
       p.email.toLowerCase().includes(search.toLowerCase())
     )
     .sort((a, b) => {
@@ -69,6 +63,10 @@ const Pelatih = () => {
         ? valA - valB
         : valB - valA;
     });
+
+    useEffect(()=>{
+      getAllPelatih()
+    },[])
 
   return (
     <div className="bg-[#f7f7f7] min-h-screen text-sm text-[#333]">
@@ -126,12 +124,12 @@ const Pelatih = () => {
                         key={p.id}
                         className="border-t border-gray-200 hover:bg-gray-50"
                       >
-                        <td className="px-4 py-3 font-medium">{p.nama}</td>
+                        <td className="px-4 py-3 font-medium">{p.name}</td>
                         <td className="px-4 py-3">{p.email}</td>
-                        <td className="px-4 py-3">{p.noTelepon}</td>
+                        <td className="px-4 py-3">{p.telp}</td>
                         <td className="px-4 py-3 text-right">
                           <div className="flex justify-end gap-3">
-                            <Link to={`/admin/pelatih/edit`}>
+                            <Link to={`/admin/pelatih/edit/${p.id}`}>
                               <Edit className="text-primary w-5 h-5 hover:scale-110 cursor-pointer" />
                             </Link>
                             <button onClick={() => handleOpenModal(p.id)}>

@@ -1,31 +1,12 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { FiEdit, FiTrash2 } from 'react-icons/fi';
 import AdminSidebar from '../../components/Admin/Sidebar';
 import AdminHeader from '../../components/Admin/Header';
 import { sortIcon } from '../../utils/sort';
-
-const siswaDummy = [
-  {
-    id: 'FZ1401',
-    nama: 'AFIF BIMA SAID',
-    jenisKelamin: 'Laki-laki',
-    tempatTanggalLahir: 'Surabaya, 26 Jan 2014',
-    usia: 11,
-    level: 'U11',
-    kategoriBMI: 'Normal',
-  },
-  {
-    id: 'FZ1403',
-    nama: 'AL SAFARAZ AKMA FADHIL PRASETYO',
-    jenisKelamin: 'Laki-laki',
-    tempatTanggalLahir: 'Surabaya, 12 Oct 2014',
-    usia: 10,
-    level: 'U10',
-    kategoriBMI: 'Overweight',
-  },
-  // Tambahkan data lainnya jika perlu
-];
+import Api from '../../utils/Api';
+import { useCookies } from 'react-cookie';
+import { toLocal } from '../../utils/dates';
 
 const Siswa = () => {
   const [search, setSearch] = useState('');
@@ -33,7 +14,19 @@ const Siswa = () => {
   const [sortOrder, setSortOrder] = useState('asc');
   const [showModal, setShowModal] = useState(false);
   const [selectedId, setSelectedId] = useState(null);
+  const [siswa,setSiswa] = useState([])
+  const [cookies] = useCookies([import.meta.env.VITE_COOKIES_NAME]);
 
+  const getAllSiswa = async() =>{
+    await Api.get("/admin/students",{
+      headers : { 
+        Authorization : "Bearer " + cookies.session 
+      }
+    }).then((res)=>{
+      setSiswa(res.data)
+    })
+  }
+  
   const handleSort = (field) => {
     if (field === sortField) {
       setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
@@ -53,9 +46,9 @@ const Siswa = () => {
     setShowModal(false);
   };
 
-  const filteredSiswa = siswaDummy
+  const filteredSiswa = siswa
     .filter((siswa) =>
-      siswa.nama.toLowerCase().includes(search.toLowerCase())
+      siswa.name.toLowerCase().includes(search.toLowerCase())
     )
     .sort((a, b) => {
       const valA = a[sortField];
@@ -69,6 +62,10 @@ const Siswa = () => {
         return sortOrder === 'asc' ? valA - valB : valB - valA;
       }
     });
+
+    useEffect(()=>{
+      getAllSiswa()
+    },[])
 
   return (
     <div className="bg-[#f7f7f7] min-h-screen text-sm text-[#333]">
@@ -151,10 +148,10 @@ const Siswa = () => {
                         className="border-t border-gray-200 hover:bg-gray-50"
                       >
                         <td className="px-4 py-3 font-medium">{siswa.id}</td>
-                        <td className="px-4 py-3">{siswa.nama}</td>
-                        <td className="px-4 py-3">{siswa.jenisKelamin}</td>
-                        <td className="px-4 py-3">{siswa.tempatTanggalLahir}</td>
-                        <td className="px-4 py-3">{siswa.usia}</td>
+                        <td className="px-4 py-3">{siswa.name}</td>
+                        <td className="px-4 py-3">{siswa.gender}</td>
+                        <td className="px-4 py-3">{siswa.tempatLahir + ", " + toLocal(siswa.tanggalLahir)}</td>
+                        <td className="px-4 py-3">{siswa.age}</td>
                         <td className="px-4 py-3">{siswa.level}</td>
                         <td className="px-4 py-3">{siswa.kategoriBMI}</td>
                         <td className="px-4 py-3 text-right">
