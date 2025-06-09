@@ -8,6 +8,7 @@ import Api from '../../utils/Api';
 import { toLocal } from '../../utils/dates';
 import { useToken } from '../../utils/Cookies';
 import { jwtDecode } from 'jwt-decode';
+import toast from 'react-hot-toast';
 
 const Siswa = () => {
   const [search, setSearch] = useState('');
@@ -25,6 +26,26 @@ const Siswa = () => {
       }
     }).then((res)=>{
       setSiswa(res.data)
+    })
+  }
+
+  const deleteSiswa = async()=>{
+    await Api.delete("/admin/students/" + selectedId,{
+      headers : {
+        Authorization : "Bearer " + getToken()
+      }
+    }).then(()=>{
+      toast.success("Sukses menghapus siswa")
+      const role = jwtDecode(getToken()).role
+      switch (role) {
+        case "SUPER_ADMIN":
+          getAllSiswa()
+          break;
+      
+        case "COACH":
+          getSiswaByCoach()
+          break;
+      }
     })
   }
 
@@ -53,7 +74,7 @@ const Siswa = () => {
   };
 
   const handleDelete = () => {
-    console.log(`Menghapus siswa dengan ID: ${selectedId}`);
+    deleteSiswa()
     setShowModal(false);
   };
 
