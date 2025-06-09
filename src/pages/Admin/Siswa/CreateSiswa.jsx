@@ -9,7 +9,7 @@ import toast from "react-hot-toast";
 
 const CreateSiswa = () => {
   const navigate = useNavigate();
-  const {getToken} = useToken()
+  const { getToken } = useToken();
   const [formData, setFormData] = useState({
     nama: "",
     gender: "",
@@ -50,36 +50,41 @@ const CreateSiswa = () => {
     }
   };
 
-  const addSiswa = async() =>{
-    const data = new FormData()
-    data.append("coachId",formData.coachId)
-    data.append("name",formData.nama)
-    data.append("age",formData.age)
-    data.append("gender",formData.gender)
-    data.append("level",formData.level)
-    data.append("tanggalLahir",formData.tanggalLahir)
-    data.append("tempatLahir",formData.tempatLahir)
-    data.append("kategoriBMI",formData.kategoriBMI)
-    data.append("photo",files.foto)
-    await Api.post("/admin/students",data,{
-      headers : {
-        Authorization : "Bearer " + getToken()
-      }
-    }).then(()=>{
-      toast.success("Berhasil menambah siswa")
-      navigate("/admin/siswa")
-    }).catch(err=>{
-      console.log(err)
+  const addSiswa = async () => {
+    const data = new FormData();
+    data.append("coachId", formData.coachId);
+    data.append("name", formData.nama);
+    data.append("age", formData.age);
+    data.append("gender", formData.gender);
+    data.append("level", formData.level);
+    data.append("tanggalLahir", formData.tanggalLahir);
+    data.append("tempatLahir", formData.tempatLahir);
+    data.append("kategoriBMI", formData.kategoriBMI);
+    data.append("photo", files.foto);
+    await Api.post("/admin/students", data, {
+      headers: {
+        Authorization: "Bearer " + getToken(),
+      },
     })
-  }
+      .then(() => {
+        toast.success("Berhasil menambah siswa");
+        navigate("/admin/siswa");
+      })
+      .catch(() => {
+        toast.error("Gagal menambah siswa");
+      });
+  };
 
-const handleGender = (e) => {
-  setFormData({ ...formData, gender: e.target.value === "Laki-Laki" ? "L" : "P" });
-};
+  const handleGender = (e) => {
+    setFormData({
+      ...formData,
+      gender: e.target.value === "Laki-Laki" ? "L" : "P",
+    });
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    addSiswa()
+    addSiswa();
   };
 
   return (
@@ -117,7 +122,7 @@ const handleGender = (e) => {
               id="gender"
               required
               onChange={handleGender}
-              value={formData.gender == "L"? "Laki-Laki": "Perempuan"}
+              value={formData.gender == "L" ? "Laki-Laki" : "Perempuan"}
               options={["Laki-Laki", "Perempuan"]}
             />
 

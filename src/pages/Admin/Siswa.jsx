@@ -176,7 +176,7 @@ const Siswa = () => {
                         <td className="px-4 py-3">{siswa.kategoriBMI}</td>
                         <td className="px-4 py-3 text-right">
                           <div className="flex justify-end gap-3">
-                            {jwtDecode(getToken()).role == "COACH"? (<Link to={`/admin/siswa/edit`}>
+                            {jwtDecode(getToken()).role == "COACH"? (<Link to={`/admin/siswa/edit/${siswa.id}`}>
                               <FiEdit className="text-primary w-5 h-5 hover:scale-110" />
                             </Link>) : null}
                             <button onClick={() => handleOpenModal(siswa.id)}>

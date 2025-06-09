@@ -55,7 +55,7 @@ function App() {
           <Route path="dashboard" element={<AdminDashboard />} />
           <Route path="siswa" element={<Siswa />} />
           <Route path="siswa/create" element={<CreateSiswa />} />  
-          <Route path="siswa/edit" element={<EditSiswa />} />  
+          <Route path="siswa/edit/:id" element={<EditSiswa />} />  
           <Route path="pelatih" element={<Pelatih />} />  
           <Route path="pelatih/create" element={<CreatePelatih />} />  
           <Route path="pelatih/edit/:id" element={<EditPelatih />} />  
