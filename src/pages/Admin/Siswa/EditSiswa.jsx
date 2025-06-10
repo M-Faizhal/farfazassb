@@ -166,17 +166,17 @@ const EditSiswa = () => {
               onChange={handleChange}
               value={formData.level}
               options={[
-                "U8",
-                "U9",
-                "U10",
-                "U11",
-                "U12",
-                "U13",
-                "U14",
-                "U15",
-                "U16",
-                "U17",
-                "U18",
+                "U-8",
+                "U-9",
+                "U-10",
+                "U-11",
+                "U-12",
+                "U-13",
+                "U-14",
+                "U-15",
+                "U-16",
+                "U-17",
+                "U-18",
               ]}
             />
 

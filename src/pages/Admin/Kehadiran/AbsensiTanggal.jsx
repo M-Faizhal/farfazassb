@@ -1,73 +1,71 @@
-import { useState } from 'react';
-import { FiTrash2 } from 'react-icons/fi';
-import AdminSidebar from '../../../components/Admin/Sidebar';
-import AdminHeader from '../../../components/Admin/Header';
-import { sortIcon } from '../../../utils/sort';
-import { useLocation } from 'react-router-dom';
+import { useEffect, useState } from "react";
+import { FiTrash2 } from "react-icons/fi";
+import AdminSidebar from "../../../components/Admin/Sidebar";
+import AdminHeader from "../../../components/Admin/Header";
+import { sortIcon } from "../../../utils/sort";
+import { useLocation, useParams } from "react-router-dom";
+import Api from "../../../utils/Api";
+import { useToken } from "../../../utils/Cookies";
+import toast from "react-hot-toast";
+import { jwtDecode } from "jwt-decode";
 
 const semuaSiswaDummy = [
-  { id: 'FZ113', nama: 'AL SAFARAZ AKMA FADHIL PRASETYO', jenisKelamin: 'Laki-laki' },
-  { id: 'FZ231', nama: 'RAKA PUTRA WICAKSONO', jenisKelamin: 'Laki-laki' },
-  { id: 'FZ241', nama: 'DANIA ARUM SEKAR', jenisKelamin: 'Perempuan' },
-  { id: 'FZ301', nama: 'BIMA SATRIA', jenisKelamin: 'Laki-laki' },
-  { id: 'FZ302', nama: 'SINTA DEWI LESTARI', jenisKelamin: 'Perempuan' },
+  {
+    id: "FZ113",
+    nama: "AL SAFARAZ AKMA FADHIL PRASETYO",
+    jenisKelamin: "Laki-laki",
+  },
+  { id: "FZ231", nama: "RAKA PUTRA WICAKSONO", jenisKelamin: "Laki-laki" },
+  { id: "FZ241", nama: "DANIA ARUM SEKAR", jenisKelamin: "Perempuan" },
+  { id: "FZ301", nama: "BIMA SATRIA", jenisKelamin: "Laki-laki" },
+  { id: "FZ302", nama: "SINTA DEWI LESTARI", jenisKelamin: "Perempuan" },
 ];
 
 const AbsensiTanggal = () => {
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
-  const selectedDate = queryParams.get('date');
+  const selectedDate = queryParams.get("date");
+  const { level } = useParams();
 
-  const [search, setSearch] = useState('');
-  const [sortField, setSortField] = useState('nama');
-  const [sortOrder, setSortOrder] = useState('asc');
+  const [search, setSearch] = useState("");
+  const [sortField, setSortField] = useState("nama");
+  const [sortOrder, setSortOrder] = useState("asc");
   const [showSimpanModal, setShowSimpanModal] = useState(false);
   const [showHapusModal, setShowHapusModal] = useState(false);
   const [selectedHapusId, setSelectedHapusId] = useState(null);
-  const [tambahSiswaId, setTambahSiswaId] = useState('');
+  const [tambahSiswaId, setTambahSiswaId] = useState("");
+  const [siswa, setSiswa] = useState([]);
+  const { getToken } = useToken();
 
-  const [kehadiran, setKehadiran] = useState([
-    { id: 'FZ113', nama: 'AL SAFARAZ AKMA FADHIL PRASETYO', jenisKelamin: 'Laki-laki', status: true },
-    { id: 'FZ231', nama: 'RAKA PUTRA WICAKSONO', jenisKelamin: 'Laki-laki', status: false },
-    { id: 'FZ241', nama: 'DANIA ARUM SEKAR', jenisKelamin: 'Perempuan', status: false },
-  ]);
+  const [kehadiran, setKehadiran] = useState([]);
 
   const handleSort = (field) => {
     if (field === sortField) {
-      setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
+      setSortOrder(sortOrder === "asc" ? "desc" : "asc");
     } else {
       setSortField(field);
-      setSortOrder('asc');
+      setSortOrder("asc");
     }
   };
 
   const filteredSiswa = kehadiran
-    .filter((siswa) => siswa.nama.toLowerCase().includes(search.toLowerCase()))
+    .filter((siswa) =>
+      siswa.student.name.toLowerCase().includes(search.toLowerCase())
+    )
     .sort((a, b) => {
       const valA = a[sortField];
       const valB = b[sortField];
-      return typeof valA === 'string'
-        ? sortOrder === 'asc'
+      return typeof valA === "string"
+        ? sortOrder === "asc"
           ? valA.localeCompare(valB)
           : valB.localeCompare(valA)
-        : sortOrder === 'asc'
+        : sortOrder === "asc"
         ? valA - valB
         : valB - valA;
     });
 
-  const handleCheckboxChange = (id) => {
-    const updated = kehadiran.map((siswa) =>
-      siswa.id === id ? { ...siswa, status: !siswa.status } : siswa
-    );
-    setKehadiran(updated);
-  };
-
   const handleTambahSiswa = () => {
-    const siswa = semuaSiswaDummy.find((s) => s.id === tambahSiswaId);
-    if (siswa && !kehadiran.some((s) => s.id === siswa.id)) {
-      setKehadiran([...kehadiran, { ...siswa, status: false }]);
-      setTambahSiswaId('');
-    }
+    createAttendance();
   };
 
   const handleHapusSiswa = () => {
@@ -77,9 +75,118 @@ const AbsensiTanggal = () => {
   };
 
   const handleSubmit = () => {
-    console.log('Absensi disimpan:', kehadiran);
     setShowSimpanModal(false);
   };
+
+  const updateAttendance = async (id, present) => {
+    setKehadiran((prev) =>
+      prev.map((hadir) => (hadir.id === id ? { ...hadir, present } : hadir))
+    );
+    await Api.put(
+      "/admin/attendance/" + id,
+      {
+        date: new Date(selectedDate),
+        present,
+      },
+      {
+        headers: {
+          Authorization: "Bearer " + getToken(),
+        },
+      }
+    ).catch(() => {
+      toast.error("Gagal menubah absensi");
+    });
+  };
+
+  const createAttendance = async () => {
+    await Api.post(
+      "/admin/attendance",
+      {
+        date: new Date(selectedDate),
+        present: true,
+        studentId: parseInt(tambahSiswaId),
+      },
+      {
+        headers: {
+          Authorization: "Bearer " + getToken(),
+        },
+      }
+    ).then(() => {
+      setTambahSiswaId("");
+      const role = jwtDecode(getToken()).role;
+      switch (role) {
+        case "SUPER_ADMIN":
+          getData();
+          break;
+
+        case "COACH":
+          getDataCoach();
+          break;
+      }
+    });
+  };
+
+  const getData = async () => {
+    const absensiRes = await Api.get("/admin/attendance/date/" + selectedDate, {
+      headers: {
+        Authorization: "Bearer " + getToken(),
+      },
+    });
+    setKehadiran(absensiRes.data.filter((hadir)=>hadir.student.level == level));
+
+    const siswaRes = await Api.get("/admin/students", {
+      headers: {
+        Authorization: "Bearer " + getToken(),
+      },
+    });
+
+    const hadirIds = absensiRes.data.map((h) => h.studentId);
+    const filteredSiswa = siswaRes.data.filter(
+      (siswa) => !hadirIds.includes(siswa.id)
+    );
+    setSiswa(filteredSiswa.filter((s) => s.level == level));
+  };
+
+  const getDataCoach = async () => {
+    const absensiRes = await Api.get("/admin/attendance/date/" + selectedDate, {
+      headers: {
+        Authorization: "Bearer " + getToken(),
+      },
+    });
+    setKehadiran(
+      absensiRes.data.filter(
+        (hadir) => hadir.student.coachId == jwtDecode(getToken()).userId && hadir.student.level == level
+      )
+    );
+
+    const siswaRes = await Api.get(
+      "/admin/students/coach/" + jwtDecode(getToken()).userId,
+      {
+        headers: {
+          Authorization: "Bearer " + getToken(),
+        },
+      }
+    );
+
+    const hadirIds = absensiRes.data.map((h) => h.studentId);
+    const filteredSiswa = siswaRes.data.filter(
+      (siswa) => !hadirIds.includes(siswa.id)
+    );
+    setSiswa(filteredSiswa.filter((s) => s.level == level));
+  };
+
+  useEffect(() => {
+    const role = jwtDecode(getToken()).role;
+    switch (role) {
+      case "SUPER_ADMIN":
+        getData();
+        break;
+
+      case "COACH":
+        getDataCoach();
+        break;
+    }
+  }, [level, selectedDate]);
 
   return (
     <div className="bg-[#f7f7f7] min-h-screen text-sm text-[#333]">
@@ -89,8 +196,12 @@ const AbsensiTanggal = () => {
           <AdminHeader />
           <div className="flex justify-between items-start flex-col md:flex-row mb-6 mt-6 gap-4 md:gap-0">
             <div>
-              <h1 className="text-xl font-bold text-black">Absensi Siswa - U10</h1>
-              <p className="text-sm text-gray-600">Tanggal: {selectedDate || 'Tidak ada tanggal'}</p>
+              <h1 className="text-xl font-bold text-black">
+                Absensi Siswa {level}
+              </h1>
+              <p className="text-sm text-gray-600">
+                Tanggal: {selectedDate || "Tidak ada tanggal"}
+              </p>
             </div>
             <div className="flex flex-col md:flex-row gap-3 w-full md:w-auto">
               <input
@@ -100,21 +211,27 @@ const AbsensiTanggal = () => {
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
               />
-              <div className="flex gap-2">
-                <select
-                  value={tambahSiswaId}
-                  onChange={(e) => setTambahSiswaId(e.target.value)}
-                  className="bg-gray-100 px-3 py-2 rounded-md text-sm"
-                >
-                  <option value="">Tambah siswa...</option>
-                  {semuaSiswaDummy.map((s) => (
-                    <option key={s.id} value={s.id}>{s.nama}</option>
-                  ))}
-                </select>
-                <button onClick={handleTambahSiswa} className="bg-primary text-white px-4 py-2 rounded-md">
-                  Tambah
-                </button>
-              </div>
+              {jwtDecode(getToken()).role == "COACH" ? (
+                <div className="flex gap-2">
+                  <select
+                    onChange={(e) => setTambahSiswaId(e.target.value)}
+                    className="bg-gray-100 px-3 py-2 rounded-md text-sm"
+                  >
+                    <option value="">Tambah siswa...</option>
+                    {siswa.map((s) => (
+                      <option key={s.id} value={s.id}>
+                        {s.name}
+                      </option>
+                    ))}
+                  </select>
+                  <button
+                    onClick={handleTambahSiswa}
+                    className="bg-primary text-white px-4 py-2 rounded-md"
+                  >
+                    Tambah
+                  </button>
+                </div>
+              ) : null}
             </div>
           </div>
 
@@ -123,14 +240,23 @@ const AbsensiTanggal = () => {
               <table className="min-w-full text-sm text-left text-gray-700 hidden md:table">
                 <thead className="bg-primary text-white font-semibold">
                   <tr>
-                    <th className="px-4 py-3 cursor-pointer" onClick={() => handleSort('id')}>
-                      ID Siswa {sortIcon(sortField, 'id')}
+                    <th
+                      className="px-4 py-3 cursor-pointer"
+                      onClick={() => handleSort("id")}
+                    >
+                      ID Siswa {sortIcon(sortField, "id")}
                     </th>
-                    <th className="px-4 py-3 cursor-pointer" onClick={() => handleSort('nama')}>
-                      Nama {sortIcon(sortField, 'nama')}
+                    <th
+                      className="px-4 py-3 cursor-pointer"
+                      onClick={() => handleSort("nama")}
+                    >
+                      Nama {sortIcon(sortField, "nama")}
                     </th>
-                    <th className="px-4 py-3 cursor-pointer" onClick={() => handleSort('jenisKelamin')}>
-                      Jenis Kelamin {sortIcon(sortField, 'jenisKelamin')}
+                    <th
+                      className="px-4 py-3 cursor-pointer"
+                      onClick={() => handleSort("jenisKelamin")}
+                    >
+                      Jenis Kelamin {sortIcon(sortField, "jenisKelamin")}
                     </th>
                     <th className="px-4 py-3">Hadir?</th>
                     <th className="px-4 py-3 text-center">Aksi</th>
@@ -139,15 +265,26 @@ const AbsensiTanggal = () => {
                 <tbody>
                   {filteredSiswa.length > 0 ? (
                     filteredSiswa.map((siswa) => (
-                      <tr key={siswa.id} className="border-t border-gray-200 hover:bg-gray-50">
-                        <td className="px-4 py-3 font-medium">{siswa.id}</td>
-                        <td className="px-4 py-3">{siswa.nama}</td>
-                        <td className="px-4 py-3">{siswa.jenisKelamin}</td>
+                      <tr
+                        key={siswa.id}
+                        className="border-t border-gray-200 hover:bg-gray-50"
+                      >
+                        <td className="px-4 py-3 font-medium">
+                          {siswa.student.id}
+                        </td>
+                        <td className="px-4 py-3">{siswa.student.name}</td>
+                        <td className="px-4 py-3">
+                          {siswa.student.gender == "L"
+                            ? "Laki-Laki"
+                            : "Perempuan"}
+                        </td>
                         <td className="px-4 py-3">
                           <input
                             type="checkbox"
-                            checked={siswa.status}
-                            onChange={() => handleCheckboxChange(siswa.id)}
+                            checked={siswa.present}
+                            onChange={() =>
+                              updateAttendance(siswa.id, !siswa.present)
+                            }
                             className="w-4 h-4 text-green-600 border-gray-300 rounded"
                           />
                         </td>
@@ -166,7 +303,10 @@ const AbsensiTanggal = () => {
                     ))
                   ) : (
                     <tr>
-                      <td colSpan="5" className="text-center py-6 text-gray-500">
+                      <td
+                        colSpan="5"
+                        className="text-center py-6 text-gray-500"
+                      >
                         Tidak ada data ditemukan.
                       </td>
                     </tr>
@@ -178,15 +318,24 @@ const AbsensiTanggal = () => {
               <div className="md:hidden">
                 {filteredSiswa.map((siswa) => (
                   <div key={siswa.id} className="border rounded-md p-4 mb-4">
-                    <p><strong>ID:</strong> {siswa.id}</p>
-                    <p><strong>Nama:</strong> {siswa.nama}</p>
-                    <p><strong>Jenis Kelamin:</strong> {siswa.jenisKelamin}</p>
+                    <p>
+                      <strong>ID:</strong> {siswa.student.id}
+                    </p>
+                    <p>
+                      <strong>Nama:</strong> {siswa.student.name}
+                    </p>
+                    <p>
+                      <strong>Jenis Kelamin:</strong>{" "}
+                      {siswa.student.gender == "L" ? "Laki-Laki" : "Perempuan"}
+                    </p>
                     <div className="flex justify-between items-center mt-2">
                       <label className="flex items-center gap-2">
                         <input
                           type="checkbox"
-                          checked={siswa.status}
-                          onChange={() => handleCheckboxChange(siswa.id)}
+                          checked={siswa.present}
+                          onChange={() =>
+                            updateAttendance(siswa.id, !siswa.present)
+                          }
                           className="w-4 h-4 text-green-600 border-gray-300 rounded"
                         />
                         Hadir
@@ -205,15 +354,6 @@ const AbsensiTanggal = () => {
                 ))}
               </div>
             </div>
-
-            <div className="flex justify-end px-4 py-4">
-              <button
-                onClick={() => setShowSimpanModal(true)}
-                className="bg-primary text-white font-medium px-6 py-2 rounded-md"
-              >
-                Simpan Absensi
-              </button>
-            </div>
           </div>
         </main>
       </div>
@@ -227,16 +367,22 @@ const AbsensiTanggal = () => {
               <ul className="list-disc list-inside space-y-1">
                 {kehadiran.map((siswa) => (
                   <li key={siswa.id}>
-                    {siswa.nama} - {siswa.status ? 'Hadir' : 'Tidak Hadir'}
+                    {siswa.nama} - {siswa.status ? "Hadir" : "Tidak Hadir"}
                   </li>
                 ))}
               </ul>
             </div>
             <div className="flex justify-end gap-3">
-              <button onClick={() => setShowSimpanModal(false)} className="px-4 py-2 bg-gray-200 text-gray-800 rounded-md">
+              <button
+                onClick={() => setShowSimpanModal(false)}
+                className="px-4 py-2 bg-gray-200 text-gray-800 rounded-md"
+              >
                 Batal
               </button>
-              <button onClick={handleSubmit} className="px-4 py-2 bg-primary text-white rounded-md">
+              <button
+                onClick={handleSubmit}
+                className="px-4 py-2 bg-primary text-white rounded-md"
+              >
                 Simpan
               </button>
             </div>
@@ -249,10 +395,22 @@ const AbsensiTanggal = () => {
         <div className="fixed inset-0 bg-black/20 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg p-6 shadow-lg max-w-sm w-full">
             <h2 className="text-lg font-semibold mb-4">Hapus Siswa</h2>
-            <p className="mb-4">Apakah Anda yakin ingin menghapus siswa ini dari daftar absensi?</p>
+            <p className="mb-4">
+              Apakah Anda yakin ingin menghapus siswa ini dari daftar absensi?
+            </p>
             <div className="flex justify-end gap-3">
-              <button onClick={() => setShowHapusModal(false)} className="px-4 py-2 bg-gray-200 rounded-md">Batal</button>
-              <button onClick={handleHapusSiswa} className="px-4 py-2 bg-red-600 text-white rounded-md">Hapus</button>
+              <button
+                onClick={() => setShowHapusModal(false)}
+                className="px-4 py-2 bg-gray-200 rounded-md"
+              >
+                Batal
+              </button>
+              <button
+                onClick={handleHapusSiswa}
+                className="px-4 py-2 bg-red-600 text-white rounded-md"
+              >
+                Hapus
+              </button>
             </div>
           </div>
         </div>

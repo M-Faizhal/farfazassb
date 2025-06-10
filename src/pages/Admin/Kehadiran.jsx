@@ -35,7 +35,7 @@ const Kehadiran = () => {
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-6">
               {kelompokUsia.map(({ label, deskripsi }) => (
                 <Link
-                  to={`/admin/kehadiran/kalender`}
+                  to={`/admin/kehadiran/kalender/${label}`}
                   key={label}
                   className="bg-white rounded-xl shadow-md hover:shadow-lg border border-gray-200 hover:border-[#1F3C86] transition-all duration-300 p-5 group relative overflow-hidden transform hover:scale-105 hover:-mx-2"
                 >

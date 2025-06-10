@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import dayjs from 'dayjs';
 import AdminHeader from '../../../components/Admin/Header';
 import AdminSidebar from '../../../components/Admin/Sidebar';
@@ -13,6 +13,7 @@ const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 const KalenderAbsensi = () => {
   const [currentDate, setCurrentDate] = useState(dayjs());
   const navigate = useNavigate();
+  const {level} = useParams()
 
   const startOfMonth = currentDate.startOf('month');
   const startDay = (startOfMonth.day() + 6) % 7;
@@ -24,7 +25,8 @@ const KalenderAbsensi = () => {
 
   const handleDateClick = (date) => {
     const formatted = date.format('YYYY-MM-DD');
-    navigate(`/admin/kehadiran/kalender/absensi?date=${formatted}`);
+
+    navigate(`/admin/kehadiran/kalender/absensi/${level}?date=${formatted}`);
   };
 
   const renderCells = () => {
@@ -62,7 +64,7 @@ const KalenderAbsensi = () => {
         <main className="flex-1 px-4 md:px-6 py-8 pt-20 md:pt-0 md:ml-64">
           <AdminHeader />
 
-          <h1 className="text-xl font-bold text-black mb-6 pt-6">Absensi Siswa - U10</h1>
+          <h1 className="text-xl font-bold text-black mb-6 pt-6">Absensi Siswa {level}</h1>
 
           <div className="bg-white rounded-3xl shadow-md p-6 max-w-xl mx-auto">
             {/* Kalender Header */}

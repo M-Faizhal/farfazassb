@@ -66,8 +66,8 @@ function App() {
           <Route path="daftartes/penilaian/create" element={<CreatePenilaian />} />  
           <Route path="daftartes/penilaian/edit" element={<EditPenilaian />} />  
           <Route path="kehadiran" element={<Kehadiran/>} />
-          <Route path="kehadiran/kalender" element={<KalenderAbsensi/>} />
-          <Route path="kehadiran/kalender/absensi" element={<AbsensiTanggal/>} />
+          <Route path="kehadiran/kalender/:level" element={<KalenderAbsensi/>} />
+          <Route path="kehadiran/kalender/absensi/:level" element={<AbsensiTanggal/>} />
           <Route path="orangtua" element={<Orangtua />} />
           <Route path="orangtua/create" element={<CreateOrangtua />} />
           <Route path="orangtua/edit" element={<EditOrangtua />} />
