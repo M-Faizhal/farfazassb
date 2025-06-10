@@ -8,6 +8,13 @@ import About from './pages/Public/About'
 import Contact from './pages/Public/Contact'
 import Team from './pages/Public/Team' 
 
+// Private Pages
+import UserDashboard from './pages/Private/Dashboard'
+import ProfilSiswa from './pages/Private/ProfilSiswa'
+import DaftarTesSiswa from './pages/Private/DaftarTes'
+import HasilTes from './pages/Private/HasilTes'
+
+
 // Admin Pages
 import AdminLogin from './pages/Admin/Auth/Login'
 import AdminDashboard from './pages/Admin/Dashboard'
@@ -49,8 +56,14 @@ function App() {
         <Route path="/contact" element={<Contact />} />
         <Route path="/team" element={<Team />} />
 
+        {/* Private Pages */}
+        <Route path='/user/dashboard' element={<UserDashboard />} />
+        <Route path='/user/siswa' element={<ProfilSiswa />} />
+        <Route path='/user/penilaian' element={<DaftarTesSiswa />} />
+        <Route path='/user/penilaian/:testId' element={<HasilTes />} />
+
+
         {/* Admin Pages */}
-        
         <Route path='/admin' element={<ProtectAdmin />} >
           <Route path="dashboard" element={<AdminDashboard />} />
           <Route path="siswa" element={<Siswa />} />
