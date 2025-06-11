@@ -1,6 +1,21 @@
+import { useEffect, useState } from 'react';
 import Header from '../../components/Header'
+import Api from '../../utils/Api';
 
 function Home() {
+
+  const [pelatih,setPelatih] = useState([])
+
+  const getAllPelatih = async()=>{
+    await Api.get("/public/coaches/").then((res)=>{
+        setPelatih(res.data)
+    })
+  }
+
+  useEffect(()=>{
+    getAllPelatih()
+  },[])
+
   return (
     <>
       <Header />
@@ -39,22 +54,24 @@ function Home() {
         <section className="mt-16 max-w-5xl mx-auto">
           <h2 className="text-xl font-bold mb-6 text-center">Pelatih</h2>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-6">
-            {[...Array(4)].map((_, i) => (
-              <div key={i} className="relative rounded-lg overflow-hidden shadow-sm">
+            {pelatih.map((coach,index)=>{
+              return (
+                <div key={index} className="relative rounded-lg overflow-hidden shadow-sm">
                 <div className='w-full h-full'>
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/30 to-transparent"></div>
                 <img
-                  src="https://storage.googleapis.com/a1aa/image/30b557af-a7a2-4a7e-06c5-f8aee2ff07fe.jpg"
+                  src={coach.photoUrl}
                   alt="Coach"
                   className="w-full h-60 object-cover"
                 />
                 <div className="absolute bottom-2 left-2 text-white text-sm font-medium rounded px-2 py-1">
                   <p className='font-semibold'>Coach</p>
-                  <p className="font-bold text-2xl">Alibaba</p>
+                  <p className="font-bold text-2xl">{coach.name}</p>
                 </div>
                 </div>
               </div>
-            ))}
+              )
+            })}
           </div>
         </section>
 
