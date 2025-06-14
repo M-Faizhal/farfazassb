@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import AdminSidebar from '../../../components/Admin/Sidebar';
 import AdminHeader from '../../../components/Admin/Header';
 
@@ -43,6 +43,10 @@ const CreatePenilaian = () => {
   const [formData, setFormData] = useState({});
   const [showModal, setShowModal] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
+  const location = useLocation()
+  const query = new URLSearchParams(location.search);
+  const {nama} = query.get("nama")
+
 
   useEffect(() => {
     setFormData(dummyPenilaian);
@@ -69,7 +73,7 @@ const CreatePenilaian = () => {
           <h2 className="text-black text-xl font-bold mb-6 mt-6">Edit Penilaian</h2>
 
           <form onSubmit={(e) => e.preventDefault()} className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-white p-6 rounded-md border border-gray-200 shadow-sm max-w-6xl">
-            <SelectField label="Nama Siswa" id="namaSiswa" options={daftarSiswa} required value={formData.namaSiswa} onChange={handleChange} />
+            <p>{nama}</p>
             <InputField label="Tanggal Tes" id="tanggalTes" type="date" required value={formData.tanggalTes || ''} onChange={handleChange} />
             <Section title="Antropometri">
               {[

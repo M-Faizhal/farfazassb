@@ -9,18 +9,6 @@ import { useToken } from "../../../utils/Cookies";
 import toast from "react-hot-toast";
 import { jwtDecode } from "jwt-decode";
 
-const semuaSiswaDummy = [
-  {
-    id: "FZ113",
-    nama: "AL SAFARAZ AKMA FADHIL PRASETYO",
-    jenisKelamin: "Laki-laki",
-  },
-  { id: "FZ231", nama: "RAKA PUTRA WICAKSONO", jenisKelamin: "Laki-laki" },
-  { id: "FZ241", nama: "DANIA ARUM SEKAR", jenisKelamin: "Perempuan" },
-  { id: "FZ301", nama: "BIMA SATRIA", jenisKelamin: "Laki-laki" },
-  { id: "FZ302", nama: "SINTA DEWI LESTARI", jenisKelamin: "Perempuan" },
-];
-
 const AbsensiTanggal = () => {
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);

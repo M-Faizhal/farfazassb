@@ -1,78 +1,48 @@
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import { FiEdit, FiTrash2 } from 'react-icons/fi';
 import AdminSidebar from '../../../components/Admin/Sidebar';
 import AdminHeader from '../../../components/Admin/Header';
 import { sortIcon } from '../../../utils/sort';
-
-// Data Tes Dummy
-const tes = {
-  id: 'TES001',
-  tanggal: '2025-05-28',
-  namaPelatih: 'Coach Bambang',
-  jumlahSiswa: 5,
-  siswa: [
-    {
-      id: 'FZ1401',
-      nama: 'AFIF BIMA SAID',
-      jenisKelamin: 'Laki-laki',
-      tempatTanggalLahir: 'Surabaya, 26 Jan 2014',
-      usia: 11,
-      level: 'U11',
-      kategoriBMI: 'Normal',
-      nilaiTes: 85
-    },
-    {
-      id: 'FZ1402',
-      nama: 'AHMAD RAFLI SYAHPUTRA',
-      jenisKelamin: 'Laki-laki',
-      tempatTanggalLahir: 'Malang, 15 Mar 2014',
-      usia: 11,
-      level: 'U11',
-      kategoriBMI: 'Normal',
-      nilaiTes: 78
-    },
-    {
-      id: 'FZ1403',
-      nama: 'AL SAFARAZ AKMA FADHIL PRASETYO',
-      jenisKelamin: 'Laki-laki',
-      tempatTanggalLahir: 'Surabaya, 12 Oct 2014',
-      usia: 10,
-      level: 'U10',
-      kategoriBMI: 'Overweight',
-      nilaiTes: 92
-    },
-    {
-      id: 'FZ1404',
-      nama: 'BAGAS WIJAYA KUSUMA',
-      jenisKelamin: 'Laki-laki',
-      tempatTanggalLahir: 'Malang, 08 Jul 2014',
-      usia: 10,
-      level: 'U10',
-      kategoriBMI: 'Normal',
-      nilaiTes: 88
-    },
-    {
-      id: 'FZ1405',
-      nama: 'DIMAS ARYA PRATAMA',
-      jenisKelamin: 'Laki-laki',
-      tempatTanggalLahir: 'Surabaya, 20 Nov 2014',
-      usia: 10,
-      level: 'U10',
-      kategoriBMI: 'Underweight',
-      nilaiTes: 76
-    }
-  ]
-};
+import Api from '../../../utils/Api';
+import { useToken } from '../../../utils/Cookies';
+import { toLocal } from '../../../utils/dates';
+import { FaPlus } from 'react-icons/fa6';
+import { jwtDecode } from 'jwt-decode';
 
 const PenilaianSiswa = () => {
   const [search, setSearch] = useState('');
-  const [sortField, setSortField] = useState('nama');
+  const [sortField, setSortField] = useState('name');
   const [sortOrder, setSortOrder] = useState('asc');
   const [showModal, setShowModal] = useState(false);
   const [selectedId, setSelectedId] = useState(null);
+  const navigate = useNavigate()
+  const [addId,setAddId] = useState()
+  const [nama,setnama] = useState()
+  const [siswa,setSiswa] = useState()
+  const [test,setTest] = useState()
+  const {getToken} = useToken()
+  const {id} = useParams()
 
-  const siswaDummy = tes.siswa;
+  const getAllSiswa = async()=>{
+    await Api.get("/admin/students/coach/" + jwtDecode(getToken()).userId,{
+      headers : {
+        Authorization : "Bearer " + getToken()
+      }
+    }).then((res)=>{
+      setSiswa(res.data)
+    })
+  }
+
+  const getTestById = async() =>{
+    await Api.get("/admin/tests/" + id,{
+      headers : {
+        Authorization : "Bearer " + getToken()
+      }
+    }).then(res=>{
+      setTest(res.data)
+    })
+  }
 
   const handleSort = (field) => {
     if (field === sortField) {
@@ -93,22 +63,29 @@ const PenilaianSiswa = () => {
     setShowModal(false);
   };
 
-  const filteredSiswa = siswaDummy
-    .filter((siswa) =>
-      siswa.nama.toLowerCase().includes(search.toLowerCase())
-    )
-    .sort((a, b) => {
-      const valA = a[sortField];
-      const valB = b[sortField];
+const filteredSiswa = test?.grades
+  ?.filter((siswa) =>
+    siswa?.student?.name?.toLowerCase().includes(search.toLowerCase())
+  )
+  ?.sort((a, b) => {
+    const valA = a?.student?.[sortField];
+    const valB = b?.student?.[sortField];
 
-      if (typeof valA === 'string') {
-        return sortOrder === 'asc'
-          ? valA.localeCompare(valB)
-          : valB.localeCompare(valA);
-      } else {
-        return sortOrder === 'asc' ? valA - valB : valB - valA;
+    if (typeof valA === 'string') {
+      return sortOrder === 'asc'
+        ? valA.localeCompare(valB)
+        : valB.localeCompare(valA);
+    } else {
+      return sortOrder === 'asc' ? valA - valB : valB - valA;
+    }
+  }) ?? [];
+
+    useEffect(()=>{
+      if(id){
+        getTestById()
+        getAllSiswa()
       }
-    });
+    },[id])
 
   return (
     <div className="bg-[#f7f7f7] min-h-screen text-sm text-[#333]">
@@ -118,24 +95,14 @@ const PenilaianSiswa = () => {
         <main className="flex-1 px-6 py-8 pt-20 md:pt-0 md:ml-64">
           <AdminHeader />
 
-          <div className="flex justify-between items-center mb-6 mt-6">
-            <h1 className="text-xl font-bold text-black">Data Penilaian</h1>
-            <Link
-              to="/admin/daftartes/penilaian/create"
-              className="bg-primary text-white font-medium px-4 py-2 rounded-md"
-            >
-              New Penilaian
-            </Link>
-          </div>
-
-          {/* Info Tes dan Pelatih */}
+          {/* Info Tes dan Pelatih */}  
           <div className="mb-6">
-            <h2 className="text-lg font-semibold text-black mb-1">Detail Tes</h2>
+            <h2 className="text-2xl font-bold text-black mb-1">Detail Tes</h2>
             <div className="bg-white p-4 rounded-md shadow border text-sm space-y-1">
-              <p><span className="font-medium">ID Tes:</span> {tes.id}</p>
-              <p><span className="font-medium">Tanggal Tes:</span> {tes.tanggal}</p>
-              <p><span className="font-medium">Pelatih:</span> {tes.namaPelatih}</p>
-              <p><span className="font-medium">Jumlah Siswa:</span> {tes.jumlahSiswa}</p>
+              <p><span className="font-medium">ID Tes:</span> {test?.id}</p>
+              <p><span className="font-medium">Tanggal Tes:</span> {toLocal(test?.date)}</p>
+              <p><span className="font-medium">Pelatih:</span> {test?.coach.name}</p>
+              <p><span className="font-medium">Jumlah Siswa:</span> {test?.grades.length}</p>
             </div>
           </div>
 
@@ -149,6 +116,21 @@ const PenilaianSiswa = () => {
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
               />
+              <div className='flex flex-row gap-3'>
+                <select className='outline-none border-1 rounded-lg px-3 py-2'  onChange={(e)=>{
+                  setAddId(e.target.value.split(",")[0])
+                  setnama(e.target.value.split(",")[1])
+                }}>
+                  <option value={null}>Tambah Siswa</option>
+                  {siswa?.map((siswa)=>{
+                    return <option key={siswa.id} value={`${siswa.id},${siswa.name}`}>{siswa.name}</option>
+                  })}
+                </select>
+                <button onClick={()=>addId? navigate(`/admin/daftartes/penilaian/create/${addId}?nama=${nama}`) : null} className='cursor-pointer bg-primary text-white flex flex-row px-5 py-3 rounded-lg font-semibold'>
+                  <FaPlus size={20} />
+                  <p>Tambah Penilaian</p>
+                </button>
+              </div>
             </div>
 
             <div className="overflow-x-auto">
@@ -164,15 +146,11 @@ const PenilaianSiswa = () => {
                     <th className="px-4 py-3 cursor-pointer" onClick={() => handleSort('jenisKelamin')}>
                       Jenis Kelamin {sortIcon(sortField, 'jenisKelamin')}
                     </th>
-                    <th className="px-4 py-3">Tempat, Tanggal Lahir</th>
                     <th className="px-4 py-3 cursor-pointer" onClick={() => handleSort('usia')}>
                       Usia {sortIcon(sortField, 'usia')}
                     </th>
                     <th className="px-4 py-3 cursor-pointer" onClick={() => handleSort('level')}>
                       Level {sortIcon(sortField, 'level')}
-                    </th>
-                    <th className="px-4 py-3 cursor-pointer" onClick={() => handleSort('kategoriBMI')}>
-                      Kategori BMI {sortIcon(sortField, 'kategoriBMI')}
                     </th>
                     <th className="px-4 py-3 text-right">Aksi</th>
                   </tr>
@@ -181,13 +159,11 @@ const PenilaianSiswa = () => {
                   {filteredSiswa.length > 0 ? (
                     filteredSiswa.map((siswa) => (
                       <tr key={siswa.id} className="border-t border-gray-200 hover:bg-gray-50">
-                        <td className="px-4 py-3 font-medium">{siswa.id}</td>
-                        <td className="px-4 py-3">{siswa.nama}</td>
-                        <td className="px-4 py-3">{siswa.jenisKelamin}</td>
-                        <td className="px-4 py-3">{siswa.tempatTanggalLahir}</td>
-                        <td className="px-4 py-3">{siswa.usia}</td>
-                        <td className="px-4 py-3">{siswa.level}</td>
-                        <td className="px-4 py-3">{siswa.kategoriBMI}</td>
+                        <td className="px-4 py-3 font-medium">{siswa.student.id}</td>
+                        <td className="px-4 py-3">{siswa.student.name}</td>
+                        <td className="px-4 py-3">{siswa.student.gender == "L" ?  "Laki-Laki" : "Perempuan"}</td>
+                        <td className="px-4 py-3">{siswa.student.age}</td>
+                        <td className="px-4 py-3">{siswa.student.level}</td>
                         <td className="px-4 py-3 text-right">
                           <div className="flex justify-end gap-3">
                             <Link to={`/admin/daftartes/penilaian/edit`}>

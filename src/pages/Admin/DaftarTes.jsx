@@ -1,40 +1,44 @@
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
-import AdminHeader from '../../components/Admin/Header';
-import AdminSidebar from '../../components/Admin/Sidebar';
-import { FiEdit, FiEye, FiPlus, FiTrash } from 'react-icons/fi';
-
-const initialTesList = [
-  {
-    id: 'TES001',
-    tanggal: '2025-05-28',
-    jumlahSiswa: 5,
-    namaPelatih: "Coach Bambang"
-  },
-  {
-    id: 'TES002',
-    tanggal: '2025-06-01',
-    jumlahSiswa: 3,
-    namaPelatih: "Coach Joko"
-  },
-  {
-    id: 'TES003',
-    tanggal: '2025-06-01',
-    jumlahSiswa: 3,
-    namaPelatih: "Coach Lathif"
-  },
-  {
-    id: 'TES004',
-    tanggal: '2025-06-01',
-    jumlahSiswa: 3,
-    namaPelatih: "Coach Bayu"
-  }
-];
+import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+import AdminHeader from "../../components/Admin/Header";
+import AdminSidebar from "../../components/Admin/Sidebar";
+import { FiEdit, FiEye, FiPlus, FiTrash } from "react-icons/fi";
+import Api from "../../utils/Api";
+import { useToken } from "../../utils/Cookies";
+import { toLocal } from "../../utils/dates";
+import { jwtDecode } from "jwt-decode";
+import toast from "react-hot-toast";
 
 const DaftarTes = () => {
-  const [tesData, setTesData] = useState(initialTesList);
   const [showModal, setShowModal] = useState(false);
   const [selectedId, setSelectedId] = useState(null);
+  const [test, setTest] = useState([]);
+  const { getToken } = useToken();
+
+  const getAllTest = async () => {
+    await Api.get("/admin/tests", {
+      headers: {
+        Authorization: "Bearer " + getToken(),
+      },
+    }).then((res) => {
+      if (jwtDecode(getToken()).role == "COACH") {
+        setTest(res.data.filter(test=>test.coach.id === jwtDecode(getToken()).userId));
+      }else{
+        setTest(res.data)
+      }
+    });
+  };
+
+  const deleteTests = async(id)=>{
+    await Api.delete("/admin/tests/" + id,{
+      headers : {
+        Authorization : "Bearer " + getToken()
+      }
+    }).then(async ()=>{
+      await getAllTest()
+      toast.success("Berhasil menghapus test")
+    })
+  }
 
   const handleOpenModal = (id) => {
     setSelectedId(id);
@@ -42,12 +46,13 @@ const DaftarTes = () => {
   };
 
   const handleDelete = () => {
-    const updatedData = tesData.filter(tes => tes.id !== selectedId);
-    setTesData(updatedData);
+    deleteTests(selectedId)
     setShowModal(false);
   };
 
-  const sortedTesList = [...tesData].sort((a, b) => new Date(a.tanggal) - new Date(b.tanggal));
+  useEffect(() => {
+    getAllTest();
+  }, []);
 
   return (
     <div className="bg-[#f7f7f7] min-h-screen text-sm text-[#333]">
@@ -59,16 +64,18 @@ const DaftarTes = () => {
 
           <div className="flex justify-between items-center mb-6 mt-6">
             <h1 className="text-xl font-bold text-black">Daftar Tes</h1>
-            <Link
-              to="/admin/daftartes/create"
-              className="bg-primary text-white font-medium px-4 py-2 rounded-md"
-            >
-              <FiPlus className="inline-block mr-1" />
-              New Test
-            </Link>
+            {jwtDecode(getToken()).role == "COACH" ? (
+              <Link
+                to="/admin/daftartes/create"
+                className="bg-primary text-white font-medium px-4 py-2 rounded-md"
+              >
+                <FiPlus className="inline-block mr-1" />
+                New Test
+              </Link>
+            ) : null}
           </div>
 
-          {sortedTesList.length === 0 ? (
+          {test?.length === 0 ? (
             <div className="bg-white rounded-md border border-gray-200 shadow-sm p-8">
               <p className="text-gray-500 text-center text-lg">
                 Tidak ada data tes tersedia.
@@ -76,40 +83,36 @@ const DaftarTes = () => {
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 md:gap-6">
-              {sortedTesList.map((tes) => (
+              {test?.map((tes) => (
                 <div
                   key={tes.id}
                   className="bg-white rounded-md p-4 md:p-6 shadow-sm hover:shadow-md border border-gray-200 hover:border-primary transition-all duration-300 cursor-pointer"
                 >
-                  <h2 className="text-lg md:text-xl font-bold text-primary mb-2 tracking-wide select-none">
-                    {tes.id}
-                  </h2>
-                  <p className="text-gray-600 mb-1 text-xs md:text-sm">
-                    <span className="font-semibold">Tanggal:</span>{' '}
-                    {new Date(tes.tanggal).toLocaleDateString('id-ID', {
-                      day: 'numeric',
-                      month: 'long',
-                      year: 'numeric',
-                    })}
+                  <p className="text-primary font-bold text-lg mb-2">
+                    {tes.name}
                   </p>
                   <p className="text-gray-600 mb-1 text-xs md:text-sm">
-                    <span className="font-semibold">Jumlah Siswa:</span>{' '}
-                    {tes.jumlahSiswa}
+                    <span className="font-semibold">Tanggal:</span>{" "}
+                    {toLocal(tes.date)}
+                  </p>
+                  <p className="text-gray-600 mb-1 text-xs md:text-sm">
+                    <span className="font-semibold">Jumlah Siswa:</span>{" "}
+                    {tes.grades.length}
                   </p>
                   <p className="text-gray-600 mb-4 text-xs md:text-sm">
-                    <span className="font-semibold">Nama Pelatih:</span>{' '}
-                    {tes.namaPelatih || 'Tidak tersedia'}
+                    <span className="font-semibold">Nama Pelatih:</span>{" "}
+                    {tes.coach.name || "Tidak tersedia"}
                   </p>
                   <div className="flex flex-col sm:flex-row justify-between gap-2">
                     <Link
-                      to={`/admin/daftartes/penilaian`}
+                      to={`/admin/daftartes/penilaian/` + tes.id}
                       className="inline-flex items-center text-primary hover:text-primary/80 font-medium transition-colors duration-200 text-xs md:text-sm"
                     >
                       <FiEye className="mr-1" size={16} />
                       Lihat Siswa
                     </Link>
                     <Link
-                      to={`/admin/daftartes/edit`}
+                      to={`/admin/daftartes/edit/` + tes.id}
                       className="inline-flex items-center text-primary hover:text-primary/80 font-medium transition-colors duration-200 text-xs md:text-sm"
                     >
                       <FiEdit className="mr-1" size={16} />
@@ -120,7 +123,6 @@ const DaftarTes = () => {
                       className="inline-flex items-center text-red-600 hover:text-red-700 text-xs md:text-sm font-medium"
                     >
                       <FiTrash className="mr-1" size={16} />
-                      
                     </button>
                   </div>
                 </div>

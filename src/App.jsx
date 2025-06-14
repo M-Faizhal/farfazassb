@@ -74,9 +74,9 @@ function App() {
           <Route path="pelatih/edit/:id" element={<EditPelatih />} />  
           <Route path="daftartes" element={<DaftarTes />} />  
           <Route path="daftartes/create" element={<CreateTes />} />  
-          <Route path="daftartes/edit" element={<EditTes />} />  
-          <Route path="daftartes/penilaian" element={<PenilaianSiswa />} />  
-          <Route path="daftartes/penilaian/create" element={<CreatePenilaian />} />  
+          <Route path="daftartes/edit/:id" element={<EditTes />} />  
+          <Route path="daftartes/penilaian/:id" element={<PenilaianSiswa />} />  
+          <Route path="daftartes/penilaian/create/:id" element={<CreatePenilaian />} />  
           <Route path="daftartes/penilaian/edit" element={<EditPenilaian />} />  
           <Route path="kehadiran" element={<Kehadiran/>} />
           <Route path="kehadiran/kalender/:level" element={<KalenderAbsensi/>} />

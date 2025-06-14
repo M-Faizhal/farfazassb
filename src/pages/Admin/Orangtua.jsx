@@ -1,59 +1,38 @@
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { Edit, Trash2 } from 'lucide-react';
-import AdminSidebar from '../../components/Admin/Sidebar';
-import AdminHeader from '../../components/Admin/Header';
-import { sortIcon } from '../../utils/sort';
-
-const orangtuaDummy = [
-  {
-    id: 1,
-    nama: 'Budi Santoso',
-    email: 'budi.santoso@email.com',
-    noTelepon: '081234567890',
-    alamat: 'Jl. Merdeka No. 123, Surabaya',
-    namaAnak: 'AFIF BIMA SAID',
-    idAnak: 'FZ1401',
-    status: 'Aktif',
-    tanggalDaftar: '2024-01-15',
-  },
-  {
-    id: 2,
-    nama: 'Siti Aminah',
-    email: 'siti.aminah@email.com',
-    noTelepon: '081234567891',
-    alamat: 'Jl. Sudirman No. 456, Surabaya',
-    namaAnak: 'AL SAFARAZ AKMA FADHIL PRASETYO',
-    idAnak: 'FZ1403',
-    status: 'Aktif',
-    tanggalDaftar: '2024-01-20',
-  },
-  {
-    id: 3,
-    nama: 'Ahmad Rahman',
-    email: 'ahmad.rahman@email.com',
-    noTelepon: '081234567892',
-    alamat: 'Jl. Thamrin No. 789, Surabaya',
-    namaAnak: 'MUHAMMAD FARHAN',
-    idAnak: 'FZ1402',
-    status: 'Nonaktif',
-    tanggalDaftar: '2024-02-10',
-  },
-];
+import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+import { Edit, Trash2 } from "lucide-react";
+import AdminSidebar from "../../components/Admin/Sidebar";
+import AdminHeader from "../../components/Admin/Header";
+import { sortIcon } from "../../utils/sort";
+import Api from "../../utils/Api";
+import { useToken } from "../../utils/Cookies";
 
 const Orangtua = () => {
-  const [search, setSearch] = useState('');
-  const [sortField, setSortField] = useState('nama');
-  const [sortOrder, setSortOrder] = useState('asc');
+  const [search, setSearch] = useState("");
+  const [sortField, setSortField] = useState("nama");
+  const [sortOrder, setSortOrder] = useState("asc");
   const [showModal, setShowModal] = useState(false);
   const [selectedId, setSelectedId] = useState(null);
+  const [parent, setParent] = useState([]);
+  const { getToken } = useToken();
+
+  const getAllParent = async () => {
+    await Api.get("/admin/users", {
+      headers: {
+        Authorization: "Bearer " + getToken(),
+      },
+    }).then((res) => {
+      setParent(res.data);
+      console.log(res.data);
+    });
+  };
 
   const handleSort = (field) => {
     if (field === sortField) {
-      setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
+      setSortOrder(sortOrder === "asc" ? "desc" : "asc");
     } else {
       setSortField(field);
-      setSortOrder('asc');
+      setSortOrder("asc");
     }
   };
 
@@ -67,30 +46,35 @@ const Orangtua = () => {
     setShowModal(false);
   };
 
-  const filteredOrangtua = orangtuaDummy
-    .filter((orangtua) =>
-      orangtua.nama.toLowerCase().includes(search.toLowerCase()) ||
-      orangtua.email.toLowerCase().includes(search.toLowerCase()) ||
-      orangtua.namaAnak.toLowerCase().includes(search.toLowerCase())
+  const filteredOrangtua = parent
+    .filter(
+      (orangtua) =>
+        orangtua.name.toLowerCase().includes(search.toLowerCase()) ||
+        orangtua.email.toLowerCase().includes(search.toLowerCase()) ||
+        orangtua.parent.toLowerCase().includes(search.toLowerCase())
     )
     .sort((a, b) => {
       const valA = a[sortField];
       const valB = b[sortField];
 
-      if (typeof valA === 'string') {
-        return sortOrder === 'asc'
+      if (typeof valA === "string") {
+        return sortOrder === "asc"
           ? valA.localeCompare(valB)
           : valB.localeCompare(valA);
       } else {
-        return sortOrder === 'asc' ? valA - valB : valB - valA;
+        return sortOrder === "asc" ? valA - valB : valB - valA;
       }
     });
 
   const getStatusBadge = (status) => {
-    return status === 'Aktif' 
-      ? 'bg-green-100 text-green-800' 
-      : 'bg-red-100 text-red-800';
+    return status === "Aktif"
+      ? "bg-green-100 text-green-800"
+      : "bg-red-100 text-red-800";
   };
+
+  useEffect(() => {
+    getAllParent();
+  }, []);
 
   return (
     <div className="bg-[#f7f7f7] min-h-screen text-sm text-[#333]">
@@ -101,7 +85,9 @@ const Orangtua = () => {
           <AdminHeader />
 
           <div className="flex justify-between items-center mb-6 mt-6">
-            <h1 className="text-xl font-bold text-black">Data Akun Orang Tua</h1>
+            <h1 className="text-xl font-bold text-black">
+              Data Akun Orang Tua
+            </h1>
             <Link
               to="/admin/orangtua/create"
               className="bg-primary text-white font-medium px-4 py-2 rounded-md"
@@ -127,36 +113,31 @@ const Orangtua = () => {
                   <tr>
                     <th
                       className="px-4 py-3 cursor-pointer"
-                      onClick={() => handleSort('nama')}
+                      onClick={() => handleSort("name")}
                     >
-                      Nama Orangtua {sortIcon(sortField, sortOrder, 'nama')}
+                      Nama Orangtua {sortIcon(sortField, sortOrder, "name")}
                     </th>
                     <th
                       className="px-4 py-3 cursor-pointer"
-                      onClick={() => handleSort('email')}
+                      onClick={() => handleSort("email")}
                     >
-                      Email {sortIcon(sortField, sortOrder, 'email')}
+                      Email {sortIcon(sortField, sortOrder, "email")}
                     </th>
                     <th className="px-4 py-3">No. Telepon</th>
                     <th className="px-4 py-3">Alamat</th>
                     <th
                       className="px-4 py-3 cursor-pointer"
-                      onClick={() => handleSort('namaAnak')}
+                      onClick={() => handleSort("namaAnak")}
                     >
-                      Nama Anak {sortIcon(sortField, sortOrder, 'namaAnak')}
+                      Nama Anak {sortIcon(sortField, sortOrder, "namaAnak")}
                     </th>
                     <th className="px-4 py-3">ID Anak</th>
                     <th
                       className="px-4 py-3 cursor-pointer"
-                      onClick={() => handleSort('status')}
+                      onClick={() => handleSort("tanggalDaftar")}
                     >
-                      Status {sortIcon(sortField, sortOrder, 'status')}
-                    </th>
-                    <th
-                      className="px-4 py-3 cursor-pointer"
-                      onClick={() => handleSort('tanggalDaftar')}
-                    >
-                      Tanggal Daftar {sortIcon(sortField, sortOrder, 'tanggalDaftar')}
+                      Tanggal Daftar{" "}
+                      {sortIcon(sortField, sortOrder, "tanggalDaftar")}
                     </th>
                     <th className="px-4 py-3 text-right">Aksi</th>
                   </tr>
@@ -168,26 +149,43 @@ const Orangtua = () => {
                         key={orangtua.id}
                         className="border-t border-gray-200 hover:bg-gray-50"
                       >
-                        <td className="px-4 py-3 font-medium">{orangtua.nama}</td>
+                        <td className="px-4 py-3 font-medium">
+                          {orangtua.name}
+                        </td>
                         <td className="px-4 py-3">{orangtua.email}</td>
-                        <td className="px-4 py-3">{orangtua.noTelepon}</td>
-                        <td className="px-4 py-3 max-w-xs truncate" title={orangtua.alamat}>
-                          {orangtua.alamat}
+                        <td className="px-4 py-3">{orangtua.telp}</td>
+                        <td className="px-4 py-3 max-w-xs truncate">
+                          {orangtua.address}
                         </td>
-                        <td className="px-4 py-3">{orangtua.namaAnak}</td>
-                        <td className="px-4 py-3 font-medium">{orangtua.idAnak}</td>
+
                         <td className="px-4 py-3">
-                          <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusBadge(orangtua.status)}`}>
-                            {orangtua.status}
-                          </span>
+                          {orangtua.parentOf && orangtua.parentOf.length > 0
+                            ? orangtua.parentOf
+                                .map((student) => student.name)
+                                .join(", ")
+                            : "-"}
                         </td>
-                        <td className="px-4 py-3">{orangtua.tanggalDaftar}</td>
+
+                        <td className="px-4 py-3">
+                          {orangtua.parentOf && orangtua.parentOf.length > 0
+                            ? orangtua.parentOf
+                                .map((student) => student.id)
+                                .join(", ")
+                            : "-"}
+                        </td>
+
+                        <td className="px-4 py-3">
+                          {orangtua.tanggalDaftar || "-"}
+                        </td>
+
                         <td className="px-4 py-3 text-right">
                           <div className="flex justify-end gap-3">
-                            <Link to={`/admin/orangtua/edit/`}>
+                            <Link to={`/admin/orangtua/edit/${orangtua.id}`}>
                               <Edit className="text-primary w-5 h-5 hover:scale-110 cursor-pointer" />
                             </Link>
-                            <button onClick={() => handleOpenModal(orangtua.id)}>
+                            <button
+                              onClick={() => handleOpenModal(orangtua.id)}
+                            >
                               <Trash2 className="text-red-600 w-5 h-5 hover:scale-110" />
                             </button>
                           </div>
@@ -196,7 +194,10 @@ const Orangtua = () => {
                     ))
                   ) : (
                     <tr>
-                      <td colSpan="9" className="text-center py-6 text-gray-500">
+                      <td
+                        colSpan="9"
+                        className="text-center py-6 text-gray-500"
+                      >
                         Tidak ada data ditemukan.
                       </td>
                     </tr>

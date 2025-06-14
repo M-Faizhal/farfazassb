@@ -1,22 +1,20 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import AdminHeader from '../../../components/Admin/Header';
 import AdminSidebar from '../../../components/Admin/Sidebar';
-
-const pelatihList = [
-  { id: 'P001', nama: 'Bambang' },
-  { id: 'P002', nama: 'Joko' },
-  { id: 'P003', nama: 'Lathif' },
-  { id: 'P004', nama: 'Bayu' },
-];
+import Api from '../../../utils/Api';
+import { useToken } from '../../../utils/Cookies';
+import { jwtDecode } from 'jwt-decode';
+import toast from 'react-hot-toast';
 
 const CreateTes = () => {
   const navigate = useNavigate();
+  const {getToken} = useToken()
+  const {id} = useParams()
 
   const [formData, setFormData] = useState({
-    namaTes: '',
-    tanggal: '',
-    pelatih: '',
+    name: '',
+    date: '',
   });
 
   const [showModal, setShowModal] = useState(false);
@@ -27,15 +25,22 @@ const CreateTes = () => {
     setFormData((prev) => ({ ...prev, [id]: value }));
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    console.log('Data yang dikirim:', formData);
-
-    setSuccessMessage('Tes berhasil ditambahkan!');
-    setTimeout(() => {
+  const createTest = async() =>{
+    await Api.post("/admin/tests",{
+      name : formData.name,
+      date : formData.date,
+      coachId: jwtDecode(getToken()).userId
+    },{
+      headers : {
+        Authorization : "Bearer " + getToken()
+      }
+    }).then(res=>{
+      toast.success("Sukses menambahkan tes")
       navigate('/admin/daftartes');
-    }, 2000);
-  };
+    }).catch(err=>{
+      console.log(err)
+    })
+  }
 
   return (
     <div className="bg-[#f7f7f7] min-h-screen text-sm text-[#333]">
@@ -55,26 +60,18 @@ const CreateTes = () => {
           >
             <InputField
               label="Nama Tes"
-              id="namaTes"
+              id="name"
               required
-              value={formData.namaTes}
+              value={formData.name}
               onChange={handleChange}
             />
             <InputField
               label="Tanggal Tes"
-              id="tanggal"
+              id="date"
               type="date"
               required
-              value={formData.tanggal}
+              value={formData.date}
               onChange={handleChange}
-            />
-            <SelectField
-              label="Nama Pelatih"
-              id="pelatih"
-              required
-              value={formData.pelatih}
-              onChange={handleChange}
-              options={pelatihList.map((p) => p.nama)}
             />
           </form>
 
@@ -101,9 +98,8 @@ const CreateTes = () => {
               <div className="bg-white rounded-lg p-6 shadow-lg max-w-md w-full">
                 <h2 className="text-lg font-semibold mb-2">Konfirmasi Penambahan</h2>
                 <div className="text-sm text-gray-800 space-y-1 mb-4">
-                  <p><strong>Nama Tes:</strong> {formData.namaTes}</p>
-                  <p><strong>Tanggal:</strong> {formData.tanggal}</p>
-                  <p><strong>Pelatih:</strong> {formData.pelatih}</p>
+                  <p><strong>Nama Tes:</strong> {formData.name}</p>
+                  <p><strong>Tanggal:</strong> {formData.date}</p>
                 </div>
                 <p className="text-sm text-gray-700 mb-4">Apakah Anda yakin ingin menambahkan tes ini?</p>
                 <div className="flex flex-col sm:flex-row justify-end gap-3">
@@ -114,7 +110,7 @@ const CreateTes = () => {
                     Tinjau Ulang
                   </button>
                   <button 
-                    onClick={handleSubmit} 
+                    onClick={createTest} 
                     className="px-4 py-2 bg-primary text-white rounded-md w-full sm:w-auto"
                   >
                     Ya, Simpan
@@ -152,28 +148,4 @@ const InputField = ({ label, id, value, onChange, type = 'text', required }) => 
     />
   </div>
 );
-
-const SelectField = ({ label, id, options = [], value, onChange, required }) => (
-  <div className="flex flex-col">
-    <label htmlFor={id} className="text-sm text-black mb-1">
-      {label}
-      {required && <span className="text-red-600">*</span>}
-    </label>
-    <select
-      id={id}
-      value={value}
-      onChange={onChange}
-      required={required}
-      className="rounded-md bg-[#E6EEFF] border border-gray-300 h-10 px-3 text-black focus:outline-primary text-sm"
-    >
-      <option value="">-- Pilih --</option>
-      {options.map((opt) => (
-        <option key={opt} value={opt}>
-          {opt}
-        </option>
-      ))}
-    </select>
-  </div>
-);
-
 export default CreateTes;
