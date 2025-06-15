@@ -1,63 +1,20 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import AdminHeader from '../../components/Admin/Header';
 import AdminSidebar from '../../components/Admin/Sidebar';
 import { Edit, Eye, Plus, Trash2, Trophy, Users, User, X, Calendar, Award, MapPin } from 'lucide-react';
-
-const initialPrestasiList = [
-  {
-    id: 'PRS001',
-    judul: 'Juara 1 Liga Junior Surabaya 2024',
-    kategori: 'Tim',
-    tanggal: '2024-12-15',
-    tingkat: 'Regional',
-    peringkat: '1',
-    deskripsi: 'Tim U12 berhasil meraih juara 1 dalam Liga Junior Surabaya dengan skor akhir 3-1. Pertandingan berlangsung sangat sengit dan tim menunjukkan performa luar biasa sepanjang turnamen.',
-    namaSiswa: null,
-    namaEvent: 'Liga Junior Surabaya 2024'
-  },
-  {
-    id: 'PRS002',
-    judul: 'Top Scorer Liga Junior',
-    kategori: 'Individu',
-    tanggal: '2024-11-20',
-    tingkat: 'Regional',
-    peringkat: '1',
-    deskripsi: 'Afif Bima Said menjadi top scorer dengan 15 gol sepanjang liga junior. Pencapaian yang luar biasa untuk pemain muda berbakat ini.',
-    namaSiswa: 'Afif Bima Said',
-    namaEvent: 'Liga Junior Surabaya 2024'
-  },
-  {
-    id: 'PRS003',
-    judul: 'Juara 3 Turnamen Nasional U11',
-    kategori: 'Tim',
-    tanggal: '2024-10-10',
-    tingkat: 'Nasional',
-    peringkat: '3',
-    deskripsi: 'Tim U11 meraih juara 3 setelah mengalahkan tim dari Jakarta dengan skor 2-0 di pertandingan perebutan juara 3.',
-    namaSiswa: null,
-    namaEvent: 'Turnamen Nasional U11 Indonesia Cup'
-  },
-  {
-    id: 'PRS004',
-    judul: 'Best Player Tournament',
-    kategori: 'Individu',
-    tanggal: '2024-09-05',
-    tingkat: 'Lokal',
-    peringkat: '1',
-    deskripsi: 'Muhammad Farhan terpilih sebagai pemain terbaik turnamen berkat performa konsisten dan skill yang luar biasa di setiap pertandingan.',
-    namaSiswa: 'Muhammad Farhan',
-    namaEvent: 'Turnamen Ramadan Cup'
-  }
-];
+import Api from '../../utils/Api';
+import { useToken } from '../../utils/Cookies';
+import { toLocal } from '../../utils/dates';
 
 const Prestasi = () => {
-  const [prestasiData, setPrestasiData] = useState(initialPrestasiList);
+  const [prestasiData, setPrestasiData] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [showDetailModal, setShowDetailModal] = useState(false);
   const [selectedId, setSelectedId] = useState(null);
   const [selectedPrestasi, setSelectedPrestasi] = useState(null);
   const [filterKategori, setFilterKategori] = useState('Semua');
+  const {getToken} = useToken()
 
   const handleOpenModal = (id) => {
     setSelectedId(id);
@@ -76,16 +33,16 @@ const Prestasi = () => {
   };
 
   const filteredPrestasi = prestasiData.filter(prestasi => 
-    filterKategori === 'Semua' || prestasi.kategori === filterKategori
+    filterKategori === 'Semua' || prestasi.level === filterKategori
   );
 
-  const sortedPrestasiList = [...filteredPrestasi].sort((a, b) => new Date(b.tanggal) - new Date(a.tanggal));
+  const sortedPrestasiList = [...filteredPrestasi].sort((a, b) => new Date(b.date) - new Date(a.date));
 
   const getPeringkatBadge = (peringkat) => {
     const badges = {
-      '1': 'bg-yellow-100 text-yellow-800 border-yellow-200',
-      '2': 'bg-gray-100 text-gray-800 border-gray-200', 
-      '3': 'bg-orange-100 text-orange-800 border-orange-200'
+      1: 'bg-yellow-100 text-yellow-800 border-yellow-200',
+      2: 'bg-gray-100 text-gray-800 border-gray-200', 
+      3: 'bg-orange-100 text-orange-800 border-orange-200'
     };
     return badges[peringkat] || 'bg-blue-100 text-blue-800 border-blue-200';
   };
@@ -98,6 +55,20 @@ const Prestasi = () => {
     };
     return badges[tingkat] || 'bg-gray-100 text-gray-800';
   };
+
+  const getAllPrestasi = async() =>{
+    await Api.get("/admin/achievements",{
+      headers : {
+        Authorization : "Bearer " + getToken()
+      }
+    }).then((res)=>{
+        setPrestasiData(res.data)
+    })
+  }
+
+  useEffect(()=>{
+    getAllPrestasi()
+  },[])
 
   return (
     <div className="bg-[#f7f7f7] min-h-screen text-sm text-[#333]">
@@ -144,52 +115,48 @@ const Prestasi = () => {
                 >
                   <div className="flex items-start justify-between mb-3">
                     <div className="flex items-center gap-2">
-                      {prestasi.kategori === 'Tim' ? (
+                      {prestasi.studentId === null ? (
                         <Users className="text-primary" size={20} />
                       ) : (
                         <User className="text-primary" size={20} />
                       )}
-                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${getTingkatBadge(prestasi.tingkat)}`}>
-                        {prestasi.tingkat}
+                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${getTingkatBadge(prestasi.level)}`}>
+                        {prestasi.level}
                       </span>
                     </div>
-                    <div className={`px-2 py-1 rounded-full text-xs font-bold border ${getPeringkatBadge(prestasi.peringkat)} flex items-center gap-1`}>
+                    <div className={`px-2 py-1 rounded-full text-xs font-bold border ${getPeringkatBadge(prestasi.place)} flex items-center gap-1`}>
                       <Trophy size={12} />
-                      Juara {prestasi.peringkat}
+                      Juara {prestasi.place}
                     </div>
                   </div>
 
                   <h2 className="text-lg md:text-xl font-bold text-gray-800 mb-2 leading-tight line-clamp-2">
-                    {prestasi.judul}
+                    {prestasi.title}
                   </h2>
 
                   <div className="space-y-1 mb-4">
                     <p className="text-gray-600 text-xs md:text-sm">
-                      <span className="font-semibold">Event:</span> {prestasi.namaEvent}
+                      <span className="font-semibold">Event:</span> {prestasi.event}
                     </p>
                     <p className="text-gray-600 text-xs md:text-sm">
                       <span className="font-semibold">Tanggal:</span>{' '}
-                      {new Date(prestasi.tanggal).toLocaleDateString('id-ID', {
-                        day: 'numeric',
-                        month: 'long',
-                        year: 'numeric',
-                      })}
+                      {(toLocal(prestasi.date))}
                     </p>
                     <p className="text-gray-600 text-xs md:text-sm">
                       <span className="font-semibold">Kategori:</span>{' '}
-                      <span className={`px-2 py-1 rounded text-xs ${prestasi.kategori === 'Tim' ? 'bg-blue-100 text-blue-800' : 'bg-purple-100 text-purple-800'}`}>
-                        {prestasi.kategori}
+                      <span className={`px-2 py-1 rounded text-xs ${prestasi.studentId === null ? 'bg-blue-100 text-blue-800' : 'bg-purple-100 text-purple-800'}`}>
+                        {prestasi.studentId === null ? "Tim" : "Individu"}
                       </span>
                     </p>
-                    {prestasi.namaSiswa && (
+                    {prestasi.student.name && (
                       <p className="text-gray-600 text-xs md:text-sm">
-                        <span className="font-semibold">Siswa:</span> {prestasi.namaSiswa}
+                        <span className="font-semibold">Siswa:</span> {prestasi.student.name}
                       </p>
                     )}
                   </div>
 
                   <p className="text-gray-700 text-xs md:text-sm mb-4 line-clamp-2">
-                    {prestasi.deskripsi}
+                    {prestasi.desc}
                   </p>
 
                   <div className="flex flex-col sm:flex-row justify-between gap-2 pt-2 border-t border-gray-100">
@@ -252,16 +219,16 @@ const Prestasi = () => {
             <div className="p-6">
               <div className="mb-6">
                 <div className="flex items-center gap-2 mb-3">
-                  <div className={`px-3 py-1 rounded-full text-sm font-bold border ${getPeringkatBadge(selectedPrestasi.peringkat)} flex items-center gap-2`}>
+                  <div className={`px-3 py-1 rounded-full text-sm font-bold border ${getPeringkatBadge(selectedPrestasi.plac)} flex items-center gap-2`}>
                     <Trophy size={16} />
-                    Juara {selectedPrestasi.peringkat}
+                    Juara {selectedPrestasi.place}
                   </div>
-                  <span className={`px-3 py-1 rounded-full text-sm font-medium ${getTingkatBadge(selectedPrestasi.tingkat)}`}>
-                    {selectedPrestasi.tingkat}
+                  <span className={`px-3 py-1 rounded-full text-sm font-medium ${getTingkatBadge(selectedPrestasi.level)}`}>
+                    {selectedPrestasi.level}
                   </span>
                 </div>
-                <h1 className="text-2xl font-bold text-gray-800 mb-2">{selectedPrestasi.judul}</h1>
-                <p className="text-gray-600">{selectedPrestasi.namaEvent}</p>
+                <h1 className="text-2xl font-bold text-gray-800 mb-2">{selectedPrestasi.title}</h1>
+                <p className="text-gray-600">{selectedPrestasi.event}</p>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
@@ -271,12 +238,7 @@ const Prestasi = () => {
                     <div>
                       <p className="text-sm font-medium text-gray-700">Tanggal Event</p>
                       <p className="text-gray-800">
-                        {new Date(selectedPrestasi.tanggal).toLocaleDateString('id-ID', {
-                          weekday: 'long',
-                          day: 'numeric',
-                          month: 'long',
-                          year: 'numeric',
-                        })}
+                        {toLocal(selectedPrestasi.date)}
                       </p>
                     </div>
                   </div>
@@ -285,30 +247,30 @@ const Prestasi = () => {
                     <MapPin className="text-primary" size={20} />
                     <div>
                       <p className="text-sm font-medium text-gray-700">Tingkat Kompetisi</p>
-                      <p className="text-gray-800">{selectedPrestasi.tingkat}</p>
+                      <p className="text-gray-800">{selectedPrestasi.level}</p>
                     </div>
                   </div>
                 </div>
 
                 <div className="space-y-4">
                   <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
-                    {selectedPrestasi.kategori === 'Tim' ? (
+                    {selectedPrestasi.studentId === null ? (
                       <Users className="text-primary" size={20} />
                     ) : (
                       <User className="text-primary" size={20} />
                     )}
                     <div>
                       <p className="text-sm font-medium text-gray-700">Kategori</p>
-                      <p className="text-gray-800">{selectedPrestasi.kategori}</p>
+                      <p className="text-gray-800">{selectedPrestasi.studentId === null? "Tim" : "Individu" }</p>
                     </div>
                   </div>
 
-                  {selectedPrestasi.namaSiswa && (
+                  {selectedPrestasi.student.name && (
                     <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
                       <User className="text-primary" size={20} />
                       <div>
                         <p className="text-sm font-medium text-gray-700">Nama Siswa</p>
-                        <p className="text-gray-800">{selectedPrestasi.namaSiswa}</p>
+                        <p className="text-gray-800">{selectedPrestasi.student.name}</p>
                       </div>
                     </div>
                   )}
@@ -317,7 +279,7 @@ const Prestasi = () => {
                     <Award className="text-primary" size={20} />
                     <div>
                       <p className="text-sm font-medium text-gray-700">Peringkat</p>
-                      <p className="text-gray-800">Juara {selectedPrestasi.peringkat}</p>
+                      <p className="text-gray-800">Juara {selectedPrestasi.place}</p>
                     </div>
                   </div>
                 </div>
@@ -326,7 +288,7 @@ const Prestasi = () => {
               <div className="mb-6">
                 <h3 className="text-lg font-semibold text-gray-800 mb-3">Deskripsi Prestasi</h3>
                 <div className="bg-gray-50 rounded-lg p-4">
-                  <p className="text-gray-700 leading-relaxed">{selectedPrestasi.deskripsi}</p>
+                  <p className="text-gray-700 leading-relaxed">{selectedPrestasi.desc}</p>
                 </div>
               </div>
 
