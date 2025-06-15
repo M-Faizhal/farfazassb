@@ -6,6 +6,8 @@ import { Edit, Eye, Plus, Trash2, Trophy, Users, User, X, Calendar, Award, MapPi
 import Api from '../../utils/Api';
 import { useToken } from '../../utils/Cookies';
 import { toLocal } from '../../utils/dates';
+import id from 'dayjs/locale/id';
+import toast from 'react-hot-toast';
 
 const Prestasi = () => {
   const [prestasiData, setPrestasiData] = useState([]);
@@ -27,13 +29,12 @@ const Prestasi = () => {
   };
 
   const handleDelete = () => {
-    const updatedData = prestasiData.filter(prestasi => prestasi.id !== selectedId);
-    setPrestasiData(updatedData);
+    deletePrestasi()
     setShowModal(false);
   };
 
   const filteredPrestasi = prestasiData.filter(prestasi => 
-    filterKategori === 'Semua' || prestasi.level === filterKategori
+    filterKategori === "Tim" ? prestasi.studentId === null : prestasi.studentId != null 
   );
 
   const sortedPrestasiList = [...filteredPrestasi].sort((a, b) => new Date(b.date) - new Date(a.date));
@@ -63,6 +64,17 @@ const Prestasi = () => {
       }
     }).then((res)=>{
         setPrestasiData(res.data)
+    })
+  }
+  
+  const deletePrestasi = async(id) =>{
+    await Api.delete("/admin/achievements/" + selectedId,{
+      headers : {
+        Authorization : "Bearer " + getToken()
+      }
+    }).then(()=>{
+      toast.success("Sukses Menghapus Prestasi")
+      getAllPrestasi()
     })
   }
 
