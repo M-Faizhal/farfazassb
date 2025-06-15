@@ -1,55 +1,81 @@
-import { useEffect, useState } from 'react';
-import { Link, useNavigate, useParams } from 'react-router-dom';
-import { FiEdit, FiTrash2 } from 'react-icons/fi';
-import AdminSidebar from '../../../components/Admin/Sidebar';
-import AdminHeader from '../../../components/Admin/Header';
-import { sortIcon } from '../../../utils/sort';
-import Api from '../../../utils/Api';
-import { useToken } from '../../../utils/Cookies';
-import { toLocal } from '../../../utils/dates';
-import { FaPlus } from 'react-icons/fa6';
-import { jwtDecode } from 'jwt-decode';
+import { useEffect, useState } from "react";
+import { Link, useNavigate, useParams } from "react-router-dom";
+import { FiEdit, FiTrash2 } from "react-icons/fi";
+import AdminSidebar from "../../../components/Admin/Sidebar";
+import AdminHeader from "../../../components/Admin/Header";
+import { sortIcon } from "../../../utils/sort";
+import Api from "../../../utils/Api";
+import { useToken } from "../../../utils/Cookies";
+import { toLocal } from "../../../utils/dates";
+import { FaPlus } from "react-icons/fa6";
+import { jwtDecode } from "jwt-decode";
+import toast from "react-hot-toast";
 
 const PenilaianSiswa = () => {
-  const [search, setSearch] = useState('');
-  const [sortField, setSortField] = useState('name');
-  const [sortOrder, setSortOrder] = useState('asc');
+  const [search, setSearch] = useState("");
+  const [sortField, setSortField] = useState("name");
+  const [sortOrder, setSortOrder] = useState("asc");
   const [showModal, setShowModal] = useState(false);
   const [selectedId, setSelectedId] = useState(null);
-  const navigate = useNavigate()
-  const [addId,setAddId] = useState()
-  const [nama,setnama] = useState()
-  const [siswa,setSiswa] = useState()
-  const [test,setTest] = useState()
-  const {getToken} = useToken()
-  const {id} = useParams()
+  const navigate = useNavigate();
+  const [addId, setAddId] = useState();
+  const [nama, setnama] = useState();
+  const [siswa, setSiswa] = useState();
+  const [test, setTest] = useState();
+  const { getToken } = useToken();
+  const { id } = useParams();
 
-  const getAllSiswa = async()=>{
-    await Api.get("/admin/students/coach/" + jwtDecode(getToken()).userId,{
-      headers : {
-        Authorization : "Bearer " + getToken()
-      }
-    }).then((res)=>{
-      setSiswa(res.data)
+  const removeGrades = async (id) => {
+    await Api.delete(`/admin/grades/${id}`, {
+      headers: {
+        Authorization: "Bearer " + getToken(),
+      },
     })
-  }
+      .then(() => {
+        toast.success("Sukses menghapus penilaian");
+        getTestById();
+      })
+      .catch(() => {
+        toast.error("Error menghapus penilaian");
+      });
+  };
 
-  const getTestById = async() =>{
-    await Api.get("/admin/tests/" + id,{
-      headers : {
-        Authorization : "Bearer " + getToken()
+  const getAllSiswa = async () => {
+    await Api.get("/admin/students/coach/" + jwtDecode(getToken()).userId, {
+      headers: {
+        Authorization: "Bearer " + getToken(),
+      },
+    }).then((res) => {
+      console.log(test.grades);
+      if (test.grades.length >= 0) {
+        setSiswa(
+          res.data.filter(
+            (siswa) =>
+              !test.grades.some((grade) => grade.student.id === siswa.id)
+          )
+        );
+      } else {
+        setSiswa(res.data);
       }
-    }).then(res=>{
-      setTest(res.data)
-    })
-  }
+    });
+  };
+
+  const getTestById = async () => {
+    await Api.get("/admin/tests/" + id, {
+      headers: {
+        Authorization: "Bearer " + getToken(),
+      },
+    }).then((res) => {
+      setTest(res.data);
+    });
+  };
 
   const handleSort = (field) => {
     if (field === sortField) {
-      setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
+      setSortOrder(sortOrder === "asc" ? "desc" : "asc");
     } else {
       setSortField(field);
-      setSortOrder('asc');
+      setSortOrder("asc");
     }
   };
 
@@ -59,33 +85,36 @@ const PenilaianSiswa = () => {
   };
 
   const handleDelete = () => {
-    console.log(`Menghapus siswa dengan ID: ${selectedId}`);
+    removeGrades(selectedId);
     setShowModal(false);
   };
 
-const filteredSiswa = test?.grades
-  ?.filter((siswa) =>
-    siswa?.student?.name?.toLowerCase().includes(search.toLowerCase())
-  )
-  ?.sort((a, b) => {
-    const valA = a?.student?.[sortField];
-    const valB = b?.student?.[sortField];
+  const filteredSiswa =
+    test?.grades
+      ?.filter((siswa) =>
+        siswa?.student?.name?.toLowerCase().includes(search.toLowerCase())
+      )
+      ?.sort((a, b) => {
+        const valA = a?.student?.[sortField];
+        const valB = b?.student?.[sortField];
 
-    if (typeof valA === 'string') {
-      return sortOrder === 'asc'
-        ? valA.localeCompare(valB)
-        : valB.localeCompare(valA);
-    } else {
-      return sortOrder === 'asc' ? valA - valB : valB - valA;
-    }
-  }) ?? [];
+        if (typeof valA === "string") {
+          return sortOrder === "asc"
+            ? valA.localeCompare(valB)
+            : valB.localeCompare(valA);
+        } else {
+          return sortOrder === "asc" ? valA - valB : valB - valA;
+        }
+      }) ?? [];
 
-    useEffect(()=>{
-      if(id){
-        getTestById()
-        getAllSiswa()
+  useEffect(() => {
+    if (id) {
+      getTestById();
+      if (test) {
+        getAllSiswa();
       }
-    },[id])
+    }
+  }, [id]);
 
   return (
     <div className="bg-[#f7f7f7] min-h-screen text-sm text-[#333]">
@@ -95,14 +124,24 @@ const filteredSiswa = test?.grades
         <main className="flex-1 px-6 py-8 pt-20 md:pt-0 md:ml-64">
           <AdminHeader />
 
-          {/* Info Tes dan Pelatih */}  
+          {/* Info Tes dan Pelatih */}
           <div className="mb-6">
             <h2 className="text-2xl font-bold text-black mb-1">Detail Tes</h2>
             <div className="bg-white p-4 rounded-md shadow border text-sm space-y-1">
-              <p><span className="font-medium">ID Tes:</span> {test?.id}</p>
-              <p><span className="font-medium">Tanggal Tes:</span> {toLocal(test?.date)}</p>
-              <p><span className="font-medium">Pelatih:</span> {test?.coach.name}</p>
-              <p><span className="font-medium">Jumlah Siswa:</span> {test?.grades.length}</p>
+              <p>
+                <span className="font-medium">ID Tes:</span> {test?.id}
+              </p>
+              <p>
+                <span className="font-medium">Tanggal Tes:</span>{" "}
+                {toLocal(test?.date)}
+              </p>
+              <p>
+                <span className="font-medium">Pelatih:</span> {test?.coach.name}
+              </p>
+              <p>
+                <span className="font-medium">Jumlah Siswa:</span>{" "}
+                {test?.grades.length}
+              </p>
             </div>
           </div>
 
@@ -116,17 +155,38 @@ const filteredSiswa = test?.grades
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
               />
-              <div className='flex flex-row gap-3'>
-                <select className='outline-none border-1 rounded-lg px-3 py-2'  onChange={(e)=>{
-                  setAddId(e.target.value.split(",")[0])
-                  setnama(e.target.value.split(",")[1])
-                }}>
+              <div className="flex flex-row gap-3">
+                <select
+                  className="outline-none border-1 rounded-lg px-3 py-2"
+                  onChange={(e) => {
+                    setAddId(e.target.value.split(",")[0]);
+                    setnama(e.target.value.split(",")[1]);
+                  }}
+                >
                   <option value={null}>Tambah Siswa</option>
-                  {siswa?.map((siswa)=>{
-                    return <option key={siswa.id} value={`${siswa.id},${siswa.name}`}>{siswa.name}</option>
+                  {siswa?.map((siswa) => {
+                    return (
+                      <option
+                        key={siswa.id}
+                        value={`${siswa.id},${siswa.name}`}
+                      >
+                        {siswa.name}
+                      </option>
+                    );
                   })}
                 </select>
-                <button onClick={()=>addId? navigate(`/admin/daftartes/penilaian/create/${addId}?nama=${nama}`) : null} className='cursor-pointer bg-primary text-white flex flex-row px-5 py-3 rounded-lg font-semibold'>
+                <button
+                  onClick={() =>
+                    addId
+                      ? navigate(
+                          `/admin/daftartes/penilaian/create/${addId}?test=${id}&nama=${nama}&tanggal=${toLocal(
+                            test.date
+                          )}`
+                        )
+                      : null
+                  }
+                  className="cursor-pointer bg-primary text-white flex flex-row px-5 py-3 rounded-lg font-semibold"
+                >
                   <FaPlus size={20} />
                   <p>Tambah Penilaian</p>
                 </button>
@@ -137,20 +197,35 @@ const filteredSiswa = test?.grades
               <table className="min-w-full text-sm text-left text-gray-700">
                 <thead className="bg-primary text-white font-semibold">
                   <tr>
-                    <th className="px-4 py-3 cursor-pointer" onClick={() => handleSort('id')}>
-                      ID Siswa {sortIcon(sortField, 'id')}
+                    <th
+                      className="px-4 py-3 cursor-pointer"
+                      onClick={() => handleSort("id")}
+                    >
+                      ID Siswa {sortIcon(sortField, "id")}
                     </th>
-                    <th className="px-4 py-3 cursor-pointer" onClick={() => handleSort('nama')}>
-                      Nama {sortIcon(sortField, 'nama')}
+                    <th
+                      className="px-4 py-3 cursor-pointer"
+                      onClick={() => handleSort("nama")}
+                    >
+                      Nama {sortIcon(sortField, "nama")}
                     </th>
-                    <th className="px-4 py-3 cursor-pointer" onClick={() => handleSort('jenisKelamin')}>
-                      Jenis Kelamin {sortIcon(sortField, 'jenisKelamin')}
+                    <th
+                      className="px-4 py-3 cursor-pointer"
+                      onClick={() => handleSort("jenisKelamin")}
+                    >
+                      Jenis Kelamin {sortIcon(sortField, "jenisKelamin")}
                     </th>
-                    <th className="px-4 py-3 cursor-pointer" onClick={() => handleSort('usia')}>
-                      Usia {sortIcon(sortField, 'usia')}
+                    <th
+                      className="px-4 py-3 cursor-pointer"
+                      onClick={() => handleSort("usia")}
+                    >
+                      Usia {sortIcon(sortField, "usia")}
                     </th>
-                    <th className="px-4 py-3 cursor-pointer" onClick={() => handleSort('level')}>
-                      Level {sortIcon(sortField, 'level')}
+                    <th
+                      className="px-4 py-3 cursor-pointer"
+                      onClick={() => handleSort("level")}
+                    >
+                      Level {sortIcon(sortField, "level")}
                     </th>
                     <th className="px-4 py-3 text-right">Aksi</th>
                   </tr>
@@ -158,15 +233,32 @@ const filteredSiswa = test?.grades
                 <tbody>
                   {filteredSiswa.length > 0 ? (
                     filteredSiswa.map((siswa) => (
-                      <tr key={siswa.id} className="border-t border-gray-200 hover:bg-gray-50">
-                        <td className="px-4 py-3 font-medium">{siswa.student.id}</td>
+                      <tr
+                        key={siswa.id}
+                        className="border-t border-gray-200 hover:bg-gray-50"
+                      >
+                        <td className="px-4 py-3 font-medium">
+                          {siswa.student.id}
+                        </td>
                         <td className="px-4 py-3">{siswa.student.name}</td>
-                        <td className="px-4 py-3">{siswa.student.gender == "L" ?  "Laki-Laki" : "Perempuan"}</td>
+                        <td className="px-4 py-3">
+                          {siswa.student.gender == "L"
+                            ? "Laki-Laki"
+                            : "Perempuan"}
+                        </td>
                         <td className="px-4 py-3">{siswa.student.age}</td>
                         <td className="px-4 py-3">{siswa.student.level}</td>
                         <td className="px-4 py-3 text-right">
                           <div className="flex justify-end gap-3">
-                            <Link to={`/admin/daftartes/penilaian/edit`}>
+                            <Link
+                              to={`/admin/daftartes/penilaian/edit/${
+                                siswa.student.id
+                              }?test=${id}&nama=${
+                                siswa.student.name
+                              }&tanggal=${toLocal(test.date)}&grade=${
+                                siswa.id
+                              }`}
+                            >
                               <FiEdit className="text-primary w-5 h-5 hover:scale-110" />
                             </Link>
                             <button onClick={() => handleOpenModal(siswa.id)}>
@@ -178,7 +270,10 @@ const filteredSiswa = test?.grades
                     ))
                   ) : (
                     <tr>
-                      <td colSpan="8" className="text-center py-6 text-gray-500">
+                      <td
+                        colSpan="8"
+                        className="text-center py-6 text-gray-500"
+                      >
                         Tidak ada data ditemukan.
                       </td>
                     </tr>

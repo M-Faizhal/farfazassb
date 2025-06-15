@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Edit, Trash2 } from "lucide-react";
 import AdminSidebar from "../../components/Admin/Sidebar";
 import AdminHeader from "../../components/Admin/Header";
 import { sortIcon } from "../../utils/sort";
 import Api from "../../utils/Api";
 import { useToken } from "../../utils/Cookies";
+import { toLocal } from "../../utils/dates";
 
 const Orangtua = () => {
   const [search, setSearch] = useState("");
@@ -14,6 +15,7 @@ const Orangtua = () => {
   const [showModal, setShowModal] = useState(false);
   const [selectedId, setSelectedId] = useState(null);
   const [parent, setParent] = useState([]);
+  const navigate = useNavigate()
   const { getToken } = useToken();
 
   const getAllParent = async () => {
@@ -23,7 +25,6 @@ const Orangtua = () => {
       },
     }).then((res) => {
       setParent(res.data);
-      console.log(res.data);
     });
   };
 
@@ -65,12 +66,6 @@ const Orangtua = () => {
         return sortOrder === "asc" ? valA - valB : valB - valA;
       }
     });
-
-  const getStatusBadge = (status) => {
-    return status === "Aktif"
-      ? "bg-green-100 text-green-800"
-      : "bg-red-100 text-red-800";
-  };
 
   useEffect(() => {
     getAllParent();
@@ -139,6 +134,7 @@ const Orangtua = () => {
                       Tanggal Daftar{" "}
                       {sortIcon(sortField, sortOrder, "tanggalDaftar")}
                     </th>
+                    <th className="px-4 py-3 text-right">Status</th>
                     <th className="px-4 py-3 text-right">Aksi</th>
                   </tr>
                 </thead>
@@ -147,6 +143,7 @@ const Orangtua = () => {
                     filteredOrangtua.map((orangtua) => (
                       <tr
                         key={orangtua.id}
+                        onClick={(()=>navigate("/admin/orangtua/detail/" + orangtua.id))}
                         className="border-t border-gray-200 hover:bg-gray-50"
                       >
                         <td className="px-4 py-3 font-medium">
@@ -175,16 +172,25 @@ const Orangtua = () => {
                         </td>
 
                         <td className="px-4 py-3">
-                          {orangtua.tanggalDaftar || "-"}
+                          {toLocal(orangtua.createAt) || "-"}
+                        </td>
+
+                        <td className="px-4 py-3">
+                          <p className={`${orangtua.status?  `bg-green-600` : `bg-red-600`} px-3 py-1 text-center font-semibold rounded-full text-white`}>
+                            {orangtua.status? "Aktif": "Nonaktif"}
+                          </p>
                         </td>
 
                         <td className="px-4 py-3 text-right">
                           <div className="flex justify-end gap-3">
-                            <Link to={`/admin/orangtua/edit/${orangtua.id}`}>
+                            <Link to={`/admin/orangtua/edit/${orangtua.id}`} onClick={(e)=>e.stopPropagation()}>
                               <Edit className="text-primary w-5 h-5 hover:scale-110 cursor-pointer" />
                             </Link>
                             <button
-                              onClick={() => handleOpenModal(orangtua.id)}
+                              onClick={(e) => {
+                                e.stopPropagation()
+                                handleOpenModal(orangtua.id)
+                              }}
                             >
                               <Trash2 className="text-red-600 w-5 h-5 hover:scale-110" />
                             </button>

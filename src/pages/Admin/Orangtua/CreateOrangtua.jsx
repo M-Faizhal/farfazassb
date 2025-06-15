@@ -2,44 +2,55 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import AdminSidebar from '../../../components/Admin/Sidebar';
 import AdminHeader from '../../../components/Admin/Header';
+import Api from '../../../utils/Api';
+import { useToken } from '../../../utils/Cookies';
+import toast from 'react-hot-toast';
 
 const CreateOrangtua = () => {
   const navigate = useNavigate();
+  const {getToken} = useToken()
+  const [confirm,setConfirm] = useState()
   const [formData, setFormData] = useState({
-    nama: '',
+    name: '',
     email: '',
     password: '',
-    confirmPassword: '',
-    noTelepon: '',
-    alamat: '',
-    namaAnak: '',
-    idAnak: '',
-    status: 'Aktif',
+    role: "USER",
+    telp: '',
+    address: '',
   });
 
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
+
+  const handleConfirm = (e) =>{
+    setConfirm(e.target.value)
+  }
 
   const handleChange = (e) => {
     const { id, value } = e.target;
     setFormData((prev) => ({ ...prev, [id]: value }));
   };
 
+  const create = async() =>{
+    await Api.post("/admin/users",formData,{
+      headers : {
+        Authorization : "Bearer " + getToken()
+      }
+    }).then(()=>{
+      toast.success("Sukses Menambahkan Orang Tua")
+      navigate('/admin/orangtua')
+    })
+  }
+
   const handleSubmit = (e) => {
     e.preventDefault();
     
-    // Validasi password
-    if (formData.password !== formData.confirmPassword) {
+    if (formData.password !== confirm) {
       alert('Password dan Konfirmasi Password tidak cocok!');
       return;
     }
 
-    console.log('Form submitted:', formData);
-    setShowCreateModal(false);
-    setSuccessMessage('Akun orangtua berhasil ditambahkan!');
-    setTimeout(() => {
-      navigate('/admin/orangtua');
-    }, 2000);
+    create()
   };
 
   return (
@@ -58,7 +69,7 @@ const CreateOrangtua = () => {
           >
             <InputField 
               label="Nama Orangtua" 
-              id="nama" 
+              id="name" 
               required 
               onChange={handleChange} 
               value={formData.nama} 
@@ -85,52 +96,29 @@ const CreateOrangtua = () => {
               id="confirmPassword" 
               type="password" 
               required 
-              onChange={handleChange} 
-              value={formData.confirmPassword} 
+              onChange={handleConfirm} 
+              value={confirm} 
             />
 
             <InputField 
               label="No. Telepon" 
-              id="noTelepon" 
+              id="telp" 
               type="tel" 
               required 
               onChange={handleChange} 
-              value={formData.noTelepon} 
-            />
-            <SelectField 
-              label="Status" 
-              id="status" 
-              required 
-              onChange={handleChange} 
-              value={formData.status} 
-              options={['Aktif', 'Nonaktif']} 
+              value={formData.telp} 
             />
 
             <div className="md:col-span-2">
               <InputField 
                 label="Alamat" 
-                id="alamat" 
+                id="address" 
                 required 
                 onChange={handleChange} 
-                value={formData.alamat} 
+                value={formData.address} 
                 isTextarea={true}
               />
             </div>
-
-            <InputField 
-              label="Nama Anak" 
-              id="namaAnak" 
-              required 
-              onChange={handleChange} 
-              value={formData.namaAnak} 
-            />
-            <InputField 
-              label="ID Anak" 
-              id="idAnak" 
-              required 
-              onChange={handleChange} 
-              value={formData.idAnak} 
-            />
           </form>
 
           <div className="mt-6 flex flex-col sm:flex-row gap-3">

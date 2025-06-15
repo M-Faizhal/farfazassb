@@ -41,6 +41,9 @@ import CreatePrestasi from './pages/Admin/Prestasi/CreatePrestasi'
 import EditPrestasi from './pages/Admin/Prestasi/EditPrestasi'
 import ProtectAdmin from './utils/ProtectAdmin'
 import AlreadyLogin from './utils/AlreadyLogin'
+import DetailSiswa from './pages/Admin/Siswa/DetailSiswa'
+import DetailPelatih from './pages/Admin/Pelatih/DetailPelatih'
+import DetailOrangtua from './pages/Admin/Orangtua/DetailOrangTua'
 
 
 function App() {
@@ -67,23 +70,26 @@ function App() {
         <Route path='/admin' element={<ProtectAdmin />} >
           <Route path="dashboard" element={<AdminDashboard />} />
           <Route path="siswa" element={<Siswa />} />
+          <Route path="siswa/detail/:id" element={<DetailSiswa />} />  
           <Route path="siswa/create" element={<CreateSiswa />} />  
           <Route path="siswa/edit/:id" element={<EditSiswa />} />  
           <Route path="pelatih" element={<Pelatih />} />  
           <Route path="pelatih/create" element={<CreatePelatih />} />  
+          <Route path="pelatih/detail/:id" element={<DetailPelatih />} />  
           <Route path="pelatih/edit/:id" element={<EditPelatih />} />  
           <Route path="daftartes" element={<DaftarTes />} />  
           <Route path="daftartes/create" element={<CreateTes />} />  
           <Route path="daftartes/edit/:id" element={<EditTes />} />  
           <Route path="daftartes/penilaian/:id" element={<PenilaianSiswa />} />  
           <Route path="daftartes/penilaian/create/:id" element={<CreatePenilaian />} />  
-          <Route path="daftartes/penilaian/edit" element={<EditPenilaian />} />  
+          <Route path="daftartes/penilaian/edit/:id" element={<EditPenilaian />} />  
           <Route path="kehadiran" element={<Kehadiran/>} />
           <Route path="kehadiran/kalender/:level" element={<KalenderAbsensi/>} />
           <Route path="kehadiran/kalender/absensi/:level" element={<AbsensiTanggal/>} />
           <Route path="orangtua" element={<Orangtua />} />
           <Route path="orangtua/create" element={<CreateOrangtua />} />
-          <Route path="orangtua/edit" element={<EditOrangtua />} />
+          <Route path="orangtua/detail/:id" element={<DetailOrangtua />} />
+          <Route path="orangtua/edit/:id" element={<EditOrangtua />} />
           <Route path="prestasi" element={<Prestasi />} />
           <Route path="prestasi/create" element={<CreatePrestasi />} />
           <Route path="prestasi/edit/:id" element={<EditPrestasi />} />

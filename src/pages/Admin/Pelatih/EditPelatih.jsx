@@ -14,7 +14,6 @@ const EditPelatih = () => {
     email: "",
     telp: "",
     gender: "",
-    sertifikasi: "",
     password: "",
   });
 
@@ -37,7 +36,6 @@ const EditPelatih = () => {
           ...prev,
           nama: res.data.name,
           email: res.data.email,
-          sertifikasi: "A",
           telp : res.data.telp,
           gender : res.data.gender
         }));
@@ -133,15 +131,6 @@ const EditPelatih = () => {
               options={["Laki-Laki","Perempuan"]}
             />
 
-            <SelectField
-              label="Sertifikasi"
-              id="sertifikasi"
-              required
-              value={formData.sertifikasi}
-              onChange={handleChange}
-              options={["A", "B", "C", "D"]}
-            />
-
             <div className="flex flex-col">
               <label htmlFor="password" className="text-sm text-black mb-1">
                 Password{" "}
@@ -179,7 +168,7 @@ const EditPelatih = () => {
                   >
                     Drag & Drop atau{" "}
                     <span className="text-primary font-semibold ml-1">
-                      Browse
+                      Cari
                     </span>
                   </label>
                   <input
@@ -203,7 +192,7 @@ const EditPelatih = () => {
                   >
                     Drag & Drop atau{" "}
                     <span className="text-primary font-semibold ml-1">
-                      Browse
+                      Cari
                     </span>
                   </label>
                   <input

@@ -109,14 +109,6 @@ const CreatePelatih = () => {
               options={['Laki-Laki', 'Perempuan']}
             />
 
-            <SelectField
-              label="Sertifikasi"
-              id="sertifikasi"
-              required
-              value={formData.sertifikasi}
-              onChange={handleChange}
-              options={['A', 'B', 'C', 'D']}
-            />
           </form>
 
           <div className="mt-6 flex flex-col sm:flex-row gap-3">
@@ -144,7 +136,6 @@ const CreatePelatih = () => {
                 <div className="text-sm text-gray-800 space-y-1 mb-4">
                   <p><strong>Nama:</strong> {formData.nama}</p>
                   <p><strong>Jenis Kelamin:</strong> {formData.gender}</p>
-                  <p><strong>Sertifikasi:</strong> {formData.sertifikasi}</p>
                   <p><strong>Password:</strong> {formData.password.replace(/./g, '*')}</p>
                   {preview && (
                     <img src={preview} alt="Preview" className="mt-2 w-full max-h-32 md:max-h-48 object-contain rounded-md border" />
@@ -241,7 +232,7 @@ const FileUpload = ({ label, id, required, onChange, preview }) => (
           htmlFor={id}
           className="cursor-pointer rounded-md bg-white border border-gray-300 h-12 flex items-center justify-center text-sm text-gray-600"
         >
-          Drag & Drop atau <span className="text-primary font-semibold ml-1">Browse</span>
+          Drag & Drop atau <span className="text-primary font-semibold ml-1">Cari</span>
         </label>
         <input id={id} type="file" onChange={onChange} className="hidden" />
       </>

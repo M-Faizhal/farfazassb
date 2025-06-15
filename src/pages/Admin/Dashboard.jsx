@@ -4,31 +4,44 @@ import { useEffect, useState } from "react";
 import Api from "../../utils/Api";
 import { useToken } from "../../utils/Cookies";
 import { jwtDecode } from "jwt-decode";
+import { toLocal } from "../../utils/dates";
 
 const AdminDashboard = () => {
   const [siswa, setSiswa] = useState([]);
-  const [pelatih,setPelatih] = useState([])
+  const [pelatih, setPelatih] = useState([]);
+  const [orangTua, setOrangTua] = useState([]);
+  const [attendance, setAttendance] = useState([]);
   const { getToken } = useToken();
 
-  const getAllPelatih = async() =>{
-    await Api.get("/admin/coaches",{
-      headers : {
-        Authorization : "Bearer " + getToken()
-      }
-    }).then((res)=>{
-      setPelatih(res.data)
-    })
-  }
+  const getAllOrangTua = async () => {
+    await Api.get("/admin/users", {
+      headers: {
+        Authorization: "Bearer " + getToken(),
+      },
+    }).then((res) => {
+      setOrangTua(res.data);
+    });
+  };
 
-     const getSiswaByCoach = async() =>{
-    await Api.get("/admin/students/coach/" + jwtDecode(getToken()).userId,{
-      headers : { 
-        Authorization : "Bearer " + getToken()
-      }
-    }).then((res)=>{
-      setSiswa(res.data)
-    })
-  }
+  const getAllPelatih = async () => {
+    await Api.get("/admin/coaches", {
+      headers: {
+        Authorization: "Bearer " + getToken(),
+      },
+    }).then((res) => {
+      setPelatih(res.data);
+    });
+  };
+
+  const getSiswaByCoach = async () => {
+    await Api.get("/admin/students/coach/" + jwtDecode(getToken()).userId, {
+      headers: {
+        Authorization: "Bearer " + getToken(),
+      },
+    }).then((res) => {
+      setSiswa(res.data);
+    });
+  };
 
   const getAllSiswa = async () => {
     await Api.get("/admin/students", {
@@ -40,18 +53,42 @@ const AdminDashboard = () => {
     });
   };
 
+  const getTodayAttendance = async () => {
+    await Api.get(
+      "/admin/attendance/date/" + new Date().toISOString().slice(0, 10),
+      {
+        headers: {
+          Authorization: "Bearer " + getToken(),
+        },
+      }
+    ).then((res) => {
+      if (jwtDecode(getToken()).role == "SUPER_ADMIN") {
+        setAttendance(res.data);
+      } else {
+        console.log(res.data);
+        setAttendance(
+          res.data.filter(
+            (absen) => absen.student.coachId === jwtDecode(getToken()).userId
+          )
+        );
+      }
+    });
+  };
+
   useEffect(() => {
-    const role = jwtDecode(getToken()).role
+    const role = jwtDecode(getToken()).role;
     switch (role) {
       case "SUPER_ADMIN":
         getAllSiswa();
         break;
-    
+
       case "COACH":
-        getSiswaByCoach()
+        getSiswaByCoach();
         break;
     }
-    getAllPelatih()
+    getAllPelatih();
+    getAllOrangTua();
+    getTodayAttendance();
   }, []);
 
   return (
@@ -71,7 +108,7 @@ const AdminDashboard = () => {
             {[
               { label: "Siswa", value: siswa.length },
               { label: "Pelatih", value: pelatih.length },
-              { label: "Orang tua", value: 0 },
+              { label: "Orang tua", value: orangTua.length },
               { label: "Prestasi", value: 0 },
             ].map((item, i) => (
               <div
@@ -87,73 +124,47 @@ const AdminDashboard = () => {
           {/* Kehadiran */}
           <section className="mb-10">
             <h2 className="text-base font-semibold text-black mb-4">
-              Kehadiran Terbaru
-            </h2>
-            <div className="overflow-x-auto bg-white rounded-md border border-gray-200 shadow-sm">
-              <table className="w-full text-left table-auto">
-                <thead className="bg-primary text-white">
-                  <tr>
-                    <th className="px-4 py-2 font-semibold ">Student Name</th>
-                    <th className="px-4 py-2 font-semibold ">Date</th>
-                    <th className="px-4 py-2 font-semibold ">Status</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr className="border-t">
-                    <td className="px-4 py-2">Alex</td>
-                    <td className="px-4 py-2 text-gray-700">2023-12-12</td>
-                    <td className="px-4 py-2">
-                      <span className="bg-red-600 text-white px-3 py-1 rounded-full text-xs font-semibold">
-                        Absent
-                      </span>
-                    </td>
-                  </tr>
-                  <tr className="border-t">
-                    <td className="px-4 py-2">Liam</td>
-                    <td className="px-4 py-2 text-gray-700">2023-12-12</td>
-                    <td className="px-4 py-2">
-                      <span className="bg-green-600 text-white px-3 py-1 rounded-full text-xs font-semibold">
-                        Present
-                      </span>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </section>
-
-          {/* Nilai */}
-          <section>
-            <h2 className="text-base font-semibold text-black mb-4">
-              Nilai Terbaru
+              Kehadiran Hari Ini
             </h2>
             <div className="overflow-x-auto bg-white rounded-md border border-gray-200 shadow-sm">
               <table className="w-full text-left table-auto">
                 <thead className="bg-primary text-white">
                   <tr>
                     <th className="px-4 py-2 font-semibold ">Nama Siswa</th>
-                    <th className="px-4 py-2 font-semibold ">Tanggal</th>
-                    <th className="px-4 py-2 font-semibold ">Kelas</th>
-                    <th className="px-4 py-2 font-semibold ">Nilai</th>
+                    <th className="px-4 py-2 font-semibold ">Status</th>
                   </tr>
                 </thead>
                 <tbody>
-                  <tr className="border-t">
-                    <td className="px-4 py-2">Alex</td>
-                    <td className="px-4 py-2 text-gray-700">2023-12-12</td>
-                    <td className="px-4 py-2">Fisika</td>
-                    <td className="px-4 py-2">A</td>
-                  </tr>
-                  <tr className="border-t">
-                    <td className="px-4 py-2">Liam</td>
-                    <td className="px-4 py-2 text-gray-700">2023-12-12</td>
-                    <td className="px-4 py-2">—</td>
-                    <td className="px-4 py-2">—</td>
-                  </tr>
+                  {attendance.length === 0 ? (
+                    <tr>
+                      <td
+                        colSpan="2"
+                        className="text-center py-4 text-gray-500"
+                      >
+                        Belum ada data kehadiran hari ini.
+                      </td>
+                    </tr>
+                  ) : (
+                    attendance.map((absen, index) => (
+                      <tr key={index} className="border-t">
+                        <td className="px-4 py-2">{absen.student.name}</td>
+                        <td className="px-4 py-2">
+                          <span
+                            className={`${
+                              absen.present ? "bg-green-600" : "bg-red-600"
+                            } text-white px-3 py-1 rounded-full text-xs font-semibold`}
+                          >
+                            {absen.present ? "Hadir" : "Absen"}
+                          </span>
+                        </td>
+                      </tr>
+                    ))
+                  )}
                 </tbody>
               </table>
             </div>
           </section>
+
         </main>
       </div>
     </div>

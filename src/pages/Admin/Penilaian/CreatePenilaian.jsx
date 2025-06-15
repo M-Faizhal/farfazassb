@@ -1,56 +1,71 @@
-import { useState, useEffect } from 'react';
-import { useLocation, useNavigate, useParams } from 'react-router-dom';
-import AdminSidebar from '../../../components/Admin/Sidebar';
-import AdminHeader from '../../../components/Admin/Header';
+import { useState } from "react";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
+import AdminSidebar from "../../../components/Admin/Sidebar";
+import AdminHeader from "../../../components/Admin/Header";
+import Api from "../../../utils/Api";
+import toast from "react-hot-toast";
+import { useToken } from "../../../utils/Cookies";
 
-const daftarSiswa = ['Budi', 'Ani', 'Joko'];
-const kategoriSkala = ['Kurang', 'Cukup', 'Baik', 'Sangat Baik'];
-
-const dummyPenilaian = {
-  namaSiswa: '',
-  tanggalTes: '',
-  tinggiBadan: '',
-  beratBadan: '',
-  bmi: '',
-  kategoriBmi: '',
-  tinggiDuduk: '',
-  panjangTungkai: '',
-  rentangLengan: '',
-  denyutNadi: '',
-  saturasiOksigen: '',
-  boardJump: '',
-  kecepatan: '',
-  dayaTahan: '',
-  ControllingTungkaiKanan: '',
-  ControllingTungkaiKiri: '',
-  Dribbling: '',
-  LongpassTungkaiKanan: '',
-  LongpassTungkaiKiri: '',
-  ShortpassTungkaiKanan: '',
-  ShortpassTungkaiKiri: '',
-  ShootingTungkaiKanan: '',
-  ShootingTungkaiKiri: '',
-  disiplin: '',
-  komitmen: '',
-  percayaDiri: '',
-  injuryDetail: '',
-  comment: ''
-};
+const kategoriSkala = ["Kurang", "Cukup", "Baik", "Sangat Baik"];
 
 const CreatePenilaian = () => {
   const navigate = useNavigate();
   const { id } = useParams();
-  const [formData, setFormData] = useState({});
-  const [showModal, setShowModal] = useState(false);
-  const [successMessage, setSuccessMessage] = useState('');
-  const location = useLocation()
+  const [formData, setFormData] = useState({
+    tinggiBadan: "",
+    beratBadan: "",
+    bmi: "",
+    kategoriBMI: "NORMAL",
+    tinggiDuduk: "",
+    panjangTungkai: "",
+    rentangLengan: "",
+    denyutNadiIstirahat: "",
+    saturasiOksigen: "",
+    standingBoardJump: "",
+    kecepatan: "",
+    dayaTahan: "",
+    controllingKanan: "",
+    controllingKiri: "",
+    dribbling: "",
+    longpassKanan: "",
+    longpassKiri: "",
+    shortpassKanan: "",
+    shortpassKiri: "",
+    shootingKanan: "",
+    shootingKiri: "",
+    disiplin: "",
+    komitmen: "",
+    percayaDiri: "",
+    injuryDetail: "",
+    comment: "",
+  });
+  const location = useLocation();
   const query = new URLSearchParams(location.search);
-  const {nama} = query.get("nama")
+  const nama = query.get("nama");
+  const tanggal = query.get("tanggal");
+  const test = query.get("test");
+  const { getToken } = useToken();
 
-
-  useEffect(() => {
-    setFormData(dummyPenilaian);
-  }, []);
+  const createGrade = async () => {
+    console.log(formData.kategoriBMI)
+    await Api.post(
+      "/admin/grades",
+      {
+        ...formData,
+        date: tanggal,
+        studentId: id,
+        testId: test,
+      },
+      {
+        headers: {
+          Authorization: "Bearer " + getToken(),
+        },
+      }
+    ).then(() => {
+      toast.success("Sukses Menilai Siswa!");
+      navigate(-1);
+    });
+  };
 
   const handleChange = (e) => {
     const { id, value } = e.target;
@@ -59,9 +74,7 @@ const CreatePenilaian = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log('Updated Form Data:', formData);
-    setSuccessMessage('Data penilaian berhasil diperbarui!');
-    setTimeout(() => navigate('/admin/daftartes/penilaian'), 2000);
+    createGrade();
   };
 
   return (
@@ -70,58 +83,110 @@ const CreatePenilaian = () => {
         <AdminSidebar />
         <main className="flex-1 px-6 py-8 pt-20 md:pt-0 md:ml-64">
           <AdminHeader />
-          <h2 className="text-black text-xl font-bold mb-6 mt-6">Edit Penilaian</h2>
+          <h2 className="text-black text-xl font-bold mb-6 mt-6">
+            Buat Penilaian
+          </h2>
 
-          <form onSubmit={(e) => e.preventDefault()} className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-white p-6 rounded-md border border-gray-200 shadow-sm max-w-6xl">
-            <p>{nama}</p>
-            <InputField label="Tanggal Tes" id="tanggalTes" type="date" required value={formData.tanggalTes || ''} onChange={handleChange} />
+          <form
+            onSubmit={(e) => e.preventDefault()}
+            className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-white p-6 rounded-md border border-gray-200 shadow-sm max-w-6xl"
+          >
+            <div className="flex flex-col">
+              <label className="text-sm text-black mb-1">Nama Siswa</label>
+              <p className="font-semibold text-2xl">{nama}</p>
+            </div>
+            <div className="flex flex-col">
+              <label className="text-sm text-black mb-1">Tanggal Tes</label>
+              <p className="font-semibold text-2xl">{tanggal}</p>
+            </div>
             <Section title="Antropometri">
+              <div className="flex flex-col">
+                <label className="text-sm text-black mb-1">Kategori BMI</label>
+                <select
+                  defaultValue={"NORMAL"}
+                  onChange={(e) =>
+                    setFormData({ ...formData, kategoriBMI: e.target.value })
+                  }
+                  className="rounded-md bg-[#E6EEFF] border border-gray-300 h-10 px-3 text-black focus:outline-primary text-sm"
+                >
+                  {Array.from(["NORMAL", "UNDERWEIGHT", "OVERWEIGHT"]).map(
+                    (bmi, index) => {
+                      return (
+                        <option key={index} value={bmi}>
+                          {bmi}
+                        </option>
+                      );
+                    }
+                  )}
+                </select>
+              </div>
               {[
-                ['tinggiBadan', 'Tinggi Badan (cm)'],
-                ['beratBadan', 'Berat Badan (kg)'],
-                ['bmi', 'Body Mass Index (kg/m²)'],
-                ['kategoriBmi', 'Kategori BMI'],
-                ['tinggiDuduk', 'Tinggi Duduk (cm)'],
-                ['panjangTungkai', 'Panjang Tungkai (cm)'],
-                ['rentangLengan', 'Rentang Lengan (cm)']
+                ["bmi", "Body Mass Index (kg/m²)"],
+                ["tinggiBadan", "Tinggi Badan (cm)"],
+                ["beratBadan", "Berat Badan (kg)"],
+                ["tinggiDuduk", "Tinggi Duduk (cm)"],
+                ["panjangTungkai", "Panjang Tungkai (cm)"],
+                ["rentangLengan", "Rentang Lengan (cm)"],
               ].map(([id, label]) => (
-                <InputField key={id} id={id} label={label} value={formData[id] || ''} onChange={handleChange} />
+                <InputField
+                  key={id}
+                  id={id}
+                  label={label}
+                  value={formData[id] || ""}
+                  onChange={handleChange}
+                />
               ))}
             </Section>
 
             <Section title="Fisiologi">
-              <InputField id="denyutNadi" label="Denyut Nadi Istirahat (bpm)" value={formData.denyutNadi || ''} onChange={handleChange} />
-              <InputField id="saturasiOksigen" label="Saturasi Oksigen (%)" value={formData.saturasiOksigen || ''} onChange={handleChange} />
+              <InputField
+                id="denyutNadiIstirahat"
+                label="Denyut Nadi Istirahat (bpm)"
+                value={formData.denyutNadiIstirahat || ""}
+                onChange={handleChange}
+              />
+              <InputField
+                id="saturasiOksigen"
+                label="Saturasi Oksigen (%)"
+                value={formData.saturasiOksigen || ""}
+                onChange={handleChange}
+              />
             </Section>
 
             <Section title="Komponen Biomotor">
               {[
-                ['boardJump', 'Tes Standing Board Jump (cm)'],
-                ['kecepatan', 'Tes Kecepatan (detik)'],
-                ['dayaTahan', 'Tes Daya Tahan (menit)']
+                ["standingBoardJump", "Tes Standing Board Jump (cm)"],
+                ["kecepatan", "Tes Kecepatan (detik)"],
+                ["dayaTahan", "Tes Daya Tahan (menit)"],
               ].map(([id, label]) => (
-                <InputField key={id} id={id} label={label} value={formData[id] || ''} onChange={handleChange} />
+                <InputField
+                  key={id}
+                  id={id}
+                  label={label}
+                  value={formData[id] || ""}
+                  onChange={handleChange}
+                />
               ))}
             </Section>
 
             <Section title="Keterampilan">
               {[
-                "ControllingTungkaiKanan",
-                "ControllingTungkaiKiri",
-                "Dribbling",
-                "LongpassTungkaiKanan",
-                "LongpassTungkaiKiri",
-                "ShortpassTungkaiKanan",
-                "ShortpassTungkaiKiri",
-                "ShootingTungkaiKanan",
-                "ShootingTungkaiKiri"
+                "controllingKanan",
+                "controllingKiri",
+                "dribbling",
+                "longpassKanan",
+                "longpassKiri",
+                "shortpassKanan",
+                "shortpassKiri",
+                "shootingKanan",
+                "shootingKiri",
               ].map((id) => (
                 <SelectField
                   key={id}
                   id={id}
-                  label={id.replace(/([A-Z])/g, ' $1')}
+                  label={id.replace(/([A-Z])/g, " $1")}
                   options={kategoriSkala}
-                  value={formData[id] || ''}
+                  value={formData[id] || ""}
                   onChange={handleChange}
                 />
               ))}
@@ -134,7 +199,7 @@ const CreatePenilaian = () => {
                   id={id}
                   label={id.charAt(0).toUpperCase() + id.slice(1)}
                   options={kategoriSkala}
-                  value={formData[id] || ''}
+                  value={formData[id] || ""}
                   onChange={handleChange}
                 />
               ))}
@@ -145,7 +210,7 @@ const CreatePenilaian = () => {
               <TextAreaField
                 label="Detail Cedera"
                 id="injuryDetail"
-                value={formData.injuryDetail || ''}
+                value={formData.injuryDetail || ""}
                 onChange={handleChange}
                 placeholder="Masukkan detail cedera jika ada"
                 className="h-full"
@@ -153,7 +218,7 @@ const CreatePenilaian = () => {
               <TextAreaField
                 label="Komentar"
                 id="comment"
-                value={formData.comment || ''}
+                value={formData.comment || ""}
                 onChange={handleChange}
                 placeholder="Masukkan komentar tambahan di sini..."
                 className="h-full"
@@ -162,35 +227,33 @@ const CreatePenilaian = () => {
           </form>
 
           <div className="mt-6 flex gap-3">
-            <button onClick={() => setShowModal(true)} className="bg-primary text-white font-semibold px-4 py-2 rounded-md">Update</button>
-            <button onClick={() => navigate('/admin/daftartes/penilaian')} className="bg-gray-200 text-gray-800 font-semibold px-4 py-2 rounded-md">Cancel</button>
+            <button
+              onClick={handleSubmit}
+              className="bg-primary text-white font-semibold px-4 py-2 rounded-md"
+            >
+              Buat
+            </button>
+            <button
+              onClick={() => navigate(-1)}
+              className="bg-gray-200 text-gray-800 font-semibold px-4 py-2 rounded-md"
+            >
+              Cancel
+            </button>
           </div>
-
-          {showModal && (
-            <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50">
-              <div className="bg-white p-6 rounded-lg shadow-lg">
-                <h2 className="text-lg font-semibold mb-3">Konfirmasi Update</h2>
-                <p>Apakah Anda yakin ingin memperbarui data ini?</p>
-                <div className="mt-4 flex justify-end gap-2">
-                  <button onClick={() => setShowModal(false)} className="bg-gray-200 px-4 py-2 rounded">Tinjau Ulang</button>
-                  <button onClick={handleSubmit} className="bg-primary text-white px-4 py-2 rounded">Ya, Simpan</button>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {successMessage && (
-            <div className="fixed bottom-6 right-6 bg-green-500 text-white px-4 py-3 rounded-md shadow-lg z-50">
-              {successMessage}
-            </div>
-          )}
         </main>
       </div>
     </div>
   );
 };
 
-const InputField = ({ label, id, type = 'text', required, value, onChange }) => (
+const InputField = ({
+  label,
+  id,
+  type = "text",
+  required,
+  value,
+  onChange,
+}) => (
   <div className="flex flex-col">
     <label htmlFor={id} className="text-sm text-black mb-1">
       {label} {required && <span className="text-red-600">*</span>}
@@ -206,7 +269,14 @@ const InputField = ({ label, id, type = 'text', required, value, onChange }) => 
   </div>
 );
 
-const SelectField = ({ label, id, options = [], required, value, onChange }) => (
+const SelectField = ({
+  label,
+  id,
+  options = [],
+  required,
+  value,
+  onChange,
+}) => (
   <div className="flex flex-col">
     <label htmlFor={id} className="text-sm text-black mb-1">
       {label} {required && <span className="text-red-600">*</span>}
@@ -220,15 +290,27 @@ const SelectField = ({ label, id, options = [], required, value, onChange }) => 
     >
       <option value="">-- Pilih --</option>
       {options.map((opt) => (
-        <option key={opt} value={opt}>{opt}</option>
+        <option key={opt} value={kategoriSkala.indexOf(opt) + 1}>
+          {opt}
+        </option>
       ))}
     </select>
   </div>
 );
 
-const TextAreaField = ({ label, id, value, onChange, rows = 4, placeholder, className = '' }) => (
+const TextAreaField = ({
+  label,
+  id,
+  value,
+  onChange,
+  rows = 4,
+  placeholder,
+  className = "",
+}) => (
   <div className={`flex flex-col w-full ${className}`}>
-    <label htmlFor={id} className="text-sm text-black mb-1">{label}</label>
+    <label htmlFor={id} className="text-sm text-black mb-1">
+      {label}
+    </label>
     <textarea
       id={id}
       value={value}
@@ -242,7 +324,9 @@ const TextAreaField = ({ label, id, value, onChange, rows = 4, placeholder, clas
 
 const Section = ({ title, children }) => (
   <div className="col-span-2">
-    <h3 className="text-base font-semibold mb-2 mt-4 text-[#1F3C86]">{title}</h3>
+    <h3 className="text-base font-semibold mb-2 mt-4 text-[#1F3C86]">
+      {title}
+    </h3>
     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">{children}</div>
   </div>
 );
