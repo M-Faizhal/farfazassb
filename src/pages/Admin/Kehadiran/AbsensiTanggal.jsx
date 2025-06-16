@@ -1,3 +1,4 @@
+// FULL CODE DENGAN LOADING PADA GET, ADD, DELETE
 import { useEffect, useState } from "react";
 import { FiTrash2 } from "react-icons/fi";
 import AdminSidebar from "../../../components/Admin/Sidebar";
@@ -18,14 +19,14 @@ const AbsensiTanggal = () => {
   const [search, setSearch] = useState("");
   const [sortField, setSortField] = useState("nama");
   const [sortOrder, setSortOrder] = useState("asc");
-  const [showSimpanModal, setShowSimpanModal] = useState(false);
   const [showHapusModal, setShowHapusModal] = useState(false);
   const [selectedHapusId, setSelectedHapusId] = useState(null);
   const [tambahSiswaId, setTambahSiswaId] = useState("");
   const [siswa, setSiswa] = useState([]);
-  const { getToken } = useToken();
-
   const [kehadiran, setKehadiran] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [actionLoading, setActionLoading] = useState(false);
+  const { getToken } = useToken();
 
   const handleSort = (field) => {
     if (field === sortField) {
@@ -52,18 +53,55 @@ const AbsensiTanggal = () => {
         : valB - valA;
     });
 
-  const handleTambahSiswa = () => {
-    createAttendance();
+  const getData = async () => {
+    setLoading(true);
+    try {
+      const absensiRes = await Api.get("/admin/attendance/date/" + selectedDate, {
+        headers: { Authorization: "Bearer " + getToken() },
+      });
+      setKehadiran(absensiRes.data.filter((hadir) => hadir.student.level == level));
+
+      const siswaRes = await Api.get("/admin/students", {
+        headers: { Authorization: "Bearer " + getToken() },
+      });
+
+      const hadirIds = absensiRes.data.map((h) => h.studentId);
+      setSiswa(
+        siswaRes.data
+          .filter((siswa) => !hadirIds.includes(siswa.id))
+          .filter((s) => s.level == level)
+      );
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleHapusSiswa = () => {
-    setKehadiran(kehadiran.filter((s) => s.id !== selectedHapusId));
-    setShowHapusModal(false);
-    setSelectedHapusId(null);
-  };
+  const getDataCoach = async () => {
+    setLoading(true);
+    try {
+      const userId = jwtDecode(getToken()).userId;
+      const absensiRes = await Api.get("/admin/attendance/date/" + selectedDate, {
+        headers: { Authorization: "Bearer " + getToken() },
+      });
+      setKehadiran(
+        absensiRes.data.filter(
+          (hadir) => hadir.student.coachId == userId && hadir.student.level == level
+        )
+      );
 
-  const handleSubmit = () => {
-    setShowSimpanModal(false);
+      const siswaRes = await Api.get("/admin/students/coach/" + userId, {
+        headers: { Authorization: "Bearer " + getToken() },
+      });
+
+      const hadirIds = absensiRes.data.map((h) => h.studentId);
+      setSiswa(
+        siswaRes.data
+          .filter((siswa) => !hadirIds.includes(siswa.id))
+          .filter((s) => s.level == level)
+      );
+    } finally {
+      setLoading(false);
+    }
   };
 
   const updateAttendance = async (id, present) => {
@@ -82,98 +120,50 @@ const AbsensiTanggal = () => {
         },
       }
     ).catch(() => {
-      toast.error("Gagal menubah absensi");
+      toast.error("Gagal mengubah absensi");
     });
   };
 
   const createAttendance = async () => {
-    await Api.post(
-      "/admin/attendance",
-      {
-        date: new Date(selectedDate),
-        present: true,
-        studentId: parseInt(tambahSiswaId),
-      },
-      {
-        headers: {
-          Authorization: "Bearer " + getToken(),
+    setActionLoading(true);
+    try {
+      await Api.post(
+        "/admin/attendance",
+        {
+          date: new Date(selectedDate),
+          present: true,
+          studentId: parseInt(tambahSiswaId),
         },
-      }
-    ).then(() => {
+        {
+          headers: {
+            Authorization: "Bearer " + getToken(),
+          },
+        }
+      );
       setTambahSiswaId("");
       const role = jwtDecode(getToken()).role;
-      switch (role) {
-        case "SUPER_ADMIN":
-          getData();
-          break;
-
-        case "COACH":
-          getDataCoach();
-          break;
-      }
-    });
+      role === "SUPER_ADMIN" ? await getData() : await getDataCoach();
+    } catch {
+      toast.error("Gagal menambahkan siswa");
+    } finally {
+      setActionLoading(false);
+    }
   };
 
-  const getData = async () => {
-    const absensiRes = await Api.get("/admin/attendance/date/" + selectedDate, {
-      headers: {
-        Authorization: "Bearer " + getToken(),
-      },
-    });
-    setKehadiran(absensiRes.data.filter((hadir)=>hadir.student.level == level));
-
-    const siswaRes = await Api.get("/admin/students", {
-      headers: {
-        Authorization: "Bearer " + getToken(),
-      },
-    });
-
-    const hadirIds = absensiRes.data.map((h) => h.studentId);
-    const filteredSiswa = siswaRes.data.filter(
-      (siswa) => !hadirIds.includes(siswa.id)
-    );
-    setSiswa(filteredSiswa.filter((s) => s.level == level));
-  };
-
-  const getDataCoach = async () => {
-    const absensiRes = await Api.get("/admin/attendance/date/" + selectedDate, {
-      headers: {
-        Authorization: "Bearer " + getToken(),
-      },
-    });
-    setKehadiran(
-      absensiRes.data.filter(
-        (hadir) => hadir.student.coachId == jwtDecode(getToken()).userId && hadir.student.level == level
-      )
-    );
-
-    const siswaRes = await Api.get(
-      "/admin/students/coach/" + jwtDecode(getToken()).userId,
-      {
-        headers: {
-          Authorization: "Bearer " + getToken(),
-        },
-      }
-    );
-
-    const hadirIds = absensiRes.data.map((h) => h.studentId);
-    const filteredSiswa = siswaRes.data.filter(
-      (siswa) => !hadirIds.includes(siswa.id)
-    );
-    setSiswa(filteredSiswa.filter((s) => s.level == level));
+  const handleHapusSiswa = async () => {
+    setActionLoading(true);
+    try {
+      setKehadiran((prev) => prev.filter((s) => s.id !== selectedHapusId));
+      setShowHapusModal(false);
+      setSelectedHapusId(null);
+    } finally {
+      setActionLoading(false);
+    }
   };
 
   useEffect(() => {
     const role = jwtDecode(getToken()).role;
-    switch (role) {
-      case "SUPER_ADMIN":
-        getData();
-        break;
-
-      case "COACH":
-        getDataCoach();
-        break;
-    }
+    role === "SUPER_ADMIN" ? getData() : getDataCoach();
   }, [level, selectedDate]);
 
   return (
@@ -184,12 +174,8 @@ const AbsensiTanggal = () => {
           <AdminHeader />
           <div className="flex justify-between items-start flex-col md:flex-row mb-6 mt-6 gap-4 md:gap-0">
             <div>
-              <h1 className="text-xl font-bold text-black">
-                Absensi Siswa {level}
-              </h1>
-              <p className="text-sm text-gray-600">
-                Tanggal: {selectedDate || "Tidak ada tanggal"}
-              </p>
+              <h1 className="text-xl font-bold text-black">Absensi Siswa {level}</h1>
+              <p className="text-sm text-gray-600">Tanggal: {selectedDate || "-"}</p>
             </div>
             <div className="flex flex-col md:flex-row gap-3 w-full md:w-auto">
               <input
@@ -199,7 +185,7 @@ const AbsensiTanggal = () => {
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
               />
-              {jwtDecode(getToken()).role == "COACH" ? (
+              {jwtDecode(getToken()).role === "COACH" && (
                 <div className="flex gap-2">
                   <select
                     onChange={(e) => setTambahSiswaId(e.target.value)}
@@ -207,197 +193,95 @@ const AbsensiTanggal = () => {
                   >
                     <option value="">Tambah siswa...</option>
                     {siswa.map((s) => (
-                      <option key={s.id} value={s.id}>
-                        {s.name}
-                      </option>
+                      <option key={s.id} value={s.id}>{s.name}</option>
                     ))}
                   </select>
                   <button
-                    onClick={handleTambahSiswa}
+                    onClick={createAttendance}
+                    disabled={actionLoading || !tambahSiswaId}
                     className="bg-primary text-white px-4 py-2 rounded-md"
                   >
-                    Tambah
+                    {actionLoading ? (
+                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                    ) : "Tambah"}
                   </button>
                 </div>
-              ) : null}
+              )}
             </div>
           </div>
 
-          <div className="bg-white rounded-md border border-gray-200 shadow-sm mb-8">
-            <div className="block w-full overflow-x-auto">
+          {loading ? (
+            <div className="flex justify-center items-center h-64">
+              <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+            </div>
+          ) : filteredSiswa.length === 0 ? (
+            <div className="bg-white rounded-md border border-gray-200 shadow-sm p-8">
+              <p className="text-center text-gray-500 text-lg">Belum ada absensi hari ini.</p>
+            </div>
+          ) : (
+            <div className="bg-white rounded-md border border-gray-200 shadow-sm mb-8">
               <table className="min-w-full text-sm text-left text-gray-700 hidden md:table">
                 <thead className="bg-primary text-white font-semibold">
                   <tr>
-                    <th
-                      className="px-4 py-3 cursor-pointer"
-                      onClick={() => handleSort("id")}
-                    >
-                      ID Siswa {sortIcon(sortField, "id")}
-                    </th>
-                    <th
-                      className="px-4 py-3 cursor-pointer"
-                      onClick={() => handleSort("nama")}
-                    >
-                      Nama {sortIcon(sortField, "nama")}
-                    </th>
-                    <th
-                      className="px-4 py-3 cursor-pointer"
-                      onClick={() => handleSort("jenisKelamin")}
-                    >
-                      Jenis Kelamin {sortIcon(sortField, "jenisKelamin")}
-                    </th>
+                    <th className="px-4 py-3">ID</th>
+                    <th className="px-4 py-3">Nama</th>
+                    <th className="px-4 py-3">Jenis Kelamin</th>
                     <th className="px-4 py-3">Hadir?</th>
                     <th className="px-4 py-3 text-center">Aksi</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {filteredSiswa.length > 0 ? (
-                    filteredSiswa.map((siswa) => (
-                      <tr
-                        key={siswa.id}
-                        className="border-t border-gray-200 hover:bg-gray-50"
-                      >
-                        <td className="px-4 py-3 font-medium">
-                          {siswa.student.id}
-                        </td>
-                        <td className="px-4 py-3">{siswa.student.name}</td>
-                        <td className="px-4 py-3">
-                          {siswa.student.gender == "L"
-                            ? "Laki-Laki"
-                            : "Perempuan"}
-                        </td>
-                        <td className="px-4 py-3">
-                          <input
-                            type="checkbox"
-                            checked={siswa.present}
-                            onChange={() =>
-                              updateAttendance(siswa.id, !siswa.present)
-                            }
-                            className="w-4 h-4 text-green-600 border-gray-300 rounded"
-                          />
-                        </td>
-                        <td className="px-4 py-3 text-center">
-                          <button
-                            onClick={() => {
-                              setSelectedHapusId(siswa.id);
-                              setShowHapusModal(true);
-                            }}
-                            className="text-red-500 hover:text-red-700"
-                          >
-                            <FiTrash2 />
-                          </button>
-                        </td>
-                      </tr>
-                    ))
-                  ) : (
-                    <tr>
-                      <td
-                        colSpan="5"
-                        className="text-center py-6 text-gray-500"
-                      >
-                        Tidak ada data ditemukan.
-                      </td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
-
-              {/* Mobile version */}
-              <div className="md:hidden">
-                {filteredSiswa.map((siswa) => (
-                  <div key={siswa.id} className="border rounded-md p-4 mb-4">
-                    <p>
-                      <strong>ID:</strong> {siswa.student.id}
-                    </p>
-                    <p>
-                      <strong>Nama:</strong> {siswa.student.name}
-                    </p>
-                    <p>
-                      <strong>Jenis Kelamin:</strong>{" "}
-                      {siswa.student.gender == "L" ? "Laki-Laki" : "Perempuan"}
-                    </p>
-                    <div className="flex justify-between items-center mt-2">
-                      <label className="flex items-center gap-2">
+                  {filteredSiswa.map((siswa) => (
+                    <tr key={siswa.id} className="border-t hover:bg-gray-50">
+                      <td className="px-4 py-3 font-medium">{siswa.student.id}</td>
+                      <td className="px-4 py-3">{siswa.student.name}</td>
+                      <td className="px-4 py-3">{siswa.student.gender === "L" ? "Laki-Laki" : "Perempuan"}</td>
+                      <td className="px-4 py-3">
                         <input
                           type="checkbox"
                           checked={siswa.present}
-                          onChange={() =>
-                            updateAttendance(siswa.id, !siswa.present)
-                          }
-                          className="w-4 h-4 text-green-600 border-gray-300 rounded"
+                          onChange={() => updateAttendance(siswa.id, !siswa.present)}
+                          className="w-4 h-4"
                         />
-                        Hadir
-                      </label>
-                      <button
-                        onClick={() => {
-                          setSelectedHapusId(siswa.id);
-                          setShowHapusModal(true);
-                        }}
-                        className="text-red-500 hover:text-red-700"
-                      >
-                        <FiTrash2 />
-                      </button>
-                    </div>
-                  </div>
-                ))}
-              </div>
+                      </td>
+                      <td className="px-4 py-3 text-center">
+                        <button
+                          onClick={() => {
+                            setSelectedHapusId(siswa.id);
+                            setShowHapusModal(true);
+                          }}
+                          className="text-red-500 hover:text-red-700"
+                        >
+                          <FiTrash2 />
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
-          </div>
+          )}
         </main>
       </div>
 
-      {/* Modal Simpan */}
-      {showSimpanModal && (
-        <div className="fixed inset-0 bg-black/20 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 shadow-lg max-w-md w-full">
-            <h2 className="text-lg font-semibold mb-3">Konfirmasi Absensi</h2>
-            <div className="max-h-64 overflow-y-auto text-sm mb-4">
-              <ul className="list-disc list-inside space-y-1">
-                {kehadiran.map((siswa) => (
-                  <li key={siswa.id}>
-                    {siswa.nama} - {siswa.status ? "Hadir" : "Tidak Hadir"}
-                  </li>
-                ))}
-              </ul>
-            </div>
-            <div className="flex justify-end gap-3">
-              <button
-                onClick={() => setShowSimpanModal(false)}
-                className="px-4 py-2 bg-gray-200 text-gray-800 rounded-md"
-              >
-                Batal
-              </button>
-              <button
-                onClick={handleSubmit}
-                className="px-4 py-2 bg-primary text-white rounded-md"
-              >
-                Simpan
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Modal Hapus */}
       {showHapusModal && (
         <div className="fixed inset-0 bg-black/20 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg p-6 shadow-lg max-w-sm w-full">
             <h2 className="text-lg font-semibold mb-4">Hapus Siswa</h2>
-            <p className="mb-4">
-              Apakah Anda yakin ingin menghapus siswa ini dari daftar absensi?
-            </p>
+            <p className="mb-4">Apakah Anda yakin ingin menghapus siswa ini dari daftar absensi?</p>
             <div className="flex justify-end gap-3">
               <button
                 onClick={() => setShowHapusModal(false)}
                 className="px-4 py-2 bg-gray-200 rounded-md"
-              >
-                Batal
-              </button>
+              >Batal</button>
               <button
                 onClick={handleHapusSiswa}
+                disabled={actionLoading}
                 className="px-4 py-2 bg-red-600 text-white rounded-md"
               >
-                Hapus
+                {actionLoading ? (
+                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                ) : "Hapus"}
               </button>
             </div>
           </div>

@@ -10,15 +10,19 @@ const DetailPelatih = () => {
   const { id } = useParams();
   const { getToken } = useToken();
   const [coach, setCoach] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   const getCoachById = async () => {
     try {
+      setLoading(true);
       const res = await Api.get(`/admin/coaches/${id}`, {
         headers: { Authorization: 'Bearer ' + getToken() },
       });
       setCoach(res.data);
     } catch (err) {
       console.error('Gagal mengambil data pelatih:', err);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -36,7 +40,11 @@ const DetailPelatih = () => {
 
           <h2 className="text-black text-xl font-bold mb-6 mt-6">Detail Pelatih</h2>
 
-          {coach && (
+          {loading ? (
+            <div className="flex justify-center items-center h-64">
+              <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+            </div>
+          ) : coach ? (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-white p-6 rounded-md border border-gray-200 shadow-sm max-w-6xl">
               <FilePreview label="Foto Pelatih" src={coach.photoUrl} />
               <TextPreview label="Nama" value={coach.name} />
@@ -47,17 +55,23 @@ const DetailPelatih = () => {
                 value={coach.gender === 'L' ? 'Laki-Laki' : 'Perempuan'}
               />
             </div>
+          ) : (
+            <div className="text-center py-20 text-gray-500 italic">
+              Data pelatih tidak ditemukan.
+            </div>
           )}
 
-          <div className="mt-6 flex flex-col sm:flex-row gap-3">
-            <button
-              type="button"
-              onClick={() => navigate('/admin/pelatih')}
-              className="bg-gray-200 cursor-pointer text-gray-800 font-semibold px-4 py-2 rounded-md w-full sm:w-auto"
-            >
-              Kembali
-            </button>
-          </div>
+          {loading ? null : (
+            <div className="mt-6 flex flex-col sm:flex-row gap-3 ">
+              <button
+                type="button"
+                onClick={() => navigate(-1)}
+                className="bg-gray-200 cursor-pointer text-gray-800 font-semibold px-4 py-2 rounded-md w-full sm:w-auto "
+              >
+                Kembali
+              </button>
+            </div>
+          )}
         </main>
       </div>
     </div>

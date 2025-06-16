@@ -13,32 +13,48 @@ const DaftarTes = () => {
   const [showModal, setShowModal] = useState(false);
   const [selectedId, setSelectedId] = useState(null);
   const [test, setTest] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [loadingHapus, setLoadingHapus] = useState(false); 
   const { getToken } = useToken();
 
   const getAllTest = async () => {
-    await Api.get("/admin/tests", {
-      headers: {
-        Authorization: "Bearer " + getToken(),
-      },
-    }).then((res) => {
-      if (jwtDecode(getToken()).role == "COACH") {
-        setTest(res.data.filter(test=>test.coach.id === jwtDecode(getToken()).userId));
-      }else{
-        setTest(res.data)
+    try {
+      const res = await Api.get("/admin/tests", {
+        headers: {
+          Authorization: "Bearer " + getToken(),
+        },
+      });
+      const role = jwtDecode(getToken()).role;
+      if (role === "COACH") {
+        const coachId = jwtDecode(getToken()).userId;
+        setTest(res.data.filter((t) => t.coach.id === coachId));
+      } else {
+        setTest(res.data);
       }
-    });
+    } catch (err) {
+      toast.error("Gagal memuat data tes");
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const deleteTests = async(id)=>{
-    await Api.delete("/admin/tests/" + id,{
-      headers : {
-        Authorization : "Bearer " + getToken()
-      }
-    }).then(async ()=>{
-      await getAllTest()
-      toast.success("Berhasil menghapus test")
-    })
-  }
+  const deleteTests = async (id) => {
+    setLoadingHapus(true); 
+    try {
+      await Api.delete("/admin/tests/" + id, {
+        headers: {
+          Authorization: "Bearer " + getToken(),
+        },
+      });
+      toast.success("Berhasil menghapus test");
+      await getAllTest();
+      setShowModal(false);
+    } catch {
+      toast.error("Gagal menghapus test");
+    } finally {
+      setLoadingHapus(false);
+    }
+  };
 
   const handleOpenModal = (id) => {
     setSelectedId(id);
@@ -46,8 +62,7 @@ const DaftarTes = () => {
   };
 
   const handleDelete = () => {
-    deleteTests(selectedId)
-    setShowModal(false);
+    deleteTests(selectedId);
   };
 
   useEffect(() => {
@@ -64,7 +79,7 @@ const DaftarTes = () => {
 
           <div className="flex justify-between items-center mb-6 mt-6">
             <h1 className="text-xl font-bold text-black">Daftar Tes</h1>
-            {jwtDecode(getToken()).role == "COACH" ? (
+            {jwtDecode(getToken()).role === "COACH" && (
               <Link
                 to="/admin/daftartes/create"
                 className="bg-primary text-white font-medium px-4 py-2 rounded-md"
@@ -72,10 +87,14 @@ const DaftarTes = () => {
                 <FiPlus className="inline-block mr-1" />
                 New Test
               </Link>
-            ) : null}
+            )}
           </div>
 
-          {test?.length === 0 ? (
+          {loading ? (
+            <div className="flex justify-center items-center h-64">
+              <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+            </div>
+          ) : test?.length === 0 ? (
             <div className="bg-white rounded-md border border-gray-200 shadow-sm p-8">
               <p className="text-gray-500 text-center text-lg">
                 Tidak ada data tes tersedia.
@@ -105,14 +124,14 @@ const DaftarTes = () => {
                   </p>
                   <div className="flex flex-col sm:flex-row justify-between gap-2">
                     <Link
-                      to={`/admin/daftartes/penilaian/` + tes.id}
+                      to={`/admin/daftartes/penilaian/${tes.id}`}
                       className="inline-flex items-center text-primary hover:text-primary/80 font-medium transition-colors duration-200 text-xs md:text-sm"
                     >
                       <FiEye className="mr-1" size={16} />
                       Lihat Siswa
                     </Link>
                     <Link
-                      to={`/admin/daftartes/edit/` + tes.id}
+                      to={`/admin/daftartes/edit/${tes.id}`}
                       className="inline-flex items-center text-primary hover:text-primary/80 font-medium transition-colors duration-200 text-xs md:text-sm"
                     >
                       <FiEdit className="mr-1" size={16} />
@@ -132,7 +151,6 @@ const DaftarTes = () => {
         </main>
       </div>
 
-      {/* Modal Konfirmasi Hapus */}
       {showModal && (
         <div className="fixed inset-0 bg-black/20 backdrop-blur-none flex items-center justify-center z-50">
           <div className="bg-white rounded-lg p-6 shadow-lg max-w-md w-full mx-4">
@@ -143,15 +161,21 @@ const DaftarTes = () => {
             <div className="flex justify-end gap-3">
               <button
                 onClick={() => setShowModal(false)}
+                disabled={loadingHapus}
                 className="px-4 py-2 bg-gray-200 text-gray-800 rounded-md"
               >
                 Batal
               </button>
               <button
                 onClick={handleDelete}
-                className="px-4 py-2 bg-red-600 text-white rounded-md"
+                disabled={loadingHapus}
+                className={`px-4 py-2 rounded-md ${
+                  loadingHapus
+                    ? "bg-gray-400 text-white cursor-not-allowed"
+                    : "bg-red-600 text-white"
+                }`}
               >
-                Hapus
+                {loadingHapus ? "Menghapus..." : "Hapus"}
               </button>
             </div>
           </div>

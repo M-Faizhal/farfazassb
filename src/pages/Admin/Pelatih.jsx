@@ -16,28 +16,42 @@ const Pelatih = () => {
   const [showModal, setShowModal] = useState(false);
   const [selectedId, setSelectedId] = useState(null);
   const [pelatih, setPelatih] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [loadingDelete, setLoadingDelete] = useState(false); // NEW
   const { getToken } = useToken();
   const navigate = useNavigate();
 
   const hapusPelatih = async (id) => {
-    await Api.delete("/admin/coaches/" + id, {
-      headers: {
-        Authorization: "Bearer " + getToken(),
-      },
-    }).then(() => {
+    setLoadingDelete(true); // NEW
+    try {
+      await Api.delete("/admin/coaches/" + id, {
+        headers: {
+          Authorization: "Bearer " + getToken(),
+        },
+      });
       toast.success("Sukses Menghapus Pelatih");
-      getAllPelatih();
-    });
+      await getAllPelatih(); // pastikan menunggu
+      setShowModal(false);
+    } catch (err) {
+      toast.error("Gagal menghapus pelatih");
+    } finally {
+      setLoadingDelete(false); // NEW
+    }
   };
 
   const getAllPelatih = async () => {
-    await Api.get("/admin/coaches", {
-      headers: {
-        Authorization: "Bearer " + getToken(),
-      },
-    }).then((res) => {
+    try {
+      const res = await Api.get("/admin/coaches", {
+        headers: {
+          Authorization: "Bearer " + getToken(),
+        },
+      });
       setPelatih(res.data);
-    });
+    } catch (error) {
+      console.error("Gagal memuat data pelatih", error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleSort = (field) => {
@@ -54,9 +68,8 @@ const Pelatih = () => {
     setShowModal(true);
   };
 
-  const handleDelete = async () => {
-    await hapusPelatih(selectedId);
-    setShowModal(false);
+  const handleDelete = () => {
+    hapusPelatih(selectedId);
   };
 
   const filteredPelatih = pelatih
@@ -68,7 +81,6 @@ const Pelatih = () => {
     .sort((a, b) => {
       const valA = a[sortField];
       const valB = b[sortField];
-
       return typeof valA === "string"
         ? sortOrder === "asc"
           ? valA.localeCompare(valB)
@@ -92,98 +104,104 @@ const Pelatih = () => {
 
           <div className="flex justify-between items-center mb-6 mt-6">
             <h1 className="text-xl font-bold text-black">Data Akun Pelatih</h1>
-            {jwtDecode(getToken()).role == "SUPER_ADMIN" ? (
+            {jwtDecode(getToken()).role === "SUPER_ADMIN" && (
               <Link
                 to="/admin/pelatih/create"
                 className="bg-primary text-white font-medium px-4 py-2 rounded-md"
               >
                 New Coach Account
               </Link>
-            ) : null}
+            )}
           </div>
 
-          <div className="bg-white rounded-md border border-gray-200 shadow-sm mb-8">
-            <div className="flex justify-between items-center px-4 py-3 border-b border-gray-100">
-              <input
-                type="text"
-                placeholder="Cari nama atau email pelatih..."
-                className="bg-gray-100 text-sm px-3 py-2 rounded-md w-full max-w-md placeholder-gray-500 focus:outline-none"
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-              />
+          {loading ? (
+            <div className="flex justify-center items-center h-64">
+              <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
             </div>
+          ) : (
+            <div className="bg-white rounded-md border border-gray-200 shadow-sm mb-8">
+              <div className="flex justify-between items-center px-4 py-3 border-b border-gray-100">
+                <input
+                  type="text"
+                  placeholder="Cari nama atau email pelatih..."
+                  className="bg-gray-100 text-sm px-3 py-2 rounded-md w-full max-w-md placeholder-gray-500 focus:outline-none"
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                />
+              </div>
 
-            <div className="overflow-x-auto">
-              <table className="min-w-full text-sm text-left text-gray-700">
-                <thead className="bg-primary text-white font-semibold">
-                  <tr>
-                    <th
-                      className="px-4 py-3 cursor-pointer"
-                      onClick={() => handleSort("name")}
-                    >
-                      Nama {sortIcon(sortField, sortOrder, "name")}
-                    </th>
-                    <th
-                      className="px-4 py-3 cursor-pointer"
-                      onClick={() => handleSort("email")}
-                    >
-                      Email {sortIcon(sortField, sortOrder, "email")}
-                    </th>
-                    <th className="px-4 py-3">No. Telepon</th>
-                    {jwtDecode(getToken()).role == "SUPER_ADMIN" ? (
-                      <th className="px-4 py-3 text-right">Aksi</th>
-                    ) : null}
-                  </tr>
-                </thead>
-                <tbody>
-                  {filteredPelatih.length > 0 ? (
-                    filteredPelatih.map((p) => (
-                      <tr
-                        onClick={() =>
-                          navigate(`/admin/pelatih/detail/${p.id}`)
-                        }
-                        key={p.id}
-                        className="border-t border-gray-200 hover:bg-gray-50"
-                      >
-                        <td className="px-4 py-3 font-medium">{p.name}</td>
-                        <td className="px-4 py-3">{p.email}</td>
-                        <td className="px-4 py-3">{p.telp}</td>
-                        {jwtDecode(getToken()).role == "SUPER_ADMIN" ? (
-                          <td className="px-4 py-3 text-right">
-                            <div className="flex justify-end gap-3">
-                              <Link
-                                to={`/admin/pelatih/edit/${p.id}`}
-                                onClick={(e) => e.stopPropagation()}
-                              >
-                                <Edit className="text-primary w-5 h-5 hover:scale-110 cursor-pointer" />
-                              </Link>
-                              <button
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  handleOpenModal(p.id);
-                                }}
-                              >
-                                <Trash2 className="text-red-600 w-5 h-5 hover:scale-110" />
-                              </button>
-                            </div>
-                          </td>
-                        ) : null}
-                      </tr>
-                    ))
-                  ) : (
+              <div className="overflow-x-auto">
+                <table className="min-w-full text-sm text-left text-gray-700">
+                  <thead className="bg-primary text-white font-semibold">
                     <tr>
-                      <td
-                        colSpan="4"
-                        className="text-center py-6 text-gray-500"
+                      <th
+                        className="px-4 py-3 cursor-pointer"
+                        onClick={() => handleSort("name")}
                       >
-                        Tidak ada data ditemukan.
-                      </td>
+                        Nama {sortIcon(sortField, sortOrder, "name")}
+                      </th>
+                      <th
+                        className="px-4 py-3 cursor-pointer"
+                        onClick={() => handleSort("email")}
+                      >
+                        Email {sortIcon(sortField, sortOrder, "email")}
+                      </th>
+                      <th className="px-4 py-3">No. Telepon</th>
+                      {jwtDecode(getToken()).role === "SUPER_ADMIN" && (
+                        <th className="px-4 py-3 text-right">Aksi</th>
+                      )}
                     </tr>
-                  )}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody>
+                    {filteredPelatih.length > 0 ? (
+                      filteredPelatih.map((p) => (
+                        <tr
+                          onClick={() =>
+                            navigate(`/admin/pelatih/detail/${p.id}`)
+                          }
+                          key={p.id}
+                          className="border-t border-gray-200 hover:bg-gray-50"
+                        >
+                          <td className="px-4 py-3 font-medium">{p.name}</td>
+                          <td className="px-4 py-3">{p.email}</td>
+                          <td className="px-4 py-3">{p.telp}</td>
+                          {jwtDecode(getToken()).role === "SUPER_ADMIN" && (
+                            <td className="px-4 py-3 text-right">
+                              <div className="flex justify-end gap-3">
+                                <Link
+                                  to={`/admin/pelatih/edit/${p.id}`}
+                                  onClick={(e) => e.stopPropagation()}
+                                >
+                                  <Edit className="text-primary w-5 h-5 hover:scale-110 cursor-pointer" />
+                                </Link>
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleOpenModal(p.id);
+                                  }}
+                                >
+                                  <Trash2 className="text-red-600 w-5 h-5 hover:scale-110" />
+                                </button>
+                              </div>
+                            </td>
+                          )}
+                        </tr>
+                      ))
+                    ) : (
+                      <tr>
+                        <td
+                          colSpan="4"
+                          className="text-center py-6 text-gray-500"
+                        >
+                          Tidak ada data ditemukan.
+                        </td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
             </div>
-          </div>
+          )}
         </main>
       </div>
 
@@ -198,14 +216,20 @@ const Pelatih = () => {
               <button
                 onClick={() => setShowModal(false)}
                 className="px-4 py-2 bg-gray-200 text-gray-800 rounded-md"
+                disabled={loadingDelete}
               >
                 Batal
               </button>
               <button
                 onClick={handleDelete}
-                className="px-4 py-2 bg-red-600 text-white rounded-md"
+                disabled={loadingDelete}
+                className={`px-4 py-2 rounded-md ${
+                  loadingDelete
+                    ? "bg-gray-400 text-white cursor-not-allowed"
+                    : "bg-red-600 text-white"
+                }`}
               >
-                Hapus
+                {loadingDelete ? "Menghapus..." : "Hapus"}
               </button>
             </div>
           </div>

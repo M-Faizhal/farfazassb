@@ -107,7 +107,7 @@ const Prestasi = () => {
                 className="bg-primary text-white font-medium px-4 py-2 rounded-md inline-flex items-center"
               >
                 <Plus className="mr-1" size={16} />
-                New Achievement
+                Tambah Prestasi
               </Link>
             </div>
           </div>

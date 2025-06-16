@@ -41,7 +41,7 @@ const CreatePelatih = () => {
       toast.success("Berhasil membuat pelatih!")
       navigate("/admin/pelatih")
     }).catch(err=>{
-      console.log(err)
+      
     })
   }
 

@@ -15,17 +15,32 @@ const Orangtua = () => {
   const [showModal, setShowModal] = useState(false);
   const [selectedId, setSelectedId] = useState(null);
   const [parent, setParent] = useState([]);
-  const navigate = useNavigate()
+  const [loading, setLoading] = useState(true); 
+  const navigate = useNavigate();
   const { getToken } = useToken();
 
   const getAllParent = async () => {
-    await Api.get("/admin/users", {
+    try {
+      const res = await Api.get("/admin/users", {
+        headers: {
+          Authorization: "Bearer " + getToken(),
+        },
+      });
+      setParent(res.data);
+    } catch (error) {
+      console.error("Gagal mengambil data orang tua:", error);
+    } finally {
+      setLoading(false); 
+    }
+  };
+
+  const deleteParent = async () => {
+    await Api.delete("/admin/users/" + selectedId, {
       headers: {
         Authorization: "Bearer " + getToken(),
       },
-    }).then((res) => {
-      setParent(res.data);
     });
+    await getAllParent(); 
   };
 
   const handleSort = (field) => {
@@ -43,7 +58,7 @@ const Orangtua = () => {
   };
 
   const handleDelete = () => {
-    console.log(`Menghapus akun orangtua dengan ID: ${selectedId}`);
+    deleteParent();
     setShowModal(false);
   };
 
@@ -91,154 +106,163 @@ const Orangtua = () => {
             </Link>
           </div>
 
-          <div className="bg-white rounded-md border border-gray-200 shadow-sm mb-8">
-            <div className="flex justify-between items-center px-4 py-3 border-b border-gray-100">
-              <input
-                type="text"
-                placeholder="Cari nama orangtua, email, atau nama anak..."
-                className="bg-gray-100 text-sm px-3 py-2 rounded-md w-full max-w-xs placeholder-gray-500 focus:outline-none"
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-              />
+          {loading ? (
+            <div className="flex justify-center items-center h-64">
+              <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
             </div>
+          ) : (
+            <div className="bg-white rounded-md border border-gray-200 shadow-sm mb-8">
+              <div className="flex justify-between items-center px-4 py-3 border-b border-gray-100">
+                <input
+                  type="text"
+                  placeholder="Cari nama orangtua, email, atau nama anak..."
+                  className="bg-gray-100 text-sm px-3 py-2 rounded-md w-full max-w-xs placeholder-gray-500 focus:outline-none"
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                />
+              </div>
 
-            <div className="overflow-x-auto">
-              <table className="min-w-full text-sm text-left text-gray-700">
-                <thead className="bg-primary text-white font-semibold">
-                  <tr>
-                    <th
-                      className="px-4 py-3 cursor-pointer"
-                      onClick={() => handleSort("name")}
-                    >
-                      Nama Orangtua {sortIcon(sortField, sortOrder, "name")}
-                    </th>
-                    <th
-                      className="px-4 py-3 cursor-pointer"
-                      onClick={() => handleSort("email")}
-                    >
-                      Email {sortIcon(sortField, sortOrder, "email")}
-                    </th>
-                    <th className="px-4 py-3">No. Telepon</th>
-                    <th className="px-4 py-3">Alamat</th>
-                    <th
-                      className="px-4 py-3 cursor-pointer"
-                      onClick={() => handleSort("namaAnak")}
-                    >
-                      Nama Anak {sortIcon(sortField, sortOrder, "namaAnak")}
-                    </th>
-                    <th className="px-4 py-3">ID Anak</th>
-                    <th
-                      className="px-4 py-3 cursor-pointer"
-                      onClick={() => handleSort("tanggalDaftar")}
-                    >
-                      Tanggal Daftar{" "}
-                      {sortIcon(sortField, sortOrder, "tanggalDaftar")}
-                    </th>
-                    <th className="px-4 py-3 text-right">Status</th>
-                    <th className="px-4 py-3 text-right">Aksi</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {filteredOrangtua.length > 0 ? (
-                    filteredOrangtua.map((orangtua) => (
-                      <tr
-                        key={orangtua.id}
-                        onClick={(()=>navigate("/admin/orangtua/detail/" + orangtua.id))}
-                        className="border-t border-gray-200 hover:bg-gray-50"
+              <div className="overflow-x-auto">
+                <table className="min-w-full text-sm text-left text-gray-700">
+                  <thead className="bg-primary text-white font-semibold">
+                    <tr>
+                      <th
+                        className="px-4 py-3 cursor-pointer"
+                        onClick={() => handleSort("name")}
                       >
-                        <td className="px-4 py-3 font-medium">
-                          {orangtua.name}
-                        </td>
-                        <td className="px-4 py-3">{orangtua.email}</td>
-                        <td className="px-4 py-3">{orangtua.telp}</td>
-                        <td className="px-4 py-3 max-w-xs truncate">
-                          {orangtua.address}
-                        </td>
-
-                        <td className="px-4 py-3">
-                          {orangtua.parentOf && orangtua.parentOf.length > 0
-                            ? orangtua.parentOf
-                                .map((student) => student.name)
-                                .join(", ")
-                            : "-"}
-                        </td>
-
-                        <td className="px-4 py-3">
-                          {orangtua.parentOf && orangtua.parentOf.length > 0
-                            ? orangtua.parentOf
-                                .map((student) => student.id)
-                                .join(", ")
-                            : "-"}
-                        </td>
-
-                        <td className="px-4 py-3">
-                          {toLocal(orangtua.createAt) || "-"}
-                        </td>
-
-                        <td className="px-4 py-3">
-                          <p className={`${orangtua.status?  `bg-green-600` : `bg-red-600`} px-3 py-1 text-center font-semibold rounded-full text-white`}>
-                            {orangtua.status? "Aktif": "Nonaktif"}
-                          </p>
-                        </td>
-
-                        <td className="px-4 py-3 text-right">
-                          <div className="flex justify-end gap-3">
-                            <Link to={`/admin/orangtua/edit/${orangtua.id}`} onClick={(e)=>e.stopPropagation()}>
-                              <Edit className="text-primary w-5 h-5 hover:scale-110 cursor-pointer" />
-                            </Link>
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation()
-                                handleOpenModal(orangtua.id)
-                              }}
+                        Nama Orangtua {sortIcon(sortField, sortOrder, "name")}
+                      </th>
+                      <th
+                        className="px-4 py-3 cursor-pointer"
+                        onClick={() => handleSort("email")}
+                      >
+                        Email {sortIcon(sortField, sortOrder, "email")}
+                      </th>
+                      <th className="px-4 py-3">No. Telepon</th>
+                      <th className="px-4 py-3">Alamat</th>
+                      <th
+                        className="px-4 py-3 cursor-pointer"
+                        onClick={() => handleSort("namaAnak")}
+                      >
+                        Nama Anak {sortIcon(sortField, sortOrder, "namaAnak")}
+                      </th>
+                      <th className="px-4 py-3">ID Anak</th>
+                      <th
+                        className="px-4 py-3 cursor-pointer"
+                        onClick={() => handleSort("tanggalDaftar")}
+                      >
+                        Tanggal Daftar{" "}
+                        {sortIcon(sortField, sortOrder, "tanggalDaftar")}
+                      </th>
+                      <th className="px-4 py-3 text-right">Status</th>
+                      <th className="px-4 py-3 text-right">Aksi</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {filteredOrangtua.length > 0 ? (
+                      filteredOrangtua.map((orangtua) => (
+                        <tr
+                          key={orangtua.id}
+                          onClick={() =>
+                            navigate("/admin/orangtua/detail/" + orangtua.id)
+                          }
+                          className="border-t border-gray-200 hover:bg-gray-50"
+                        >
+                          <td className="px-4 py-3 font-medium">
+                            {orangtua.name}
+                          </td>
+                          <td className="px-4 py-3">{orangtua.email}</td>
+                          <td className="px-4 py-3">{orangtua.telp}</td>
+                          <td className="px-4 py-3 max-w-xs truncate">
+                            {orangtua.address}
+                          </td>
+                          <td className="px-4 py-3">
+                            {orangtua.parentOf && orangtua.parentOf.length > 0
+                              ? orangtua.parentOf
+                                  .map((student) => student.name)
+                                  .join(", ")
+                              : "-"}
+                          </td>
+                          <td className="px-4 py-3">
+                            {orangtua.parentOf && orangtua.parentOf.length > 0
+                              ? orangtua.parentOf
+                                  .map((student) => student.id)
+                                  .join(", ")
+                              : "-"}
+                          </td>
+                          <td className="px-4 py-3">
+                            {toLocal(orangtua.createAt) || "-"}
+                          </td>
+                          <td className="px-4 py-3">
+                            <p
+                              className={`${
+                                orangtua.status
+                                  ? `bg-green-600`
+                                  : `bg-red-600`
+                              } px-3 py-1 text-center font-semibold rounded-full text-white`}
                             >
-                              <Trash2 className="text-red-600 w-5 h-5 hover:scale-110" />
-                            </button>
-                          </div>
+                              {orangtua.status ? "Aktif" : "Nonaktif"}
+                            </p>
+                          </td>
+                          <td className="px-4 py-3 text-right">
+                            <div className="flex justify-end gap-3">
+                              <Link
+                                to={`/admin/orangtua/edit/${orangtua.id}`}
+                                onClick={(e) => e.stopPropagation()}
+                              >
+                                <Edit className="text-primary w-5 h-5 hover:scale-110 cursor-pointer" />
+                              </Link>
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleOpenModal(orangtua.id);
+                                }}
+                              >
+                                <Trash2 className="text-red-600 w-5 h-5 hover:scale-110" />
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))
+                    ) : (
+                      <tr>
+                        <td colSpan="9" className="text-center py-6 text-gray-500">
+                          Tidak ada data ditemukan.
                         </td>
                       </tr>
-                    ))
-                  ) : (
-                    <tr>
-                      <td
-                        colSpan="9"
-                        className="text-center py-6 text-gray-500"
-                      >
-                        Tidak ada data ditemukan.
-                      </td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
+                    )}
+                  </tbody>
+                </table>
+              </div>
             </div>
-          </div>
+          )}
+
+          {showModal && (
+            <div className="fixed inset-0 bg-black/20 backdrop-blur-none flex items-center justify-center z-50">
+              <div className="bg-white rounded-lg p-6 shadow-lg max-w-md w-full mx-4">
+                <h2 className="text-lg font-semibold mb-2">Konfirmasi Hapus</h2>
+                <p className="text-sm text-gray-700 mb-4">
+                  Apakah Anda yakin ingin menghapus akun orangtua ini?
+                </p>
+                <div className="flex justify-end gap-3">
+                  <button
+                    onClick={() => setShowModal(false)}
+                    className="px-4 py-2 bg-gray-200 text-gray-800 rounded-md"
+                  >
+                    Batal
+                  </button>
+                  <button
+                    onClick={handleDelete}
+                    className="px-4 py-2 bg-red-600 text-white rounded-md"
+                  >
+                    Hapus
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
         </main>
       </div>
-
-      {showModal && (
-        <div className="fixed inset-0 bg-black/20 backdrop-blur-none flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 shadow-lg max-w-md w-full mx-4">
-            <h2 className="text-lg font-semibold mb-2">Konfirmasi Hapus</h2>
-            <p className="text-sm text-gray-700 mb-4">
-              Apakah Anda yakin ingin menghapus akun orangtua ini?
-            </p>
-            <div className="flex justify-end gap-3">
-              <button
-                onClick={() => setShowModal(false)}
-                className="px-4 py-2 bg-gray-200 text-gray-800 rounded-md"
-              >
-                Batal
-              </button>
-              <button
-                onClick={handleDelete}
-                className="px-4 py-2 bg-red-600 text-white rounded-md"
-              >
-                Hapus
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 };
