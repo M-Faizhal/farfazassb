@@ -198,14 +198,14 @@ const CreatePrestasi = () => {
               className="bg-primary cursor-pointer text-white font-semibold px-4 py-2 rounded-md w-full sm:w-auto inline-flex items-center justify-center"
             >
               <Trophy className="mr-2" size={16} />
-              Create Achievement
+              Buat
             </button>
             <button
               type="button"
               onClick={() => navigate("/admin/prestasi")}
               className="bg-gray-200 cursor-pointer text-gray-800 font-semibold px-4 py-2 rounded-md w-full sm:w-auto"
             >
-              Cancel
+              Batal
             </button>
           </div>
 

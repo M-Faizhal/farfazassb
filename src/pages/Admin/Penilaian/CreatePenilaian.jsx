@@ -237,7 +237,7 @@ const CreatePenilaian = () => {
               onClick={() => navigate(-1)}
               className="bg-gray-200 text-gray-800 font-semibold px-4 py-2 rounded-md"
             >
-              Cancel
+              Batal
             </button>
           </div>
         </main>

@@ -109,7 +109,7 @@ const Pelatih = () => {
                 to="/admin/pelatih/create"
                 className="bg-primary text-white font-medium px-4 py-2 rounded-md"
               >
-                New Coach Account
+                Tambah Pelatih
               </Link>
             )}
           </div>

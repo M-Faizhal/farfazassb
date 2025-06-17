@@ -1,13 +1,25 @@
-import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
-import AdminHeader from '../../components/Admin/Header';
-import AdminSidebar from '../../components/Admin/Sidebar';
-import { Edit, Eye, Plus, Trash2, Trophy, Users, User, X, Calendar, Award, MapPin } from 'lucide-react';
-import Api from '../../utils/Api';
-import { useToken } from '../../utils/Cookies';
-import { toLocal } from '../../utils/dates';
-import id from 'dayjs/locale/id';
-import toast from 'react-hot-toast';
+import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+import AdminHeader from "../../components/Admin/Header";
+import AdminSidebar from "../../components/Admin/Sidebar";
+import {
+  Edit,
+  Eye,
+  Plus,
+  Trash2,
+  Trophy,
+  Users,
+  User,
+  X,
+  Calendar,
+  Award,
+  MapPin,
+} from "lucide-react";
+import Api from "../../utils/Api";
+import { useToken } from "../../utils/Cookies";
+import { toLocal } from "../../utils/dates";
+import id from "dayjs/locale/id";
+import toast from "react-hot-toast";
 
 const Prestasi = () => {
   const [prestasiData, setPrestasiData] = useState([]);
@@ -15,8 +27,9 @@ const Prestasi = () => {
   const [showDetailModal, setShowDetailModal] = useState(false);
   const [selectedId, setSelectedId] = useState(null);
   const [selectedPrestasi, setSelectedPrestasi] = useState(null);
-  const [filterKategori, setFilterKategori] = useState('Semua');
-  const {getToken} = useToken()
+  const [filterKategori, setFilterKategori] = useState("Semua");
+  const [isLoading, setIsLoading] = useState(true);
+  const { getToken } = useToken();
 
   const handleOpenModal = (id) => {
     setSelectedId(id);
@@ -29,58 +42,71 @@ const Prestasi = () => {
   };
 
   const handleDelete = () => {
-    deletePrestasi()
+    deletePrestasi();
     setShowModal(false);
   };
 
-  const filteredPrestasi = prestasiData.filter(prestasi => 
-    filterKategori === "Tim" ? prestasi.studentId === null : prestasi.studentId != null 
-  );
+  const filteredPrestasi = prestasiData.filter((prestasi) => {
+    if (filterKategori === "Semua") return true;
+    if (filterKategori === "Tim") return prestasi.studentId === null;
+    if (filterKategori === "Individu") return prestasi.studentId !== null;
+    return true;
+  });
 
-  const sortedPrestasiList = [...filteredPrestasi].sort((a, b) => new Date(b.date) - new Date(a.date));
+  const sortedPrestasiList = [...filteredPrestasi].sort(
+    (a, b) => new Date(b.date) - new Date(a.date)
+  );
 
   const getPeringkatBadge = (peringkat) => {
     const badges = {
-      1: 'bg-yellow-100 text-yellow-800 border-yellow-200',
-      2: 'bg-gray-100 text-gray-800 border-gray-200', 
-      3: 'bg-orange-100 text-orange-800 border-orange-200'
+      1: "bg-yellow-100 text-yellow-800 border-yellow-200",
+      2: "bg-gray-100 text-gray-800 border-gray-200",
+      3: "bg-orange-100 text-orange-800 border-orange-200",
     };
-    return badges[peringkat] || 'bg-blue-100 text-blue-800 border-blue-200';
+    return badges[peringkat] || "bg-blue-100 text-blue-800 border-blue-200";
   };
 
   const getTingkatBadge = (tingkat) => {
     const badges = {
-      'Nasional': 'bg-red-100 text-red-800',
-      'Regional': 'bg-blue-100 text-blue-800',
-      'Lokal': 'bg-green-100 text-green-800'
+      Nasional: "bg-red-100 text-red-800",
+      Regional: "bg-blue-100 text-blue-800",
+      Lokal: "bg-green-100 text-green-800",
     };
-    return badges[tingkat] || 'bg-gray-100 text-gray-800';
+    return badges[tingkat] || "bg-gray-100 text-gray-800";
   };
 
-  const getAllPrestasi = async() =>{
-    await Api.get("/admin/achievements",{
-      headers : {
-        Authorization : "Bearer " + getToken()
-      }
-    }).then((res)=>{
-        setPrestasiData(res.data)
+  const getAllPrestasi = async () => {
+    setIsLoading(true);
+    await Api.get("/admin/achievements", {
+      headers: {
+        Authorization: "Bearer " + getToken(),
+      },
     })
-  }
-  
-  const deletePrestasi = async(id) =>{
-    await Api.delete("/admin/achievements/" + selectedId,{
-      headers : {
-        Authorization : "Bearer " + getToken()
-      }
-    }).then(()=>{
-      toast.success("Sukses Menghapus Prestasi")
-      getAllPrestasi()
-    })
-  }
+      .then((res) => {
+        setPrestasiData(res.data);
+      })
+      .catch(() => {
+        toast.error("Gagal memuat prestasi");
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
+  };
 
-  useEffect(()=>{
-    getAllPrestasi()
-  },[])
+  const deletePrestasi = async (id) => {
+    await Api.delete("/admin/achievements/" + selectedId, {
+      headers: {
+        Authorization: "Bearer " + getToken(),
+      },
+    }).then(() => {
+      toast.success("Sukses Menghapus Prestasi");
+      getAllPrestasi();
+    });
+  };
+
+  useEffect(() => {
+    getAllPrestasi();
+  }, []);
 
   return (
     <div className="bg-[#f7f7f7] min-h-screen text-sm text-[#333]">
@@ -112,7 +138,11 @@ const Prestasi = () => {
             </div>
           </div>
 
-          {sortedPrestasiList.length === 0 ? (
+          {isLoading ? (
+            <div className="flex items-center justify-center h-96">
+              <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+            </div>
+          ) : sortedPrestasiList.length === 0 ? (
             <div className="bg-white rounded-md border border-gray-200 shadow-sm p-8">
               <p className="text-gray-500 text-center text-lg">
                 Tidak ada data prestasi tersedia.
@@ -132,11 +162,19 @@ const Prestasi = () => {
                       ) : (
                         <User className="text-primary" size={20} />
                       )}
-                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${getTingkatBadge(prestasi.level)}`}>
+                      <span
+                        className={`px-2 py-1 rounded-full text-xs font-medium ${getTingkatBadge(
+                          prestasi.level
+                        )}`}
+                      >
                         {prestasi.level}
                       </span>
                     </div>
-                    <div className={`px-2 py-1 rounded-full text-xs font-bold border ${getPeringkatBadge(prestasi.place)} flex items-center gap-1`}>
+                    <div
+                      className={`px-2 py-1 rounded-full text-xs font-bold border ${getPeringkatBadge(
+                        prestasi.place
+                      )} flex items-center gap-1`}
+                    >
                       <Trophy size={12} />
                       Juara {prestasi.place}
                     </div>
@@ -148,21 +186,29 @@ const Prestasi = () => {
 
                   <div className="space-y-1 mb-4">
                     <p className="text-gray-600 text-xs md:text-sm">
-                      <span className="font-semibold">Event:</span> {prestasi.event}
+                      <span className="font-semibold">Event:</span>{" "}
+                      {prestasi.event}
                     </p>
                     <p className="text-gray-600 text-xs md:text-sm">
-                      <span className="font-semibold">Tanggal:</span>{' '}
-                      {(toLocal(prestasi.date))}
+                      <span className="font-semibold">Tanggal:</span>{" "}
+                      {toLocal(prestasi.date)}
                     </p>
                     <p className="text-gray-600 text-xs md:text-sm">
-                      <span className="font-semibold">Kategori:</span>{' '}
-                      <span className={`px-2 py-1 rounded text-xs ${prestasi.studentId === null ? 'bg-blue-100 text-blue-800' : 'bg-purple-100 text-purple-800'}`}>
+                      <span className="font-semibold">Kategori:</span>{" "}
+                      <span
+                        className={`px-2 py-1 rounded text-xs ${
+                          prestasi.studentId === null
+                            ? "bg-blue-100 text-blue-800"
+                            : "bg-purple-100 text-purple-800"
+                        }`}
+                      >
                         {prestasi.studentId === null ? "Tim" : "Individu"}
                       </span>
                     </p>
-                    {prestasi.student.name && (
+                    {prestasi.student?.name && (
                       <p className="text-gray-600 text-xs md:text-sm">
-                        <span className="font-semibold">Siswa:</span> {prestasi.student.name}
+                        <span className="font-semibold">Siswa:</span>{" "}
+                        {prestasi.student.name}
                       </p>
                     )}
                   </div>
@@ -207,16 +253,26 @@ const Prestasi = () => {
             <div className="sticky top-0 bg-white border-b border-gray-200 p-6 rounded-t-lg">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className={`p-2 rounded-full ${selectedPrestasi.kategori === 'Tim' ? 'bg-blue-100' : 'bg-purple-100'}`}>
-                    {selectedPrestasi.kategori === 'Tim' ? (
+                  <div
+                    className={`p-2 rounded-full ${
+                      selectedPrestasi.kategori === "Tim"
+                        ? "bg-blue-100"
+                        : "bg-purple-100"
+                    }`}
+                  >
+                    {selectedPrestasi.kategori === "Tim" ? (
                       <Users className="text-primary" size={24} />
                     ) : (
                       <User className="text-primary" size={24} />
                     )}
                   </div>
                   <div>
-                    <h2 className="text-xl font-bold text-gray-800">Detail Prestasi</h2>
-                    <p className="text-sm text-gray-600">{selectedPrestasi.id}</p>
+                    <h2 className="text-xl font-bold text-gray-800">
+                      Detail Prestasi
+                    </h2>
+                    <p className="text-sm text-gray-600">
+                      {selectedPrestasi.id}
+                    </p>
                   </div>
                 </div>
                 <button
@@ -231,15 +287,25 @@ const Prestasi = () => {
             <div className="p-6">
               <div className="mb-6">
                 <div className="flex items-center gap-2 mb-3">
-                  <div className={`px-3 py-1 rounded-full text-sm font-bold border ${getPeringkatBadge(selectedPrestasi.plac)} flex items-center gap-2`}>
+                  <div
+                    className={`px-3 py-1 rounded-full text-sm font-bold border ${getPeringkatBadge(
+                      selectedPrestasi.plac
+                    )} flex items-center gap-2`}
+                  >
                     <Trophy size={16} />
                     Juara {selectedPrestasi.place}
                   </div>
-                  <span className={`px-3 py-1 rounded-full text-sm font-medium ${getTingkatBadge(selectedPrestasi.level)}`}>
+                  <span
+                    className={`px-3 py-1 rounded-full text-sm font-medium ${getTingkatBadge(
+                      selectedPrestasi.level
+                    )}`}
+                  >
                     {selectedPrestasi.level}
                   </span>
                 </div>
-                <h1 className="text-2xl font-bold text-gray-800 mb-2">{selectedPrestasi.title}</h1>
+                <h1 className="text-2xl font-bold text-gray-800 mb-2">
+                  {selectedPrestasi.title}
+                </h1>
                 <p className="text-gray-600">{selectedPrestasi.event}</p>
               </div>
 
@@ -248,7 +314,9 @@ const Prestasi = () => {
                   <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
                     <Calendar className="text-primary" size={20} />
                     <div>
-                      <p className="text-sm font-medium text-gray-700">Tanggal Event</p>
+                      <p className="text-sm font-medium text-gray-700">
+                        Tanggal Event
+                      </p>
                       <p className="text-gray-800">
                         {toLocal(selectedPrestasi.date)}
                       </p>
@@ -258,7 +326,9 @@ const Prestasi = () => {
                   <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
                     <MapPin className="text-primary" size={20} />
                     <div>
-                      <p className="text-sm font-medium text-gray-700">Tingkat Kompetisi</p>
+                      <p className="text-sm font-medium text-gray-700">
+                        Tingkat Kompetisi
+                      </p>
                       <p className="text-gray-800">{selectedPrestasi.level}</p>
                     </div>
                   </div>
@@ -272,8 +342,14 @@ const Prestasi = () => {
                       <User className="text-primary" size={20} />
                     )}
                     <div>
-                      <p className="text-sm font-medium text-gray-700">Kategori</p>
-                      <p className="text-gray-800">{selectedPrestasi.studentId === null? "Tim" : "Individu" }</p>
+                      <p className="text-sm font-medium text-gray-700">
+                        Kategori
+                      </p>
+                      <p className="text-gray-800">
+                        {selectedPrestasi.studentId === null
+                          ? "Tim"
+                          : "Individu"}
+                      </p>
                     </div>
                   </div>
 
@@ -281,8 +357,12 @@ const Prestasi = () => {
                     <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
                       <User className="text-primary" size={20} />
                       <div>
-                        <p className="text-sm font-medium text-gray-700">Nama Siswa</p>
-                        <p className="text-gray-800">{selectedPrestasi.student.name}</p>
+                        <p className="text-sm font-medium text-gray-700">
+                          Nama Siswa
+                        </p>
+                        <p className="text-gray-800">
+                          {selectedPrestasi.student.name}
+                        </p>
                       </div>
                     </div>
                   )}
@@ -290,17 +370,25 @@ const Prestasi = () => {
                   <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
                     <Award className="text-primary" size={20} />
                     <div>
-                      <p className="text-sm font-medium text-gray-700">Peringkat</p>
-                      <p className="text-gray-800">Juara {selectedPrestasi.place}</p>
+                      <p className="text-sm font-medium text-gray-700">
+                        Peringkat
+                      </p>
+                      <p className="text-gray-800">
+                        Juara {selectedPrestasi.place}
+                      </p>
                     </div>
                   </div>
                 </div>
               </div>
 
               <div className="mb-6">
-                <h3 className="text-lg font-semibold text-gray-800 mb-3">Deskripsi Prestasi</h3>
+                <h3 className="text-lg font-semibold text-gray-800 mb-3">
+                  Deskripsi Prestasi
+                </h3>
                 <div className="bg-gray-50 rounded-lg p-4">
-                  <p className="text-gray-700 leading-relaxed">{selectedPrestasi.desc}</p>
+                  <p className="text-gray-700 leading-relaxed">
+                    {selectedPrestasi.desc}
+                  </p>
                 </div>
               </div>
 

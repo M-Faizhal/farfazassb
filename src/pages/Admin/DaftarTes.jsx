@@ -85,7 +85,7 @@ const DaftarTes = () => {
                 className="bg-primary text-white font-medium px-4 py-2 rounded-md"
               >
                 <FiPlus className="inline-block mr-1" />
-                New Test
+                Tambah tes
               </Link>
             )}
           </div>

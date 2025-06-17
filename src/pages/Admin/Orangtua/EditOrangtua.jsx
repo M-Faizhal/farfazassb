@@ -177,14 +177,14 @@ const EditOrangtua = () => {
               onClick={() => setShowSaveModal(true)}
               className="bg-primary cursor-pointer text-white font-semibold px-4 py-2 rounded-md w-full sm:w-auto"
             >
-              Update Account
+              Edit
             </button>
             <button
               type="button"
               onClick={() => navigate("/admin/orangtua")}
               className="bg-gray-200 cursor-pointer text-gray-800 font-semibold px-4 py-2 rounded-md w-full sm:w-auto"
             >
-              Cancel
+              Batal
             </button>
           </div>
 

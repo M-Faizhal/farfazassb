@@ -102,7 +102,7 @@ const Orangtua = () => {
               to="/admin/orangtua/create"
               className="bg-primary text-white font-medium px-4 py-2 rounded-md"
             >
-              New Parent Account
+              Tambah Akun
             </Link>
           </div>
 
