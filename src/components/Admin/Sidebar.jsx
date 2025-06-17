@@ -22,11 +22,10 @@ const AdminSidebar = () => {
     { name: 'Akun Orang Tua', path: '/admin/orangtua' },
   ];
 
-  const logout = () => {
-    removeCookie(import.meta.env.VITE_COOKIES_NAME);
-    navigate('/');
-  };
-
+const logout = () => {
+  removeCookie(import.meta.env.VITE_COOKIES_NAME, { path: '/' });
+  navigate('/');
+};
   const SidebarContent = (
     <div className="flex flex-col px-6 py-8 space-y-6 bg-white h-full w-64 border-r border-gray-200">
       <div className="flex items-center justify-between md:justify-start space-x-2">

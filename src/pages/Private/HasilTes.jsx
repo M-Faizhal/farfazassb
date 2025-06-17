@@ -50,11 +50,12 @@ const HasilTesSiswa = () => {
   }, [child]);
 
   const getScoreValue = (category) => {
+    console.log(category)
     const scores = {
-      "Kurang": 25,
-      "Cukup": 50,
-      "Baik": 75,
-      "Sangat Baik": 100
+      1 : 25,
+      2 : 50,
+      3 : 75,
+      4 : 100
     };
     return scores[category] || 0;
   };
@@ -94,7 +95,6 @@ const HasilTesSiswa = () => {
   const handlePrint = () => {
     const printWindow = window.open('', '_blank');
     
-    // Generate skill bars HTML for print
     const skillBarsHTML = Object.entries(test.keterampilan).map(([key, value]) => {
       const score = getScoreValue(value);
       const label = formatKeterampilan(key);
@@ -273,7 +273,7 @@ const HasilTesSiswa = () => {
             <div class="data-grid">
               <div class="data-item">
                 <span>Denyut Nadi:</span>
-                <span class="data-value">${test.fisiologi.denyutNadi} bpm</span>
+                <span class="data-value">${test.fisiologi.denyutNadiIstirahat} bpm</span>
               </div>
               <div class="data-item">
                 <span>Saturasi Oksigen:</span>
@@ -313,8 +313,8 @@ const HasilTesSiswa = () => {
           <div class="section">
             <div class="section-title">📝 Catatan Lain</div>
             <div class="notes">
-              <p><strong>Cedera:</strong> ${test.cedera}</p>
-              <p><strong>Komentar Pelatih:</strong> "${test.komentar}"</p>
+              <p><strong>Cedera:</strong> ${test.catatan.injuryDetail}</p>
+              <p><strong>Komentar Pelatih:</strong> "${test.catatan.comment}"</p>
             </div>
           </div>
         </body>
@@ -389,7 +389,7 @@ const HasilTesSiswa = () => {
                   {/* Info Pelatih */}
                   <div className="mb-8 p-4 bg-amber-50 rounded-lg border border-yellow-200">
                     <p className="text-sm text-amber-800">
-                      <span className="font-medium">Pelatih:</span> {test.coach}
+                      <span className="font-medium">Pelatih:</span> {test.coach.name}
                     </p>
                   </div>
 
@@ -507,11 +507,11 @@ const HasilTesSiswa = () => {
                     <div className="space-y-3">
                       <div>
                         <span className="font-medium text-amber-800">Riwayat Cedera:</span>
-                        <p className="text-amber-700 mt-1 text-sm md:text-base">{test.cedera}</p>
+                        <p className="text-amber-700 mt-1 text-sm md:text-base">{test.catatan.injuryDetail}</p>
                       </div>
                       <div>
                         <span className="font-medium text-amber-800">Komentar Pelatih:</span>
-                        <p className="text-amber-700 mt-1 italic text-sm md:text-base">"{test.komentar}"</p>
+                        <p className="text-amber-700 mt-1 italic text-sm md:text-base">"{test.catatan.comment}"</p>
                       </div>
                     </div>
                   </section>
