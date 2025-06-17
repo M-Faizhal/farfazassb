@@ -62,10 +62,10 @@ const HasilTesSiswa = () => {
 
   const getScoreColor = (category) => {
     const colors = {
-      "Kurang": "bg-red-500",
-      "Cukup": "bg-yellow-500", 
-      "Baik": "bg-amber-500",
-      "Sangat Baik": "bg-green-500"
+      1: "bg-red-500",
+      2: "bg-yellow-500", 
+      3: "bg-amber-500",
+      4: "bg-green-500"
     };
     return colors[category] || "bg-gray-400";
   };
