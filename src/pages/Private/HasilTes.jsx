@@ -1,63 +1,53 @@
 import UserSidebar from "../../components/Private/Sidebar";
 import { useEffect, useState, useRef } from "react";
 import { Printer, TrendingUp, Activity, Brain, Target } from "lucide-react";
+import Api from "../../utils/Api";
+import { useParams } from "react-router";
+import { useToken } from "../../utils/Cookies";
 
 const HasilTesSiswa = () => {
   const [test, setTest] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const printRef = useRef();
+  const {id} = useParams()
+  const {getToken} = useToken()
+  const [child,setChild] = useState([])
+
+    const getChild = async () => {
+    setIsLoading(true);
+    await Api.get("/users/my-children", {
+      headers: {
+        Authorization: "Bearer " + getToken(),
+      },
+    })
+      .then((res) => {
+        setChild(res.data)
+      })
+  };
+
+  
+  const getTestById = async()=>{
+    await Api.get("/users/test/" + id + "/" + child[0].id,{
+      headers : {
+        Authorization : "Bearer " + getToken()
+      }
+    }).then((res)=>{
+      setTest(res.data)
+      console.log(res.data)
+    }).finally(()=>{
+      setIsLoading(false)
+    })
+  }
+
+   useEffect(() => {
+    getChild();
+  }, []);
 
   useEffect(() => {
-    // Simulasi fetch hasil tes
-    const timer = setTimeout(() => {
-      setTest({
-        id: "TES001",
-        date: "2025-08-01",
-        coach: "Coach Bambang",
-        student: {
-          id: "STD001234",
-          name: "Siti Aminah"
-        },
-        antropometri: {
-          tinggiBadan: 150,
-          beratBadan: 65,
-          bmi: 22.5,
-          kategoriBMI: "Normal",
-          tinggiDuduk: 80,
-          panjangTungkai: 80,
-          rentangLengan: 175,
-        },
-        fisiologi: {
-          denyutNadi: 70,
-          saturasiOksigen: 98,
-        },
-        biomotor: {
-          standingBoardJump: 220,
-          testKecepatan: 5.5,
-          dayaTahan: 12,
-        },
-        keterampilan: {
-          controllingKanan: "Baik",
-          controllingKiri: "Cukup",
-          dribblingKanan: "Sangat Baik",
-          dribblingKiri: "Baik",
-          longpassKanan: "Cukup",
-          longpassKiri: "Baik",
-          shootingKanan: "Baik",
-          shootingKiri: "Kurang",
-        },
-        psikologi: {
-          disiplin: "Baik",
-          komitmen: "Sangat Baik",
-          percayaDiri: "Cukup",
-        },
-        cedera: "Pernah cedera hamstring bulan lalu.",
-        komentar: "Performa bagus, tetap jaga kebugaran.",
-      });
-      setIsLoading(false);
-    }, 500);
-    return () => clearTimeout(timer);
-  }, []);
+    if (child.length > 0) {
+      getTestById();
+    }
+  }, [child]);
 
   const getScoreValue = (category) => {
     const scores = {

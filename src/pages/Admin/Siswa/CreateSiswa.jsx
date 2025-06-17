@@ -33,7 +33,8 @@ const CreateSiswa = () => {
   const [previews, setPreviews] = useState({});
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
-  const [parent,setParent] = useState([])
+  const [parent, setParent] = useState([]);
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
     const { id, value } = e.target;
@@ -53,6 +54,7 @@ const CreateSiswa = () => {
   };
 
   const addSiswa = async () => {
+    setLoading(true);
 
     const data = new FormData();
     data.append("coachId", formData.coachId);
@@ -69,7 +71,8 @@ const CreateSiswa = () => {
     if (files.koperasi) data.append("koperasi", files.koperasi);
     if (files.bpjs) data.append("bpjs", files.bpjs);
     if (files.akta) data.append("akta", files.akta);
-    if (formData.parentId.akta) data.append("parentId", Number(formData.parentId));
+    if (formData.parentId.akta)
+      data.append("parentId", Number(formData.parentId));
 
     await Api.post("/admin/students", data, {
       headers: {
@@ -81,20 +84,22 @@ const CreateSiswa = () => {
         navigate("/admin/siswa");
       })
       .catch((err) => {
-        toast.error("Gagal menambah siswa");
-        console.log(err)
+        toast.error(err.response.data.message);
+      })
+      .finally(() => {
+        setLoading(false);
       });
   };
 
-  const getAllParent = async() =>{
-    await Api.get("/admin/users",{
-      headers : {
-        Authorization : "Bearer " + getToken()
-      }
-    }).then((res)=>{
-      setParent(res.data)
-    })
-  }
+  const getAllParent = async () => {
+    await Api.get("/admin/users", {
+      headers: {
+        Authorization: "Bearer " + getToken(),
+      },
+    }).then((res) => {
+      setParent(res.data);
+    });
+  };
 
   const handleGender = (e) => {
     setFormData({
@@ -108,9 +113,9 @@ const CreateSiswa = () => {
     addSiswa();
   };
 
-  useEffect(()=>{
-    getAllParent()
-  },[])
+  useEffect(() => {
+    getAllParent();
+  }, []);
 
   return (
     <div className="bg-[#f7f7f7] min-h-screen text-sm text-[#333]">
@@ -203,22 +208,22 @@ const CreateSiswa = () => {
             />
 
             <div className="flex flex-col">
-    <label className="text-sm text-black mb-1">
-      Orang Tua
-    </label>
-    <select
-      value={formData.parentId}
-      onChange={(e)=>setFormData({...formData,parentId : e.target.value})}
-      className="rounded-md bg-[#E6EEFF] border border-gray-300 h-10 px-3 text-black focus:outline-primary text-sm"
-    >
-      <option value="">-- Pilih Orang Tua --</option>
-      {parent.map((parent) => (
-        <option key={parent.id} value={parent.id}>
-          {parent.name}
-        </option>
-      ))}
-    </select>
-  </div>
+              <label className="text-sm text-black mb-1">Orang Tua</label>
+              <select
+                value={formData.parentId}
+                onChange={(e) =>
+                  setFormData({ ...formData, parentId: e.target.value })
+                }
+                className="rounded-md bg-[#E6EEFF] border border-gray-300 h-10 px-3 text-black focus:outline-primary text-sm"
+              >
+                <option value="">-- Pilih Orang Tua --</option>
+                {parent.map((parent) => (
+                  <option key={parent.id} value={parent.id}>
+                    {parent.name}
+                  </option>
+                ))}
+              </select>
+            </div>
 
             <FileUpload
               label="Kartu Keluarga"
@@ -275,23 +280,17 @@ const CreateSiswa = () => {
                 </p>
                 <div className="flex flex-col sm:flex-row justify-end gap-3">
                   <button
-                    onClick={() => setShowCreateModal(false)}
-                    className="px-4 py-2 bg-gray-200 text-gray-800 rounded-md w-full sm:w-auto"
-                  >
-                    Tinjau Ulang
-                  </button>
-                  <button
                     onClick={handleSubmit}
+                    disabled={loading}
                     className="px-4 py-2 bg-primary text-white rounded-md w-full sm:w-auto"
                   >
-                    Ya, Simpan
+                    {loading ? "Menyimpan..." : "Ya, Simpan"}
                   </button>
                 </div>
               </div>
             </div>
           )}
 
-          {/* Notifikasi Sukses */}
           {successMessage && (
             <div className="fixed bottom-6 right-6 bg-green-500 text-white px-4 py-3 rounded-md shadow-lg z-50 mx-4">
               {successMessage}

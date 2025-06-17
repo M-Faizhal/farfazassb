@@ -1,26 +1,32 @@
 import UserSidebar from "../../components/Private/Sidebar";
 import { useEffect, useState } from "react";
 import { User, Mail, Phone, MapPin, Trophy } from "lucide-react";
+import Api from "../../utils/Api";
+import { jwtDecode } from "jwt-decode";
+import { useToken } from "../../utils/Cookies";
 
 const UserDashboard = () => {
   const [user, setUser] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
+  const {getToken} = useToken()
+
+  const getUserById = async() =>{
+    setIsLoading(true)
+    await Api.get("/users/me/" + jwtDecode(getToken()).userId,{
+      headers : {
+        Authorization : "Bearer " + getToken()
+      }
+    }).then(res=>{
+      setUser(res.data)
+    }).finally(()=>{
+      setIsLoading(false)
+    })
+  }
 
   useEffect(() => {
-    // Simulasi fetch data dummy
-    const timer = setTimeout(() => {
-      setUser({
-        name: "Budi Santoso",
-        email: "budi.santoso@gmail.com",
-        telp: "08123456789",
-        alamat: "Jl. Merdeka No. 123, Surabaya, Jawa Timur",
-        namaAnak: "Siti Aminah",
-        idAnak: "STD001234",
-      });
-      setIsLoading(false);
-    }, 500);
 
-    return () => clearTimeout(timer);
+    getUserById()
+
   }, []);
 
   const profileFields = [
@@ -44,19 +50,19 @@ const UserDashboard = () => {
     },
     {
       label: "Alamat",
-      value: user?.alamat,
+      value: user?.address,
       icon: MapPin,
       colSpan: "lg:col-span-2"
     },
     {
       label: "Nama Siswa",
-      value: user?.namaAnak,
+      value:  user?.parentOf?.map((siswa) => siswa.name).join(', '),
       icon: Trophy,
       colSpan: "col-span-1"
     },
     {
       label: "ID Siswa",
-      value: user?.idAnak,
+      value: user?.parentOf?.map((siswa) => siswa.id).join(', '),
       icon: User,
       colSpan: "col-span-1"
     }
@@ -149,18 +155,6 @@ const UserDashboard = () => {
                     </div>
                   ))}
                 </div>
-              </div>
-
-              {/* Footer */}
-              <div className="bg-amber-50 px-6 py-4 md:px-8 border-t border-yellow-200">
-                <p className="text-amber-700 text-sm text-center">
-                  Terakhir diperbarui: {new Date().toLocaleDateString('id-ID', {
-                    weekday: 'long',
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric'
-                  })}
-                </p>
               </div>
             </div>
           </div>

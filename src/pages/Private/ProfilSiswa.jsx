@@ -1,72 +1,84 @@
 import UserSidebar from "../../components/Private/Sidebar";
 import { useEffect, useState } from "react";
 import { User, Calendar, Ruler, MapPin, Activity, Info } from "lucide-react";
+import Api from "../../utils/Api";
+import { useToken } from "../../utils/Cookies";
+import { toLocal } from "../../utils/dates";
 
 const ProfilSiswa = () => {
-  const [student, setStudent] = useState(null);
+  const [student, setStudent] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [imageError, setImageError] = useState(false);
+  const { getToken } = useToken();
+
+  const getChild = async () => {
+    setIsLoading(true);
+    await Api.get("/users/my-children", {
+      headers: {
+        Authorization: "Bearer " + getToken(),
+      },
+    })
+      .then((res) => {
+        setStudent(res.data);
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
+  };
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setStudent({
-        name: "Siti Aminah",
-        gender: "P",
-        tempatLahir: "Surabaya",
-        tanggalLahir: "2014-05-10",
-        usia: 10,
-        level: "U10",
-        kategoriBMI: "NORMAL",
-        // Contoh URL gambar yang valid (ganti dengan URL foto asli siswa)
-        photoUrl: "https://images.unsplash.com/photo-1570498839593-e565b39455fc?q=80&w=1935&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-      });
-      setIsLoading(false);
-    }, 500);
-    return () => clearTimeout(timer);
+    getChild();
   }, []);
 
   const profileFields = [
     {
       label: "Nama Lengkap",
-      value: student?.name,
+      value: student[0]?.name,
       icon: User,
-      colSpan: "lg:col-span-2"
+      colSpan: "lg:col-span-2",
     },
     {
       label: "Jenis Kelamin",
-      value: student?.gender === "L" ? "Laki-laki" : "Perempuan",
+      value:
+        student[0]?.gender === "L"
+          ? "Laki-laki"
+          : student[0]?.gender === "P"
+          ? "Perempuan"
+          : "-",
       icon: Info,
-      colSpan: "col-span-1"
+      colSpan: "col-span-1",
     },
     {
       label: "Tempat Lahir",
-      value: student?.tempatLahir,
+      value: student[0]?.tempatLahir,
       icon: MapPin,
-      colSpan: "col-span-1"
+      colSpan: "col-span-1",
     },
     {
       label: "Tanggal Lahir",
-      value: student?.tanggalLahir ? new Date(student.tanggalLahir).toLocaleDateString("id-ID") : "-",
+      value: student[0]?.tanggalLahir
+        ? toLocal(student[0].tanggalLahir)
+        : "-",
       icon: Calendar,
-      colSpan: "col-span-1"
+      colSpan: "col-span-1",
     },
     {
       label: "Usia",
-      value: student?.usia ? `${student.usia} tahun` : "-",
+      value: student[0]?.age ? `${student[0].age} tahun` : "-",
       icon: Calendar,
-      colSpan: "col-span-1"
+      colSpan: "col-span-1",
     },
     {
       label: "Level",
-      value: student?.level,
+      value: student[0]?.level,
       icon: Ruler,
-      colSpan: "col-span-1"
+      colSpan: "col-span-1",
     },
     {
       label: "Kategori BMI",
-      value: student?.kategoriBMI,
+      value: student[0]?.kategoriBMI,
       icon: Activity,
-      colSpan: "col-span-1"
+      colSpan: "col-span-1",
     },
   ];
 
@@ -86,7 +98,9 @@ const ProfilSiswa = () => {
                   <div className="flex items-center justify-center h-32">
                     <div className="flex flex-col items-center gap-3">
                       <div className="w-8 h-8 bg-yellow-300 rounded-full animate-spin"></div>
-                      <p className="text-amber-700 font-medium">Memuat data...</p>
+                      <p className="text-amber-700 font-medium">
+                        Memuat data...
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -126,13 +140,13 @@ const ProfilSiswa = () => {
                 <div className="flex flex-col items-center justify-center">
                   {/* Photo Container - Made Larger */}
                   <div className="relative mb-6">
-                    {imageError || !student?.photoUrl ? (
+                    {imageError || !student[0]?.photoUrl ? (
                       <div className="w-40 h-40 md:w-48 md:h-48 bg-white/20 rounded-full border-4 border-white/30 flex items-center justify-center backdrop-blur-sm">
                         <User className="text-white" size={60} />
                       </div>
                     ) : (
                       <img
-                        src={student.photoUrl}
+                        src={student[0].photoUrl}
                         alt="Foto Siswa"
                         className="w-40 h-40 md:w-48 md:h-48 rounded-full border-4 border-white shadow-xl object-cover"
                         onError={handleImageError}
@@ -140,10 +154,10 @@ const ProfilSiswa = () => {
                       />
                     )}
                   </div>
-                  
+
                   <div className="text-center">
                     <h2 className="text-2xl md:text-3xl font-bold text-white mb-2">
-                      {student?.name || '-'}
+                      {student[0]?.name || "-"}
                     </h2>
                     <p className="text-yellow-100 text-sm md:text-base">
                       Informasi Biodata Siswa
@@ -168,23 +182,11 @@ const ProfilSiswa = () => {
                         </div>
                       </div>
                       <p className="text-gray-800 text-lg font-semibold ml-13 pl-0.5">
-                        {field.value || '-'}
+                        {field.value || "-"}
                       </p>
                     </div>
                   ))}
                 </div>
-              </div>
-
-              {/* Footer */}
-              <div className="bg-amber-50 px-6 py-4 md:px-8 border-t border-yellow-200">
-                <p className="text-amber-700 text-sm text-center">
-                  Terakhir diperbarui: {new Date().toLocaleDateString("id-ID", {
-                    weekday: "long",
-                    year: "numeric",
-                    month: "long",
-                    day: "numeric",
-                  })}
-                </p>
               </div>
             </div>
           </div>

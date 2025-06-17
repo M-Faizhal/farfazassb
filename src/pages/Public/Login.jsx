@@ -2,6 +2,8 @@ import axios from "axios";
 import { useState } from "react";
 import { useCookies } from "react-cookie";
 import toast from "react-hot-toast";
+import Api from "../../utils/Api";
+import { useNavigate } from "react-router";
 
 function UserLogin() {
 
@@ -9,6 +11,7 @@ function UserLogin() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [, setCookie,] = useCookies([env.VITE_COOKIES_NAME]);
+  const navigate = useNavigate()
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -17,11 +20,12 @@ function UserLogin() {
       toast.error("Email dan Password tidak boleh kosong!");
       return;
     }else{
-      axios.post(env.VITE_API_URL + "/auth/login", {
+      Api.post("/auth/login", {
         email: email,
         password: password
       }).then((res) => {
         setCookie(env.VITE_COOKIES_NAME, res.data.token)
+        navigate("/user/dashboard")
       }).catch(err=>{
         toast.error(err.response.data.message)
       })

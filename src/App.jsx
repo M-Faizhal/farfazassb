@@ -63,7 +63,7 @@ function App() {
         <Route path='/user/dashboard' element={<UserDashboard />} />
         <Route path='/user/siswa' element={<ProfilSiswa />} />
         <Route path='/user/penilaian' element={<DaftarTesSiswa />} />
-        <Route path='/user/penilaian/:testId' element={<HasilTes />} />
+        <Route path='/user/penilaian/:id' element={<HasilTes />} />
 
 
         {/* Admin Pages */}
