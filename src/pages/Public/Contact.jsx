@@ -1,7 +1,7 @@
 import { MapPin, Phone, Mail } from 'lucide-react'
 import Header from '../../components/Header'
 
-function Contact() {
+  function Contact() {
   return (
     <>
       <Header />
@@ -26,7 +26,7 @@ function Contact() {
                   </div>
                   <div>
                     <span className="text-[#2ea1d9] font-semibold">Address</span><br />
-                    4671 Sugar Camp Road, Owatonna, Minnesota, 55060
+                    Jalan Taman Kalikepiting Indah No 1 Surabaya
                   </div>
                 </div>
 
@@ -38,7 +38,7 @@ function Contact() {
                   <div>
                     <span className="text-[#2ea1d9] font-semibold">Phone</span><br />
                     <a href="tel:50747560945" className="text-white hover:underline">
-                      507-475-60945-6094
+                      081233179929
                     </a>
                   </div>
                 </div>
@@ -51,7 +51,7 @@ function Contact() {
                   <div>
                     <span className="text-[#2ea1d9] font-semibold">Email</span><br />
                     <a href="mailto:wrub7d78l0e@temporary-mail.net" className="text-white hover:underline">
-                      wrub7d78l0e@temporary-mail.net
+                      farfazafcsurabaya@gmail.com
                     </a>
                   </div>
                 </div>
