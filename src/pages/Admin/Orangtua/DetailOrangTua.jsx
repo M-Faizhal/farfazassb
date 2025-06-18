@@ -9,17 +9,23 @@ const DetailOrangtua = () => {
   const navigate = useNavigate();
   const { id } = useParams();
   const { getToken } = useToken();
+  const [isLoading, setIsLoading] = useState(true);
 
   const [userData, setUserData] = useState(null);
 
   const getUserById = async () => {
+    setIsLoading(true);
     await Api.get("/admin/users/" + id, {
       headers: {
         Authorization: "Bearer " + getToken(),
       },
-    }).then((res) => {
-      setUserData(res.data);
-    });
+    })
+      .then((res) => {
+        setUserData(res.data);
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
   };
 
   useEffect(() => {
@@ -40,16 +46,29 @@ const DetailOrangtua = () => {
             Detail Akun Orang Tua
           </h2>
 
-          {userData && (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-4 md:gap-x-8 gap-y-4 md:gap-y-6 max-w-6xl bg-white p-4 md:p-6 rounded-md border border-gray-200 shadow-sm">
-              <ReadOnlyField label="Nama Orang Tua" value={userData.name} />
-              <ReadOnlyField label="Email" value={userData.email} />
-              <ReadOnlyField label="No. Telepon" value={userData.telp} />
-              <ReadOnlyField label="Status" value={userData.status ? "Aktif" : "Nonaktif"} />
-              <div className="md:col-span-2">
-                <ReadOnlyField label="Alamat" value={userData.address} isTextarea={true} />
-              </div>
+          {isLoading ? (
+            <div className="flex justify-center items-center h-64">
+              <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
             </div>
+          ) : (
+            userData && (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-x-4 md:gap-x-8 gap-y-4 md:gap-y-6 max-w-6xl bg-white p-4 md:p-6 rounded-md border border-gray-200 shadow-sm">
+                <ReadOnlyField label="Nama Orang Tua" value={userData.name} />
+                <ReadOnlyField label="Email" value={userData.email} />
+                <ReadOnlyField label="No. Telepon" value={userData.telp} />
+                <ReadOnlyField
+                  label="Status"
+                  value={userData.status ? "Aktif" : "Nonaktif"}
+                />
+                <div className="md:col-span-2">
+                  <ReadOnlyField
+                    label="Alamat"
+                    value={userData.address}
+                    isTextarea={true}
+                  />
+                </div>
+              </div>
+            )
           )}
 
           <div className="mt-6 flex flex-col sm:flex-row gap-3">
