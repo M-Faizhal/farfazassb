@@ -38,18 +38,6 @@ function StaffPelatih() {
     getAllStudents();
   }, []);
 
-  const getCoachRole = (index) => {
-    const roles = [
-      "Head Coach",
-      "Assistant Coach", 
-      "Technical Coach",
-      "Fitness Coach",
-      "Goalkeeping Coach",
-      "Youth Coach"
-    ];
-    return roles[index % roles.length];
-  };
-
   if (loading) {
     return (
       <>
@@ -118,7 +106,7 @@ function StaffPelatih() {
                   key={index}
                   className="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 
                             transform hover:-translate-y-2 overflow-hidden group border border-gray-100"
-                >[]
+                >
                   <div className="relative overflow-hidden">
                     <img 
                       src={coach.photoUrl} 
@@ -126,19 +114,12 @@ function StaffPelatih() {
                       alt={`Coach ${coach.name}`} 
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                    
-                    <div className="absolute top-4 right-4 bg-green-500 text-white px-3 py-1 rounded-full text-xs font-semibold">
-                      Aktif
-                    </div>
                   </div>
                   
                   <div className="p-6 text-center">
                     <h3 className="text-xl font-bold text-gray-800 mb-2 group-hover:text-blue-600 transition-colors">
                       {coach.name}
                     </h3>
-                    <p className="text-blue-600 font-medium mb-4">
-                      {getCoachRole(index)}
-                    </p>
                   </div>
                 </div>
               ))}

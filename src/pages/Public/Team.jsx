@@ -43,18 +43,25 @@ export default function Team() {
     return levels[index % levels.length];
   };
 
-  // Group students by their assigned level
-  const groupStudentsByLevel = () => {
-    const grouped = {};
-    students.forEach((student, index) => {
-      const level = getStudentLevel(index);
-      if (!grouped[level]) {
-        grouped[level] = [];
-      }
-      grouped[level].push({ ...student, level });
-    });
-    return grouped;
-  };
+const groupStudentsByLevel = () => {
+  const validLevels = [
+    "U-8", "U-9", "U-10", "U-11", "U-12",
+    "U-13", "U-14", "U-15", "U-16", "U-17", "U-18"
+  ];
+
+  const grouped = {};
+  validLevels.forEach((level) => {
+    grouped[level] = [];
+  });
+
+  students.forEach((student) => {
+    if (validLevels.includes(student.level)) {
+      grouped[student.level].push(student);
+    }
+  });
+
+  return grouped;
+};
 
   if (loading) {
     return (

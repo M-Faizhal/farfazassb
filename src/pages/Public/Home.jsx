@@ -212,15 +212,11 @@ function Home() {
                       />
                       <div className="absolute bottom-4 left-4 right-4 text-white z-20">
                         <div className="flex items-center mb-2">
-                          <FaStar className="text-yellow-400 mr-2" size={16} />
-                          <p className="font-semibold text-xs lg:text-sm opacity-90">Professional Coach</p>
+                          <p className="font-semibold text-xs lg:text-sm opacity-90">Coach</p>
                         </div>
                         <p className="font-bold text-lg lg:text-xl leading-tight group-hover:text-yellow-300 transition-colors">
                           {coach.name}
                         </p>
-                      </div>
-                      <div className="absolute top-4 right-4 w-8 h-8 border-2 border-white/50 rounded-full flex items-center justify-center">
-                        <div className="w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
                       </div>
                     </div>
                   </div>

@@ -19,16 +19,16 @@ function Header() {
 
         {/* Desktop Nav */}
         <nav className="hidden md:flex space-x-8 text-sm font-medium">
-          <Link className="hover:text-gray-700 py-2" to="/">Home</Link>
-          <Link className="hover:text-gray-700 py-2" to="/about">About Us</Link>
+          <Link className="hover:text-gray-700 py-2" to="/">Beranda</Link>
+          <Link className="hover:text-gray-700 py-2" to="/about">Tentang Kami</Link>
           <Link className="hover:text-gray-700 py-2" to="/staff">Staff Pelatih</Link>
-          <Link className="hover:text-gray-700 py-2" to="/Team">Team</Link>
-          <Link className="hover:text-gray-700 py-2" to="/contact">Contact</Link>
+          <Link className="hover:text-gray-700 py-2" to="/Team">Tim</Link>
+          <Link className="hover:text-gray-700 py-2" to="/contact">Kontak</Link>
           <Link
             to="/login"
             className="ml-4 bg-primary hover:bg-primary-200 text-white px-4 py-2 rounded-full"
           >
-            Get Started
+            Mulai
           </Link>
         </nav>
 
@@ -41,17 +41,17 @@ function Header() {
       {/* Mobile Menu */}
       {menuOpen && (
         <div className="md:hidden absolute top-full left-0 w-full bg-white shadow-md p-4 flex flex-col space-y-3 text-sm font-medium z-40">
-          <Link onClick={() => setMenuOpen(false)} to="/">Home</Link>
-          <Link onClick={() => setMenuOpen(false)} to="/about">About Us</Link>
+          <Link onClick={() => setMenuOpen(false)} to="/">Beranda</Link>
+          <Link onClick={() => setMenuOpen(false)} to="/about">Tentang Kami</Link>
           <Link onClick={() => setMenuOpen(false)} to="/staff">Staff Pelatih</Link>
-          <Link onClick={() => setMenuOpen(false)} to="/Team">Team</Link>
-          <Link onClick={() => setMenuOpen(false)} to="/contact">Contact</Link>
+          <Link onClick={() => setMenuOpen(false)} to="/Team">Tim</Link>
+          <Link onClick={() => setMenuOpen(false)} to="/contact">Kontak</Link>
           <Link
             onClick={() => setMenuOpen(false)}
             to="/login"
             className="bg-primary hover:bg-[#27548aaf] text-white px-4 py-2 rounded-full text-center"
           >
-            Get Started
+            Mulai
           </Link>
         </div>
       )}
