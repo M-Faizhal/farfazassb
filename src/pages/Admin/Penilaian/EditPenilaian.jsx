@@ -39,6 +39,8 @@ const allowedFields = [
 ];
 
 const EditPenilaian = () => {
+  const [loadingData, setLoadingData] = useState(true);
+  const [loadingSubmit, setLoadingSubmit] = useState(false);
   const navigate = useNavigate();
   const { id } = useParams();
   const [formData, setFormData] = useState({
@@ -85,24 +87,31 @@ const EditPenilaian = () => {
   } = formData;
 
   const updateGrade = async () => {
-    await Api.put(
-      "/admin/grades/" + grade,
-      {
-        ...payload,
-        date: tanggal,
-      },
-      {
-        headers: {
-          Authorization: "Bearer " + getToken(),
+    setLoadingSubmit(true);
+    try {
+      await Api.put(
+        "/admin/grades/" + grade,
+        {
+          ...payload,
+          date: tanggal,
         },
-      }
-    ).then(() => {
+        {
+          headers: {
+            Authorization: "Bearer " + getToken(),
+          },
+        }
+      );
       toast.success("Sukses Menilai Siswa!");
       navigate(-1);
-    });
+    } catch (error) {
+      toast.error("Gagal memperbarui penilaian.");
+    } finally {
+      setLoadingSubmit(false);
+    }
   };
 
   const getGrades = async () => {
+    setLoadingData(true);
     try {
       const res = await Api.get(`/admin/students/${id}/grades`, {
         headers: { Authorization: "Bearer " + getToken() },
@@ -125,6 +134,8 @@ const EditPenilaian = () => {
     } catch (err) {
       console.error("Gagal mengambil data penilaian", err);
       toast.error("Gagal mengambil data penilaian.");
+    } finally {
+      setLoadingData(false);
     }
   };
 
@@ -152,159 +163,173 @@ const EditPenilaian = () => {
             Edit Penilaian
           </h2>
 
-          <form
-            onSubmit={(e) => e.preventDefault()}
-            className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-white p-6 rounded-md border border-gray-200 shadow-sm max-w-6xl"
-          >
-            <div className="flex flex-col">
-              <label className="text-sm text-black mb-1">Nama Siswa</label>
-              <p className="font-semibold text-2xl">{nama}</p>
+          {loadingData ? (
+            <div className="flex justify-center items-center h-64">
+              <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
             </div>
-            <div className="flex flex-col">
-              <label className="text-sm text-black mb-1">Tanggal Tes</label>
-              <p className="font-semibold text-2xl">{tanggal}</p>
-            </div>
-            <Section title="Antropometri">
-              <div className="flex flex-col">
-                <label className="text-sm text-black mb-1">Kategori BMI</label>
-                <select
-                  defaultValue={"NORMAL"}
-                  onChange={(e) =>
-                    setFormData({ ...formData, kategoriBMI: e.target.value })
-                  }
-                  className="rounded-md bg-[#E6EEFF] border border-gray-300 h-10 px-3 text-black focus:outline-primary text-sm"
+          ) : (
+            <div>
+              <form
+                onSubmit={(e) => e.preventDefault()}
+                className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-white p-6 rounded-md border border-gray-200 shadow-sm max-w-6xl"
+              >
+                <div className="flex flex-col">
+                  <label className="text-sm text-black mb-1">Nama Siswa</label>
+                  <p className="font-semibold text-2xl">{nama}</p>
+                </div>
+                <div className="flex flex-col">
+                  <label className="text-sm text-black mb-1">Tanggal Tes</label>
+                  <p className="font-semibold text-2xl">{tanggal}</p>
+                </div>
+                <Section title="Antropometri">
+                  <div className="flex flex-col">
+                    <label className="text-sm text-black mb-1">
+                      Kategori BMI
+                    </label>
+                    <select
+                      defaultValue={"NORMAL"}
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          kategoriBMI: e.target.value,
+                        })
+                      }
+                      className="rounded-md bg-[#E6EEFF] border border-gray-300 h-10 px-3 text-black focus:outline-primary text-sm"
+                    >
+                      {Array.from(["NORMAL", "UNDERWEIGHT", "OVERWEIGHT"]).map(
+                        (bmi, index) => {
+                          return (
+                            <option key={index} value={bmi}>
+                              {bmi}
+                            </option>
+                          );
+                        }
+                      )}
+                    </select>
+                  </div>
+                  {[
+                    ["bmi", "Body Mass Index (kg/m²)"],
+                    ["tinggiBadan", "Tinggi Badan (cm)"],
+                    ["beratBadan", "Berat Badan (kg)"],
+                    ["tinggiDuduk", "Tinggi Duduk (cm)"],
+                    ["panjangTungkai", "Panjang Tungkai (cm)"],
+                    ["rentangLengan", "Rentang Lengan (cm)"],
+                  ].map(([id, label]) => (
+                    <InputField
+                      key={id}
+                      id={id}
+                      label={label}
+                      value={formData[id] || ""}
+                      onChange={handleChange}
+                    />
+                  ))}
+                </Section>
+
+                <Section title="Fisiologi">
+                  <InputField
+                    id="denyutNadiIstirahat"
+                    label="Denyut Nadi Istirahat (bpm)"
+                    value={formData.denyutNadiIstirahat || ""}
+                    onChange={handleChange}
+                  />
+                  <InputField
+                    id="saturasiOksigen"
+                    label="Saturasi Oksigen (%)"
+                    value={formData.saturasiOksigen || ""}
+                    onChange={handleChange}
+                  />
+                </Section>
+
+                <Section title="Komponen Biomotor">
+                  {[
+                    ["standingBoardJump", "Tes Standing Board Jump (cm)"],
+                    ["kecepatan", "Tes Kecepatan (detik)"],
+                    ["dayaTahan", "Tes Daya Tahan (menit)"],
+                  ].map(([id, label]) => (
+                    <InputField
+                      key={id}
+                      id={id}
+                      label={label}
+                      value={formData[id] || ""}
+                      onChange={handleChange}
+                    />
+                  ))}
+                </Section>
+
+                <Section title="Keterampilan">
+                  {[
+                    "controllingKanan",
+                    "controllingKiri",
+                    "dribbling",
+                    "longpassKanan",
+                    "longpassKiri",
+                    "shortpassKanan",
+                    "shortpassKiri",
+                    "shootingKanan",
+                    "shootingKiri",
+                  ].map((id) => (
+                    <SelectField
+                      key={id}
+                      id={id}
+                      label={id.replace(/([A-Z])/g, " $1")}
+                      options={kategoriSkala}
+                      value={formData[id] || ""}
+                      onChange={handleChange}
+                    />
+                  ))}
+                </Section>
+
+                <Section title="Psikologi">
+                  {["disiplin", "komitmen", "percayaDiri"].map((id) => (
+                    <SelectField
+                      key={id}
+                      id={id}
+                      label={id.charAt(0).toUpperCase() + id.slice(1)}
+                      options={kategoriSkala}
+                      value={formData[id] || ""}
+                      onChange={handleChange}
+                    />
+                  ))}
+                </Section>
+
+                {/* Cedera dan Komentar berdampingan dan tinggi sama */}
+                <div className="col-span-2 grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <TextAreaField
+                    label="Detail Cedera"
+                    id="injuryDetail"
+                    value={formData.injuryDetail || ""}
+                    onChange={handleChange}
+                    placeholder="Masukkan detail cedera jika ada"
+                    className="h-full"
+                  />
+                  <TextAreaField
+                    label="Komentar"
+                    id="comment"
+                    value={formData.comment || ""}
+                    onChange={handleChange}
+                    placeholder="Masukkan komentar tambahan di sini..."
+                    className="h-full"
+                  />
+                </div>
+              </form>
+
+              <div className="mt-6 flex gap-3">
+                <button
+                  onClick={handleSubmit}
+                  disabled={loadingSubmit}
+                  className="bg-primary text-white font-semibold px-4 py-2 rounded-md disabled:opacity-50"
                 >
-                  {Array.from(["NORMAL", "UNDERWEIGHT", "OVERWEIGHT"]).map(
-                    (bmi, index) => {
-                      return (
-                        <option key={index} value={bmi}>
-                          {bmi}
-                        </option>
-                      );
-                    }
-                  )}
-                </select>
+                  {loadingSubmit ? "Menyimpan..." : "Update"}
+                </button>
+                <button
+                  onClick={() => navigate(-1)}
+                  className="bg-gray-200 text-gray-800 font-semibold px-4 py-2 rounded-md"
+                >
+                  Cancel
+                </button>
               </div>
-              {[
-                ["bmi", "Body Mass Index (kg/m²)"],
-                ["tinggiBadan", "Tinggi Badan (cm)"],
-                ["beratBadan", "Berat Badan (kg)"],
-                ["tinggiDuduk", "Tinggi Duduk (cm)"],
-                ["panjangTungkai", "Panjang Tungkai (cm)"],
-                ["rentangLengan", "Rentang Lengan (cm)"],
-              ].map(([id, label]) => (
-                <InputField
-                  key={id}
-                  id={id}
-                  label={label}
-                  value={formData[id] || ""}
-                  onChange={handleChange}
-                />
-              ))}
-            </Section>
-
-            <Section title="Fisiologi">
-              <InputField
-                id="denyutNadiIstirahat"
-                label="Denyut Nadi Istirahat (bpm)"
-                value={formData.denyutNadiIstirahat || ""}
-                onChange={handleChange}
-              />
-              <InputField
-                id="saturasiOksigen"
-                label="Saturasi Oksigen (%)"
-                value={formData.saturasiOksigen || ""}
-                onChange={handleChange}
-              />
-            </Section>
-
-            <Section title="Komponen Biomotor">
-              {[
-                ["standingBoardJump", "Tes Standing Board Jump (cm)"],
-                ["kecepatan", "Tes Kecepatan (detik)"],
-                ["dayaTahan", "Tes Daya Tahan (menit)"],
-              ].map(([id, label]) => (
-                <InputField
-                  key={id}
-                  id={id}
-                  label={label}
-                  value={formData[id] || ""}
-                  onChange={handleChange}
-                />
-              ))}
-            </Section>
-
-            <Section title="Keterampilan">
-              {[
-                "controllingKanan",
-                "controllingKiri",
-                "dribbling",
-                "longpassKanan",
-                "longpassKiri",
-                "shortpassKanan",
-                "shortpassKiri",
-                "shootingKanan",
-                "shootingKiri",
-              ].map((id) => (
-                <SelectField
-                  key={id}
-                  id={id}
-                  label={id.replace(/([A-Z])/g, " $1")}
-                  options={kategoriSkala}
-                  value={formData[id] || ""}
-                  onChange={handleChange}
-                />
-              ))}
-            </Section>
-
-            <Section title="Psikologi">
-              {["disiplin", "komitmen", "percayaDiri"].map((id) => (
-                <SelectField
-                  key={id}
-                  id={id}
-                  label={id.charAt(0).toUpperCase() + id.slice(1)}
-                  options={kategoriSkala}
-                  value={formData[id] || ""}
-                  onChange={handleChange}
-                />
-              ))}
-            </Section>
-
-            {/* Cedera dan Komentar berdampingan dan tinggi sama */}
-            <div className="col-span-2 grid grid-cols-1 md:grid-cols-2 gap-4">
-              <TextAreaField
-                label="Detail Cedera"
-                id="injuryDetail"
-                value={formData.injuryDetail || ""}
-                onChange={handleChange}
-                placeholder="Masukkan detail cedera jika ada"
-                className="h-full"
-              />
-              <TextAreaField
-                label="Komentar"
-                id="comment"
-                value={formData.comment || ""}
-                onChange={handleChange}
-                placeholder="Masukkan komentar tambahan di sini..."
-                className="h-full"
-              />
             </div>
-          </form>
-
-          <div className="mt-6 flex gap-3">
-            <button
-              onClick={handleSubmit}
-              className="bg-primary text-white font-semibold px-4 py-2 rounded-md"
-            >
-              Edit
-            </button>
-            <button
-              onClick={() => navigate(-1)}
-              className="bg-gray-200 text-gray-800 font-semibold px-4 py-2 rounded-md"
-            >
-              Batal
-            </button>
-          </div>
+          )}
         </main>
       </div>
     </div>

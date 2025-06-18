@@ -226,7 +226,11 @@ const PenilaianSiswa = () => {
                     <tbody>
                       {filteredSiswa.length > 0 ? (
                         filteredSiswa.map((s) => (
-                          <tr key={s.id} className="border-t border-gray-200 hover:bg-gray-50">
+                          <tr key={s.id} onClick={()=>{
+                            navigate(`/admin/daftartes/penilaian/detail/${s.student.id}?test=${id}&nama=${s.student.name}&tanggal=${toLocal(
+                                    test.date
+                                  )}&grade=${s.id}`)
+                          }} className="border-t border-gray-200 hover:bg-gray-50">
                             <td className="px-4 py-3 font-medium">{s.student.id}</td>
                             <td className="px-4 py-3">{s.student.name}</td>
                             <td className="px-4 py-3">
@@ -237,13 +241,20 @@ const PenilaianSiswa = () => {
                             <td className="px-4 py-3 text-right">
                               <div className="flex justify-end gap-3">
                                 <Link
+                                onClick={e=>{
+                                  e.stopPropagation()
+                                }}
                                   to={`/admin/daftartes/penilaian/edit/${s.student.id}?test=${id}&nama=${s.student.name}&tanggal=${toLocal(
                                     test.date
                                   )}&grade=${s.id}`}
                                 >
                                   <FiEdit className="text-primary w-5 h-5 hover:scale-110" />
                                 </Link>
-                                <button onClick={() => handleOpenModal(s.id)}>
+                                <button onClick={
+                                  (e) =>{
+                                    e.stopPropagation()
+                                    handleOpenModal(s.id)
+                                  }}>
                                   <FiTrash2 className="text-red-600 w-5 h-5 hover:scale-110" />
                                 </button>
                               </div>

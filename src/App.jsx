@@ -44,6 +44,7 @@ import AlreadyLogin from './utils/AlreadyLogin'
 import DetailSiswa from './pages/Admin/Siswa/DetailSiswa'
 import DetailPelatih from './pages/Admin/Pelatih/DetailPelatih'
 import DetailOrangtua from './pages/Admin/Orangtua/DetailOrangTua'
+import DetailPenilaian from './pages/Admin/Penilaian/DetailPenilaian'
 
 
 function App() {
@@ -83,6 +84,7 @@ function App() {
           <Route path="daftartes/penilaian/:id" element={<PenilaianSiswa />} />  
           <Route path="daftartes/penilaian/create/:id" element={<CreatePenilaian />} />  
           <Route path="daftartes/penilaian/edit/:id" element={<EditPenilaian />} />  
+          <Route path="daftartes/penilaian/detail/:id" element={<DetailPenilaian />} />  
           <Route path="kehadiran" element={<Kehadiran/>} />
           <Route path="kehadiran/kalender/:level" element={<KalenderAbsensi/>} />
           <Route path="kehadiran/kalender/absensi/:level" element={<AbsensiTanggal/>} />

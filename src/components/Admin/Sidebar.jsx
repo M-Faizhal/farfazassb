@@ -23,7 +23,7 @@ const AdminSidebar = () => {
   ];
 
 const logout = () => {
-  removeCookie(import.meta.env.VITE_COOKIES_NAME, { path: '/' });
+  removeCookie(import.meta.env.VITE_COOKIES_NAME);
   navigate('/');
 };
   const SidebarContent = (
