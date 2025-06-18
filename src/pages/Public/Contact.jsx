@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import Header from '../../components/Header';
 import Api from '../../utils/Api';
 import { FaPhone, FaEnvelope, FaMapMarkerAlt, FaClock, FaWhatsapp, FaInstagram, FaFacebook, FaPaperPlane, FaCheckCircle } from 'react-icons/fa';
+import emailjs from '@emailjs/browser';
 
 export default function Contact() {
   const [formData, setFormData] = useState({
@@ -44,18 +45,42 @@ export default function Contact() {
     e.preventDefault();
     setIsSubmitting(true);
     
-    setTimeout(() => {
-      setIsSubmitting(false);
+    try {
+      const serviceID = 'service_9x561i7';
+      const templateID = 'template_pgohs6i'; 
+      const publicKey = 'PcenzsLx6x0J584Z5'; 
+      
+      const templateParams = {
+        from_name: formData.name,
+        from_email: formData.email,
+        from_phone: formData.phone,
+        subject: formData.subject,
+        message: formData.message,
+        to_email: 'musthafafaizhal@gmail.com',
+        reply_to: formData.email
+      };
+
+      await emailjs.send(serviceID, templateID, templateParams, publicKey);
+      
       setSubmitStatus('success');
       setFormData({ name: '', email: '', phone: '', subject: '', message: '' });
       
       setTimeout(() => {
         setSubmitStatus(null);
       }, 5000);
-    }, 1500);
+      
+    } catch (error) {
+      console.error('Error sending email:', error);
+      setSubmitStatus('error');
+      
+      setTimeout(() => {
+        setSubmitStatus(null);
+      }, 5000);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
-  // Contact information - updated with Indonesian phone number
   const contactInfo = [
     {
       icon: FaPhone,
@@ -130,7 +155,6 @@ export default function Contact() {
             </p>
           </div>
 
-          {/* Contact Info Cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
             {contactInfo.map((info, index) => (
               <a
@@ -154,9 +178,7 @@ export default function Contact() {
             ))}
           </div>
 
-          {/* Main Content Grid */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
-            {/* Contact Form */}
             <div className="lg:col-span-2 bg-white rounded-2xl shadow-lg p-8 border border-gray-100">
               <div className="flex items-center mb-6">
                 <FaPaperPlane className="text-blue-600 text-2xl mr-3" />
@@ -282,9 +304,7 @@ export default function Contact() {
               </form>
             </div>
 
-            {/* Sidebar */}
             <div className="space-y-8">
-              {/* Operational Hours */}
               <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-100">
                 <div className="flex items-center mb-4">
                   <FaClock className="text-blue-600 text-xl mr-3" />
@@ -300,7 +320,6 @@ export default function Contact() {
                 </div>
               </div>
 
-              {/* Social Media */}
               <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-100">
                 <h3 className="text-xl font-bold text-gray-800 mb-4">Ikuti Media Sosial</h3>
                 <p className="text-gray-600 mb-6 text-sm">Dapatkan update terbaru tentang kegiatan dan prestasi SSB Farfaza</p>
@@ -323,7 +342,6 @@ export default function Contact() {
                 </div>
               </div>
 
-              {/* Quick Stats */}
               <div className="bg-gradient-to-br from-blue-600 to-indigo-600 rounded-2xl shadow-lg p-6 text-white">
                 <h3 className="text-xl font-bold mb-4">Statistik SSB</h3>
                 <div className="space-y-4">
@@ -371,7 +389,7 @@ export default function Contact() {
 
       <footer className="bg-white shadow-inner py-6 text-center text-gray-600 text-sm mt-16">
         <div className="max-w-7xl mx-auto px-6">
-          <p>&copy; 2024 SSB Farfaza. Semua hak cipta dilindungi.</p>
+          <p>&copy; 2025 SSB Farfaza. Semua hak cipta dilindungi.</p>
         </div>
       </footer>
     </div>
